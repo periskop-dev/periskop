@@ -1,0 +1,48 @@
+{
+    "aggregated_errors": [
+        {
+            "aggregation_key": "com.soundcloud.Foon@e28e036e",
+            "total_count": 2,
+            "latest_errors": [
+                {
+                    "error": {
+                        "class": "com.soundcloud.Foo",
+                        "message": "",
+                        "stacktrace": [
+                            "com.soundcloud.Bar"
+                        ],
+                        "cause": null
+                    },
+                    "uuid": "uuid1",
+                    "timestamp": "2018-09-13T16:23:30.630Z",
+                    "http_context": {
+                        "request_method": "GET",
+                        "request_url": "http://url",
+                        "request_headers": {
+                            "Key": "value"
+                        }
+                    }
+                },
+                {
+                    "error": {
+                        "class": "com.soundcloud.Foo",
+                        "message": "",
+                        "stacktrace": [
+                            "com.soundcloud.Bar"
+                        ],
+                        "cause": null
+                    },
+                    "uuid": "uuid2",
+                    "timestamp": "2018-09-13T16:25:30.630Z",
+                    "http_context": {
+                        "request_method": "GET",
+                        "request_url": "http://url",
+                        "request_headers": {
+                            "Key": "value"
+                        }
+                    }
+                }
+            ]
+        }
+    ]
+}

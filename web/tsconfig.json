@@ -1,0 +1,25 @@
+{
+  "compilerOptions": {
+    "baseUrl": "./src",
+    "declaration": false,
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "lib": [
+      "es2016",
+      "dom"
+    ],
+    "mapRoot": "./",
+    "module": "es2015",
+    "moduleResolution": "node",
+    "outDir": "./out-tsc",
+    "sourceMap": true,
+    "target": "es5",
+    "jsx": "react",
+    "typeRoots": [
+      "./node_modules/@types"
+    ]
+  },
+  "include": [
+    "./src/**/*"
+  ]
+}

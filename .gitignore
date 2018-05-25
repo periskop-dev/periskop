@@ -1,0 +1,13 @@
+web/node_modules
+web/dist
+web/build
+.vscode
+.DS_STORE
+web/.module-cache
+*.log*
+.cache
+.config
+.kube
+target/
+periskop
+web/lint-reports

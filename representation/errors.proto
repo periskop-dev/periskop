@@ -1,0 +1,32 @@
+syntax = "proto3";
+package com.soundcloud.periskop;
+
+message Errors {
+    repeated AggregatedError aggregatedErrors = 1;
+}
+
+message AggregatedError {
+    string aggregationKey = 1;
+    int64 totalCount = 2;
+    repeated ErrorInstance latestErrors = 3; // A list of the last N error instances
+}
+
+message ErrorInstance {
+    Error error = 1;
+    string uuid = 2;
+    string timestamp = 3; // RFC3339 format
+    HttpContext httpContext = 4;
+}
+
+message Error {
+    string class = 1;
+    string message = 2;
+    repeated string stacktrace = 3; // An ordered list of stack trace lines
+    Error cause = 4; // For exceptions triggered by other exceptions
+}
+
+message HttpContext {
+    string requestMethod = 1;
+    string requestUrl = 2;
+    map<string, string> requestHeaders = 3;
+}

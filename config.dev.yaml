@@ -1,0 +1,17 @@
+services:
+  - name: service1
+    service_discovery:
+      name: service1.host
+      refresh_interval: 45s
+      type: SRV
+    scraper:
+      endpoint: /-/exceptions
+      refresh_interval: 30s
+  - name: service2
+    service_discovery:
+      name: service2.host
+      refresh_interval: 45s
+      type: SRV
+    scraper:
+      endpoint: /-/exceptions
+      refresh_interval: 15s
