@@ -15,7 +15,7 @@ A UI component is provided for convenience.
 
 Errors are scraped and aggregated using a configured endpoint from each of the instances discovered via service discovery.
 
-At the moment, only DNS service discovery is supported. See the [sample configuration](config.dev.yaml.sample).
+At the moment, only DNS service discovery is supported. See the [sample configuration](config.dev.yaml).
 
 ## Format
 
