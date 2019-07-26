@@ -1,0 +1,19 @@
+build_web_task:
+  container:
+    image: node:latest
+  node_modules_cache:
+    folder: node_modules
+    fingerprint_script: cat web/package-lock.json
+    populate_script: make ci-setup-web
+  build_script: make build-web
+
+build_api_task:
+  container:
+    image: golang:latest
+  env:
+    GOPROXY: https://proxy.golang.org
+  modules_cache:
+    fingerprint_script: cat go.sum
+    folder: $GOPATH/pkg/mod
+  build_script: make build-api
+  test_script: make test-api
