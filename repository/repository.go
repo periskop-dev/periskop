@@ -14,7 +14,7 @@ type ErrorWithContext struct {
 	Error       ErrorInstance `json:"error"`
 	UUID        string        `json:"uuid"`
 	Timestamp   int64         `json:"timestamp"`
-	HTTPContext HttpContext   `json:"http_context"`
+	HTTPContext HTTPContext   `json:"http_context"`
 }
 
 type ErrorInstance struct {
@@ -24,7 +24,7 @@ type ErrorInstance struct {
 	Cause      *error   `json:"cause"`
 }
 
-type HttpContext struct {
+type HTTPContext struct {
 	RequestMethod  string            `json:"request_method"`
 	RequestURL     string            `json:"request_url"`
 	RequestHeaders map[string]string `json:"request_headers"`
@@ -73,5 +73,5 @@ func (r inMemoryRepository) GetErrors(serviceName string, numberOfErrors int) ([
 
 		return result, nil
 	}
-	return nil, fmt.Errorf("Service %s not found", serviceName)
+	return nil, fmt.Errorf("service %s not found", serviceName)
 }

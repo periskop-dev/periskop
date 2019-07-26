@@ -22,11 +22,11 @@ type Processor struct {
 
 func (p Processor) Run() {
 	for i := 1; i <= p.numWorkers; i++ {
-		go worker(i, p)
+		go worker(p)
 	}
 }
 
-func worker(id int, p Processor) {
+func worker(p Processor) {
 	for {
 		select {
 		case r := <-p.requestsChannel:

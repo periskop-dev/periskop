@@ -38,7 +38,8 @@ func extractServiceName(url string) (string, error) {
 	return "", errors.New("invalid path")
 }
 
-func errorsForService(w http.ResponseWriter, r repository.ErrorsRepository, service string, numberOfOccurrencesPerError int) {
+func errorsForService(w http.ResponseWriter, r repository.ErrorsRepository,
+	service string, numberOfOccurrencesPerError int) {
 	if repoErrors, err := r.GetErrors(service, numberOfOccurrencesPerError); err == nil {
 		renderJSON(w, repoErrors)
 	} else {
