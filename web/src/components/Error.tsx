@@ -1,7 +1,7 @@
 import * as React from "react"
 import { ListGroup, ListGroupItem, Table } from "react-bootstrap"
 import * as moment from "moment"
-import { AggregatedError, Error, HttpContext } from "data/types"
+import { AggregatedError, Error, HttpContext, Headers } from "data/types"
 
 interface Props {
   activeError: AggregatedError
@@ -75,14 +75,16 @@ const ErrorComponent =  (props: Props) => {
       return ""
     }
 
-    let headers: string = Object.keys(context.request_headers).reduce(function(headersString, key) {
-      return `${headersString}-H "${key}: ${context.request_headers[key]}" `
+    let headers: Headers = context.request_headers == null ? {} : context.request_headers
+
+    let headersString: string = Object.keys(headers).reduce(function(headersString, key) {
+      return `${headersString}-H "${key}: ${headers[key]}" `
     }, "")
 
     return (
       <ListGroupItem>
         <h4 className="list-group-item-heading"> Curl</h4>
-        <pre>curl -X { context.request_method } {headers} {context.request_url}</pre>
+        <pre>curl -X { context.request_method } {headersString} {context.request_url}</pre>
       </ListGroupItem>
     )
   }
@@ -94,6 +96,16 @@ const ErrorComponent =  (props: Props) => {
         <td>{`${value}`}</td>
       </tr>
     )
+  }
+
+  const renderContextHeaders = (context: HttpContext) => {
+    if (context.request_headers == null) {
+      return ''
+    } else {
+      Object.keys(context.request_headers).map(function(key) {
+        return renderContextHeadersRow(key, context.request_headers[key])
+      })
+    }
   }
 
   const renderHttpContext = (context: HttpContext) => {
@@ -117,11 +129,7 @@ const ErrorComponent =  (props: Props) => {
             <h4 className="list-group-item-heading"> Headers</h4>
             <Table striped>
               <tbody>
-                {
-                  Object.keys(context.request_headers).map(function(key) {
-                    return renderContextHeadersRow(key, context.request_headers[key])
-                  })
-                }
+                { renderContextHeaders(context) }
               </tbody>
             </Table>
           </ListGroupItem>
