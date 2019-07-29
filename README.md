@@ -1,5 +1,7 @@
 # Periskop
 
+[![Build Status](https://api.cirrus-ci.com/github/soundcloud/periskop.svg)](https://cirrus-ci.com/github/soundcloud/periskop)
+
 Pull based, language agnostic exception aggregator for microservice environments.
 
 Periskop scales well with the number of exceptions and application instances:
