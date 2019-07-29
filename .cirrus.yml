@@ -10,6 +10,7 @@ task:
   build_script: make build-web
 
 build_api_task:
+  name: Build Api
   container:
     image: golang:latest
   env:
