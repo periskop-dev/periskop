@@ -9,7 +9,7 @@ task:
     populate_script: make ci-setup-web
   build_script: make build-web
 
-build_api_task:
+task:
   name: Build Api
   container:
     image: golang:latest
