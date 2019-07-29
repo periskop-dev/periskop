@@ -1,4 +1,6 @@
-build_web_task:
+task:
+  name: Build Web
+  skip: "!changesInclude('.cirrus.yml', 'web/**')"
   container:
     image: node:latest
   node_modules_cache:
