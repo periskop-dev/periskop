@@ -8,7 +8,11 @@ task:
     fingerprint_script: cat web/package-lock.json
     populate_script: make ci-setup-web
   build_script: make build-web
-
+task:
+  name: Lint Api
+  container:
+    image: golangci/golangci-lint:v1.17
+  lint_script: make lint-api
 task:
   name: Build Api
   container:

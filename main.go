@@ -15,6 +15,8 @@ import (
 	"github.com/soundcloud/periskop/servicediscovery"
 )
 
+const numOfProcessors = 8
+
 func main() {
 
 	var (
@@ -36,17 +38,17 @@ func main() {
 	}
 
 	log.Printf("Using configFile %s", *configurationFile)
-	config, err := config.LoadFile(*configurationFile)
+	cfg, err := config.LoadFile(*configurationFile)
 	if err != nil {
 		panic(err)
 	}
 
-	processor := scraper.NewProcessor(8)
+	processor := scraper.NewProcessor(numOfProcessors)
 	processor.Run()
-	repository := repository.NewInMemory()
-	for _, service := range config.Services {
+	repo := repository.NewInMemory()
+	for _, service := range cfg.Services {
 		resolver := servicediscovery.NewResolver(service)
-		s := scraper.NewScraper(resolver, &repository, service, processor)
+		s := scraper.NewScraper(resolver, &repo, service, processor)
 		go s.Scrape()
 	}
 
@@ -58,7 +60,7 @@ func main() {
 	fs := http.FileServer(http.Dir(webFolder))
 	http.Handle("/", fs)
 
-	http.Handle("/services/", api.NewHandler(repository))
+	http.Handle("/services/", api.NewHandler(repo))
 
 	address := fmt.Sprintf(":%s", *port)
 	log.Printf("Serving on address %s", address)
@@ -66,5 +68,8 @@ func main() {
 }
 
 func healthHandler(w http.ResponseWriter, r *http.Request) {
-	w.Write([]byte("OK"))
+	_, err := w.Write([]byte("OK"))
+	if err != nil {
+		log.Fatalf("error running health handler")
+	}
 }

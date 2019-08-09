@@ -28,3 +28,6 @@ build-api:
 
 test-api:
 	GO111MODULE=on go test ./...
+
+lint-api:
+	golangci-lint run

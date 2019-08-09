@@ -40,7 +40,8 @@ type Scraper struct {
 	processor     Processor
 }
 
-func NewScraper(resolver servicediscovery.SRVResolver, r *repository.ErrorsRepository, serviceConfig config.Service, processor Processor) Scraper {
+func NewScraper(resolver servicediscovery.SRVResolver, r *repository.ErrorsRepository,
+	serviceConfig config.Service, processor Processor) Scraper {
 	return Scraper{
 		Resolver:      resolver,
 		Repository:    r,
@@ -61,26 +62,22 @@ func (scraper Scraper) Scrape() {
 
 		case newResult := <-resolutions:
 			resolvedAddresses = newResult
-			log.Printf("Received new dns resolution result for %s. Address resolved: %d\n", serviceConfig.Name, len(resolvedAddresses.Addresses))
+			log.Printf("Received new dns resolution result for %s. Address resolved: %d\n", serviceConfig.Name,
+				len(resolvedAddresses.Addresses))
 
 		case <-timer.C:
 			timer.Stop()
 			var currentAggregatedErrorsMap = make(errorAggregateMap)
-			for responsePayload := range scrapeInstances(resolvedAddresses.Addresses, serviceConfig.Scraper.Endpoint, scraper.processor) {
+			for responsePayload := range scrapeInstances(resolvedAddresses.Addresses, serviceConfig.Scraper.Endpoint,
+				scraper.processor) {
 				currentAggregatedErrorsMap.combine(responsePayload)
 			}
 			store(serviceConfig.Name, scraper.Repository, currentAggregatedErrorsMap)
-			log.Printf("%s: scraped %d errors from %d instances", serviceConfig.Name, len(currentAggregatedErrorsMap), len(resolvedAddresses.Addresses))
+			log.Printf("%s: scraped %d errors from %d instances", serviceConfig.Name,
+				len(currentAggregatedErrorsMap), len(resolvedAddresses.Addresses))
 			timer.Reset(scraper.ServiceConfig.Scraper.RefreshInterval)
 		}
 	}
-}
-
-func scheduleNextScrape(d time.Duration, t chan time.Time) {
-	timer := time.NewTimer(d)
-	defer timer.Stop()
-	v := <-timer.C
-	t <- v
 }
 
 func scrapeInstances(addresses []string, endpoint string, processor Processor) <-chan []errorAggregate {
@@ -130,7 +127,7 @@ func toRepositoryErrorsWithContent(occurrences []errorWithContext) []repository.
 				Stacktrace: occurrence.Error.Stacktrace,
 				Cause:      nil, //TODO map the cause recursively
 			},
-			HTTPContext: repository.HttpContext{
+			HTTPContext: repository.HTTPContext{
 				RequestHeaders: occurrence.HTTPContext.RequestHeaders,
 				RequestMethod:  occurrence.HTTPContext.RequestMethod,
 				RequestURL:     occurrence.HTTPContext.RequestURL,

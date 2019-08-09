@@ -13,8 +13,8 @@ func TestCombineErrorsSortsByTimestamp(t *testing.T) {
 	var firstResponsePayload responsePayload
 	var secondResponsePayload responsePayload
 
-	json.Unmarshal(firstContent, &firstResponsePayload)
-	json.Unmarshal(secondContent, &secondResponsePayload)
+	json.Unmarshal(firstContent, &firstResponsePayload)  // nolint[errcheck]
+	json.Unmarshal(secondContent, &secondResponsePayload) // nolint[errcheck]
 
 	firstOccurrences := firstResponsePayload.ErrorAggregate[0].LatestErrors
 	secondOccurrences := secondResponsePayload.ErrorAggregate[0].LatestErrors
