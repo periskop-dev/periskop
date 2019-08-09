@@ -8,7 +8,16 @@ task:
     fingerprint_script: cat web/package-lock.json
     populate_script: make ci-setup-web
   build_script: make build-web
-
+task:
+  name: Lint Api
+  container:
+    image: golangci-lint:v1.17
+  env:
+    GOPROXY: https://proxy.golang.org
+  modules_cache:
+    fingerprint_script: cat go.sum
+    folder: $GOPATH/pkg/mod
+  lint_script: make lint-api
 task:
   name: Build Api
   container:
@@ -20,4 +29,3 @@ task:
     folder: $GOPATH/pkg/mod
   build_script: make build-api
   test_script: make test-api
-  lint_script: make lint
