@@ -11,7 +11,7 @@ task:
 task:
   name: Lint Api
   container:
-    image: golangci-lint:v1.17
+    image: golangci/golangci-lint:v1.17
   env:
     GOPROXY: https://proxy.golang.org
   modules_cache:
