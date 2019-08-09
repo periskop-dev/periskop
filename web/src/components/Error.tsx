@@ -102,7 +102,7 @@ const ErrorComponent =  (props: Props) => {
     if (context.request_headers == null) {
       return ''
     } else {
-      Object.keys(context.request_headers).map(function(key) {
+      return Object.keys(context.request_headers).map(function(key) {
         return renderContextHeadersRow(key, context.request_headers[key])
       })
     }
