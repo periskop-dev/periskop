@@ -28,7 +28,7 @@ const ErrorComponent =  (props: Props) => {
   }
 
   const renderStackTrace = (stackTrace: string[]) => {
-    if (stackTrace == null || stackTrace.length == 0) {
+    if (stackTrace === null || stackTrace.length === 0) {
       return ""
     }
     const trace =  stackTrace.map((line) => line + "\n")
@@ -45,7 +45,7 @@ const ErrorComponent =  (props: Props) => {
   }
 
   const renderCause = (cause: Error) => {
-    if (cause == null) {
+    if (cause === null) {
       return ""
     }
 
@@ -58,7 +58,7 @@ const ErrorComponent =  (props: Props) => {
   }
 
   const renderMessage = (message: string) => {
-    if (message == null || message.trim().length == 0) {
+    if (message === null || message.trim().length === 0) {
       return ""
     }
 
@@ -91,7 +91,7 @@ const ErrorComponent =  (props: Props) => {
 
   const renderContextHeadersRow = (key: string, value: string) => {
     return (
-      <tr>
+      <tr key={key}>
         <td>{`${key}`}</td>
         <td>{`${value}`}</td>
       </tr>
@@ -100,7 +100,7 @@ const ErrorComponent =  (props: Props) => {
 
   const renderContextHeaders = (context: HttpContext) => {
     if (context.request_headers == null) {
-      return ''
+      return ""
     } else {
       return Object.keys(context.request_headers).map(function(key) {
         return renderContextHeadersRow(key, context.request_headers[key])

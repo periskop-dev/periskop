@@ -77,7 +77,7 @@ function errorsReducer(state = initialState, action: ErrorsAction) {
         case RemoteData.SUCCESS:
           return {
             ...state,
-            activeError: state.errors.data.find(e => e.aggregation_key == action.errorKey)
+            activeError: state.errors.data.find(e => e.aggregation_key === action.errorKey)
           }
         default: {
           return state
