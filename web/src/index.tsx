@@ -18,11 +18,13 @@ const history = createHashHistory()
 render(
     <Provider store={store}>
         <Router history={history}>
-            <div>
+            <div className="app-container">
                 <NavbarComponent />
-                <Route exact path="/" component={Home}/>
-                <Route exact path="/:service" component={App}/>
-                <Route path="/:service/errors/:errorKey" component={App}/>
+                <main className="app-content">
+                    <Route exact path="/" component={Home}/>
+                    <Route exact path="/:service" component={App}/>
+                    <Route path="/:service/errors/:errorKey" component={App}/>
+                </main>
             </div>
         </Router>
     </Provider>,

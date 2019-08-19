@@ -53,7 +53,7 @@ class App extends React.Component<Props> {
     if (RemoteData.isSuccess(this.props.errors)) {
       let activeError = this.props.errors.data.find(e => e.aggregation_key === this.props.match.params.errorKey)
       if (
-        activeError != undefined &&
+        activeError !== undefined &&
         (this.props.activeError !== this.props.match.params.errorKey) &&
         !RemoteData.isLoading(this.props.errors)) {
           this.props.setActiveError(activeError.aggregation_key)
@@ -89,9 +89,9 @@ class App extends React.Component<Props> {
 
   render() {
     return (
-      <div>
-          <Grid fluid>
-            <Row className="show-grid">
+      <div className="app-component">
+          <Grid fluid className="app-component-grid">
+            <Row className="app-component-row">
               <Col xs={3} id="left-column">
                 {this.renderSideBar()}
               </Col>
