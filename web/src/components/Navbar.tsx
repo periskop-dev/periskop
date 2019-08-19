@@ -74,21 +74,29 @@ class NavbarComponent extends React.Component<Props, {}> {
 
   render() {
     return (
-      <Navbar fluid inverse collapseOnSelect staticTop>
+        <Navbar
+          fluid
+          inverse
+          collapseOnSelect
+          fixedTop
+        >
         <Navbar.Header>
           <Navbar.Brand>
             <a href="/">Periskop</a>
           </Navbar.Brand>
+          <Navbar.Toggle/>
         </Navbar.Header>
-        <Nav>
-          <NavDropdown title={this.props.activeService ? this.props.activeService : "Service"} id="project-nav-dropdown">
-          {this.renderServicesInDropdown()}
-          </NavDropdown>
-        </Nav>
-        <Nav pullRight>
-          {this.renderRefreshButton()}
-        </Nav>
-        <Navbar.Text pullRight>{this.renderUpdatedAt()}</Navbar.Text>
+        <Navbar.Collapse>
+          <Nav>
+            <NavDropdown title={this.props.activeService ? this.props.activeService : "Service"} id="project-nav-dropdown">
+            {this.renderServicesInDropdown()}
+            </NavDropdown>
+          </Nav>
+          <Nav pullRight>
+            {this.renderRefreshButton()}
+          </Nav>
+          <Navbar.Text pullRight>{this.renderUpdatedAt()}</Navbar.Text>
+        </Navbar.Collapse>
       </Navbar>
     )
   }

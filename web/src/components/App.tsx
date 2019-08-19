@@ -89,9 +89,9 @@ class App extends React.Component<Props> {
 
   render() {
     return (
-      <div>
-          <Grid fluid>
-            <Row className="show-grid">
+      <div className="app-component">
+          <Grid fluid className="app-component-grid">
+            <Row className="app-component-row">
               <Col xs={3} id="left-column">
                 {this.renderSideBar()}
               </Col>
