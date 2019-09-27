@@ -7,6 +7,7 @@ import (
 type ErrorAggregate struct {
 	AggregationKey string             `json:"aggregation_key"`
 	TotalCount     int                `json:"total_count"`
+	Severity       string             `json:"severity"`
 	LatestErrors   []ErrorWithContext `json:"latest_errors"`
 }
 
@@ -14,6 +15,7 @@ type ErrorWithContext struct {
 	Error       ErrorInstance `json:"error"`
 	UUID        string        `json:"uuid"`
 	Timestamp   int64         `json:"timestamp"`
+	Severity    string        `json:"severity"`
 	HTTPContext HTTPContext   `json:"http_context"`
 }
 

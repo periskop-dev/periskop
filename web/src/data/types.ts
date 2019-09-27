@@ -18,12 +18,14 @@ export interface Error {
     "cause"?: Error
   },
   "timestamp"?: number,
+  "severity"?: string,
   "http_context"?: HttpContext
 }
 
 export interface AggregatedError {
   "aggregation_key"?: string,
   "total_count"?: number,
+  "severity"?: string,
   "latest_errors"?: Error
 }
 
