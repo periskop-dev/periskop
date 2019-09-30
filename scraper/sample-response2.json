@@ -3,6 +3,7 @@
         {
             "aggregation_key": "com.soundcloud.Foon@e28e036e",
             "total_count": 2,
+            "severity": "error",
             "latest_errors": [
                 {
                     "error": {
@@ -15,6 +16,7 @@
                     },
                     "uuid": "uuid3",
                     "timestamp": "2018-09-13T16:24:30.630Z",
+                    "severity": "error",
                     "http_context": {
                         "request_method": "GET",
                         "request_url": "http://url",
@@ -34,6 +36,7 @@
                     },
                     "uuid": "uuid4",
                     "timestamp": "2018-09-13T16:26:30.630Z",
+                    "severity": "error",
                     "http_context": {
                         "request_method": "GET",
                         "request_url": "http://url",

@@ -19,6 +19,7 @@ func (errorAggregateMap errorAggregateMap) combine(aggregatedErrors []errorAggre
 			errorAggregateMap[item.AggregationKey] = errorAggregate{
 				TotalCount:     existing.TotalCount + item.TotalCount,
 				AggregationKey: existing.AggregationKey,
+				Severity:       item.Severity,
 				LatestErrors:   combine(existing.LatestErrors, item.LatestErrors),
 			}
 		} else {
@@ -108,6 +109,7 @@ func store(serviceName string, r *repository.ErrorsRepository, m errorAggregateM
 	for _, value := range m {
 		errors = append(errors, repository.ErrorAggregate{
 			AggregationKey: value.AggregationKey,
+			Severity:       severityWithFallback(value.Severity),
 			TotalCount:     value.TotalCount,
 			LatestErrors:   toRepositoryErrorsWithContent(value.LatestErrors),
 		})
@@ -120,6 +122,7 @@ func toRepositoryErrorsWithContent(occurrences []errorWithContext) []repository.
 	for _, occurrence := range occurrences {
 		errors = append(errors, repository.ErrorWithContext{
 			Timestamp: occurrence.Timestamp.Unix(),
+			Severity:  severityWithFallback(occurrence.Severity),
 			UUID:      occurrence.UUID,
 			Error: repository.ErrorInstance{
 				Class:      occurrence.Error.Class,
@@ -135,4 +138,11 @@ func toRepositoryErrorsWithContent(occurrences []errorWithContext) []repository.
 		})
 	}
 	return errors
+}
+
+func severityWithFallback(severity string) string {
+	if severity == "" {
+		return "error"
+	}
+	return severity
 }

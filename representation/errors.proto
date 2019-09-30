@@ -8,14 +8,16 @@ message Errors {
 message AggregatedError {
     string aggregationKey = 1;
     int64 totalCount = 2;
-    repeated ErrorInstance latestErrors = 3; // A list of the last N error instances
+    string severity = 3; // Either info, warning or error
+    repeated ErrorInstance latestErrors = 4; // A list of the last N error instances
 }
 
 message ErrorInstance {
     Error error = 1;
     string uuid = 2;
     string timestamp = 3; // RFC3339 format
-    HttpContext httpContext = 4;
+    string severity = 4;
+    HttpContext httpContext = 5;
 }
 
 message Error {

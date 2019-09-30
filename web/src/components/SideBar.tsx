@@ -1,3 +1,4 @@
+import "SideBar.less"
 import * as React from "react";
 import { ListGroup, ListGroupItem } from "react-bootstrap";
 
@@ -22,6 +23,16 @@ interface DefaultsProps {
 
 type Props = ConnectedProps & DispatchProps & DefaultsProps & RouteComponentProps<{service: string}>
 
+const sidebarItemClass = (error: AggregatedError): string => {
+  if (error.severity === "info") {
+    return "sidebar-item-info"
+  } else if (error.severity === "warning") {
+    return "sidebar-item-warning"
+  } else {
+    return "sidebar-item-error"
+  }
+}
+
 const SideBar = (props: Props) => {
 
   const renderNavItems = () => {
@@ -30,7 +41,7 @@ const SideBar = (props: Props) => {
     } else {
       return props.errors.map((error, index) => {
         return (
-          <ListGroupItem className="sidebar-item" onClick={_ => props.handleErrorSelect(error.aggregation_key)} active={ props.activeError === undefined ? false : error.aggregation_key === props.activeError.aggregation_key } key={index}>
+          <ListGroupItem className={"sidebar-item" + " " + sidebarItemClass(error)} onClick={_ => props.handleErrorSelect(error.aggregation_key)} active={ props.activeError === undefined ? false : error.aggregation_key === props.activeError.aggregation_key } key={index}>
             {error.aggregation_key} <span className="badge">{error.total_count}</span>
           </ListGroupItem>
         )

@@ -9,6 +9,7 @@ type responsePayload struct {
 type errorAggregate struct {
 	AggregationKey string             `json:"aggregation_key"`
 	TotalCount     int                `json:"total_count"`
+	Severity       string             `json:"severity"`
 	LatestErrors   []errorWithContext `json:"latest_errors"`
 }
 
@@ -16,6 +17,7 @@ type errorWithContext struct {
 	Error       errorInstance `json:"error"`
 	UUID        string        `json:"uuid"`
 	Timestamp   time.Time     `json:"timestamp"`
+	Severity    string        `json:"severity"`
 	HTTPContext httpContext   `json:"http_context"`
 }
 

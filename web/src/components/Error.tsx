@@ -152,6 +152,10 @@ const ErrorComponent =  (props: Props) => {
             {props.activeError.total_count}
           </ListGroupItem>
           <ListGroupItem>
+            <h4 className="list-group-item-heading"> Severity</h4>
+            {props.activeError.severity}
+          </ListGroupItem>
+          <ListGroupItem>
             <h4 className="list-group-item-heading"> Last Occurrence</h4>
             {renderLastOccurrence(props.activeError.latest_errors[0].timestamp)}
           </ListGroupItem>
