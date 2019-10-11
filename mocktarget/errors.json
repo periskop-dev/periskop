@@ -1,0 +1,56 @@
+{
+    "aggregated_errors": [
+        {
+            "aggregation_key": "java.lang.RuntimeException@123",
+            "total_count": 250,
+            "severity": "error",
+            "latest_errors": [
+                {
+                    "error": {
+                        "class": "java.lang.RuntimeException",
+                        "message": "Nooooes!",
+                        "stacktrace": [],
+                        "cause": null
+                    },
+                    "uuid": "e81e56ff-7f65-4279-817f-dd607585b9e0",
+                    "timestamp": "2019-10-11T12:46:25.595Z",
+                    "severity": "error",
+                    "http_context": {
+                        "request_method": "GET",
+                        "request_url": "http://badrequest.org/me",
+                        "request_headers": {
+                            "accept": "application/json",
+                            "host": "badrequest.org"
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "aggregation_key": "java.lang.Exception@456",
+            "total_count": 44,
+            "severity": "warning",
+            "latest_errors": [
+                {
+                    "error": {
+                        "class": "java.lang.Exception",
+                        "message": "Something bad",
+                        "stacktrace": [],
+                        "cause": null
+                    },
+                    "uuid": "e81e56ff-7f65-4279-1234-dd6075855555",
+                    "timestamp": "2019-09-11T11:46:25.333Z",
+                    "severity": "error",
+                    "http_context": {
+                        "request_method": "GET",
+                        "request_url": "http://badrequest.org/another-endpoint",
+                        "request_headers": {
+                            "accept": "application/json",
+                            "host": "badrequest.org"
+                        }
+                    }
+                }
+            ]
+        }
+    ]
+}

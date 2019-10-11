@@ -33,6 +33,7 @@ func NewResolver(c config.Service) SRVResolver {
 		Names:           names,
 		RefreshInterval: d,
 		Type:            c.ServiceDiscovery.Type,
+		Port:            c.ServiceDiscovery.Port,
 	}
 	return SRVResolver{
 		dnsConfig: dnsConfig,

@@ -1,4 +1,4 @@
-.PHONY: clean run-web
+.PHONY: clean setup-web ci-setup-web build-web run-api run-mock-target run-web run build-api test-api lint-api
 
 WEB_FOLDER := web
 PORT := 7777
@@ -17,6 +17,9 @@ build-web:
 
 run-api:
 	GO111MODULE=on go build -o periskop && ./periskop -port=$(PORT) -config ./config.dev.yaml
+
+run-mock-target:
+	GO111MODULE=on go build -o mock-target mocktarget/mocktarget.go && ./mock-target
 
 run-web:
 	npm start --prefix $(WEB_FOLDER)
