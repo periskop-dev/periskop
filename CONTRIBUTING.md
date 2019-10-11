@@ -37,6 +37,14 @@ Run everything (note that a different port will be used):
 make run
 ```
 
+Periskop needs something to scrape in order to show errors in the UI. In development, a mock target returning
+static responses can be used for this purpose (periskop is configured to point to it by default). To run the mock
+server:
+
+```bash
+make run-mock-target
+```
+
 ## Testing
 
 Running the API tests:

@@ -10,4 +10,5 @@ web/.module-cache
 .kube
 target/
 periskop
+mock-target
 web/lint-reports

@@ -22,6 +22,7 @@ type ServiceDiscovery struct {
 	Name            string        `yaml:"name"`
 	Type            string        `yaml:"type"`
 	RefreshInterval time.Duration `yaml:"refresh_interval"`
+	Port            int           `yaml:"port"`
 }
 
 type Scraper struct {
