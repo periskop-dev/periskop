@@ -7,4 +7,4 @@ services:
       port: 7778
     scraper:
       endpoint: /errors
-      refresh_interval: 30s
+      refresh_interval: 10s
