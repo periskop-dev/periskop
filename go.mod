@@ -13,7 +13,7 @@ require (
 	github.com/prometheus/client_model v0.0.0-20171117100541-99fa1f4be8e5
 	github.com/prometheus/common v0.0.0-20180518154759-7600349dcfe1
 	github.com/prometheus/procfs v0.0.0-20180705121852-ae68e2d4c00f
-	github.com/prometheus/prometheus v2.3.1+incompatible
+	github.com/prometheus/prometheus v2.5.0+incompatible
 	golang.org/x/crypto v0.0.0-20180621125126-a49355c7e3f8
 	golang.org/x/net v0.0.0-20180706051357-32a936f46389
 	gopkg.in/yaml.v2 v2.2.1
