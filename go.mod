@@ -5,7 +5,7 @@ require (
 	github.com/go-kit/kit v0.0.0-20170320090536-04dd4f741c6e
 	github.com/go-logfmt/logfmt v0.3.0
 	github.com/go-stack/stack v1.7.0
-	github.com/golang/protobuf v1.1.0
+	github.com/golang/protobuf v1.3.2
 	github.com/kr/logfmt v0.0.0-20140226030751-b84e30acd515
 	github.com/matttproud/golang_protobuf_extensions v1.0.1
 	github.com/miekg/dns v1.0.4
