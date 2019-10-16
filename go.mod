@@ -8,7 +8,7 @@ require (
 	github.com/golang/protobuf v1.3.2
 	github.com/kr/logfmt v0.0.0-20140226030751-b84e30acd515
 	github.com/matttproud/golang_protobuf_extensions v1.0.1
-	github.com/miekg/dns v1.0.4
+	github.com/miekg/dns v1.1.22
 	github.com/prometheus/client_golang v0.0.0-20180416233856-82f5ff156b29
 	github.com/prometheus/client_model v0.0.0-20171117100541-99fa1f4be8e5
 	github.com/prometheus/common v0.0.0-20180518154759-7600349dcfe1
