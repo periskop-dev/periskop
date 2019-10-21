@@ -32,7 +32,7 @@
     "@types/react": "~16.9.9",
     "@types/react-addons-test-utils": "~0.14.17",
     "@types/react-bootstrap": "^0.32.10",
-    "@types/react-dom": "~0.14.23",
+    "@types/react-dom": "~16.9.2",
     "@types/react-redux": "^6.0.6",
     "@types/react-router": "^4.0.30",
     "css-loader": "^3.1.0",
