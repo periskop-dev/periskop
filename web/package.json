@@ -29,7 +29,7 @@
   "devDependencies": {
     "@types/jasmine": "~2.5.46",
     "@types/node": "~6.0.60",
-    "@types/react": "~16.9.6",
+    "@types/react": "~16.9.9",
     "@types/react-addons-test-utils": "~0.14.17",
     "@types/react-bootstrap": "^0.32.10",
     "@types/react-dom": "~0.14.23",
