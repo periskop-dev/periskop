@@ -41,7 +41,7 @@
     "html-webpack-plugin": "~2.28.0",
     "jasmine-core": "~2.5.2",
     "karma": "^4.2.0",
-    "karma-cli": "~1.0.1",
+    "karma-cli": "~2.0.0",
     "karma-jasmine": "~1.1.0",
     "karma-mocha-reporter": "~2.2.3",
     "karma-phantomjs-launcher": "~1.0.4",
