@@ -1,7 +1,7 @@
-export const IDLE = "checkout/remoteDataStatus/IDLE";
-export const LOADING = "checkout/remoteDataStatus/LOADING";
-export const FAILURE = "checkout/remoteDataStatus/FAILURE";
-export const SUCCESS = "checkout/remoteDataStatus/SUCCESS";
+export const IDLE = "periskop/remoteDataStatus/IDLE";
+export const LOADING = "periskop/remoteDataStatus/LOADING";
+export const FAILURE = "periskop/remoteDataStatus/FAILURE";
+export const SUCCESS = "periskop/remoteDataStatus/SUCCESS";
 
 type RemoteDataSuccess<Payload> = {
   status: typeof SUCCESS;
