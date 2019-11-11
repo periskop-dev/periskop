@@ -34,7 +34,7 @@
     "@types/react-bootstrap": "^0.32.10",
     "@types/react-dom": "~0.14.23",
     "@types/react-redux": "^6.0.6",
-    "@types/react-router": "^4.0.30",
+    "@types/react-router": "^5.1.2",
     "css-loader": "^3.1.0",
     "extract-text-webpack-plugin": "~2.1.0",
     "file-loader": "~0.10.1",
