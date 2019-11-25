@@ -16,5 +16,5 @@ require (
 	github.com/prometheus/prometheus v2.5.0+incompatible
 	golang.org/x/crypto v0.0.0-20180621125126-a49355c7e3f8
 	golang.org/x/net v0.0.0-20180706051357-32a936f46389
-	gopkg.in/yaml.v2 v2.2.4
+	gopkg.in/yaml.v2 v2.2.7
 )
