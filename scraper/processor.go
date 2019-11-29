@@ -56,7 +56,6 @@ type ErrorsFetcher func(string) ([]errorAggregate, error)
 
 func defaultErrorsFetcher() ErrorsFetcher {
 	return func(target string) ([]errorAggregate, error) {
-
 		body, err := fetch(target)
 		if err != nil {
 			return nil, err
