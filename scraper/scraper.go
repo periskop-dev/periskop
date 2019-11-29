@@ -9,6 +9,7 @@ import (
 	"github.com/soundcloud/periskop/config"
 	"github.com/soundcloud/periskop/repository"
 	"github.com/soundcloud/periskop/servicediscovery"
+	"github.com/soundcloud/periskop/metrics"
 )
 
 type errorAggregateMap map[string]errorAggregate
@@ -74,8 +75,11 @@ func (scraper Scraper) Scrape() {
 				currentAggregatedErrorsMap.combine(responsePayload)
 			}
 			store(serviceConfig.Name, scraper.Repository, currentAggregatedErrorsMap)
-			log.Printf("%s: scraped %d errors from %d instances", serviceConfig.Name,
-				len(currentAggregatedErrorsMap), len(resolvedAddresses.Addresses))
+			numInstances := len(resolvedAddresses.Addresses)
+			numErrors := len(currentAggregatedErrorsMap)
+			metrics.InstancesScrapped.WithLabelValues(serviceConfig.Name).Set(float64(numInstances))
+			metrics.ErrorsScrapped.WithLabelValues(serviceConfig.Name).Add(float64(numErrors))
+			log.Printf("%s: scraped %d errors from %d instances", serviceConfig.Name, numErrors, numInstances)
 			timer.Reset(scraper.ServiceConfig.Scraper.RefreshInterval)
 		}
 	}

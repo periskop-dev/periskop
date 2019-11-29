@@ -8,6 +8,7 @@ import (
 	"strings"
 
 	"github.com/soundcloud/periskop/repository"
+	"github.com/soundcloud/periskop/metrics"
 )
 
 func NewHandler(r repository.ErrorsRepository) http.Handler {
@@ -43,6 +44,7 @@ func errorsForService(w http.ResponseWriter, r repository.ErrorsRepository,
 	if repoErrors, err := r.GetErrors(service, numberOfOccurrencesPerError); err == nil {
 		renderJSON(w, repoErrors)
 	} else {
+		metrics.ServiceErrors.WithLabelValues("get_errors").Inc()
 		http.Error(w, err.Error(), 404)
 	}
 }
@@ -56,6 +58,7 @@ func renderJSON(w http.ResponseWriter, value interface{}) {
 		w.Header().Set("Content-Type", "application/json")
 		fmt.Fprintln(w, string(valueJSON))
 	} else {
+		metrics.ServiceErrors.WithLabelValues("render_json").Inc()
 		http.Error(w, err.Error(), 500)
 	}
 }

@@ -2,6 +2,7 @@ package repository
 
 import (
 	"fmt"
+	"github.com/soundcloud/periskop/metrics"
 )
 
 type ErrorAggregate struct {
@@ -75,5 +76,6 @@ func (r inMemoryRepository) GetErrors(serviceName string, numberOfErrors int) ([
 
 		return result, nil
 	}
+	metrics.ServiceErrors.WithLabelValues("service_not_found").Inc()
 	return nil, fmt.Errorf("service %s not found", serviceName)
 }

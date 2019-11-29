@@ -3,6 +3,7 @@ package main
 import (
 	"flag"
 	"fmt"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"log"
 	"net/http"
 	"os"
@@ -61,6 +62,8 @@ func main() {
 	http.Handle("/", fs)
 
 	http.Handle("/services/", api.NewHandler(repo))
+	http.Handle("/metrics", promhttp.Handler())
+
 
 	address := fmt.Sprintf(":%s", *port)
 	log.Printf("Serving on address %s", address)
