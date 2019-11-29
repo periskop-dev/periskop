@@ -35,7 +35,7 @@ var (
 		prometheus.CounterOpts{
 			Namespace: PrometheusNamespace,
 			Name:      "application_errors_total",
-			Help:      "Nu.",
+			Help:      "Total number of errors in the Periskop service.",
 		},
 		[]string{"type"},
 	)
