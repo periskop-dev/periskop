@@ -7,8 +7,8 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/soundcloud/periskop/repository"
 	"github.com/soundcloud/periskop/metrics"
+	"github.com/soundcloud/periskop/repository"
 )
 
 func NewHandler(r repository.ErrorsRepository) http.Handler {

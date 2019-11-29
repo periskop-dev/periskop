@@ -3,11 +3,12 @@ package main
 import (
 	"flag"
 	"fmt"
-	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"log"
 	"net/http"
 	"os"
 	"path/filepath"
+
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 
 	"github.com/soundcloud/periskop/api"
 	"github.com/soundcloud/periskop/config"
@@ -19,7 +20,6 @@ import (
 const numOfProcessors = 8
 
 func main() {
-
 	var (
 		port              = flag.String("port", os.Getenv("PORT"), "The server port")
 		configurationFile = flag.String("config", os.Getenv("CONFIG_FILE"), "The configuration file")
@@ -63,7 +63,6 @@ func main() {
 
 	http.Handle("/services/", api.NewHandler(repo))
 	http.Handle("/metrics", promhttp.Handler())
-
 
 	address := fmt.Sprintf(":%s", *port)
 	log.Printf("Serving on address %s", address)

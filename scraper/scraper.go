@@ -7,9 +7,9 @@ import (
 	"time"
 
 	"github.com/soundcloud/periskop/config"
+	"github.com/soundcloud/periskop/metrics"
 	"github.com/soundcloud/periskop/repository"
 	"github.com/soundcloud/periskop/servicediscovery"
-	"github.com/soundcloud/periskop/metrics"
 )
 
 type errorAggregateMap map[string]errorAggregate
@@ -61,7 +61,6 @@ func (scraper Scraper) Scrape() {
 
 	for {
 		select {
-
 		case newResult := <-resolutions:
 			resolvedAddresses = newResult
 			log.Printf("Received new dns resolution result for %s. Address resolved: %d\n", serviceConfig.Name,

@@ -2,6 +2,7 @@ package repository
 
 import (
 	"fmt"
+
 	"github.com/soundcloud/periskop/metrics"
 )
 

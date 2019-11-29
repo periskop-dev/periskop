@@ -2,7 +2,6 @@ package metrics
 
 import (
 	"github.com/prometheus/client_golang/prometheus"
-
 )
 
 const (
@@ -10,6 +9,7 @@ const (
 	PrometheusNamespace = "periskop"
 )
 
+// nolint
 var (
 	scrappedLabels = []string{"service_name"}
 	// InstancesScrapped is a Prometheus gauge to track the number of instances scrapped

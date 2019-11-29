@@ -2,3 +2,6 @@ linters:
   enable-all: true
   disable:
     - gosimple
+    - wsl
+    - gochecknoinits
+    - godox
