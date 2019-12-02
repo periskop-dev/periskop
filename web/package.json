@@ -27,7 +27,7 @@
     "redux-thunk": "^2.3.0"
   },
   "devDependencies": {
-    "@types/jasmine": "~2.5.46",
+    "@types/jasmine": "~3.5.0",
     "@types/node": "~6.0.60",
     "@types/react": "~16.9.9",
     "@types/react-addons-test-utils": "~0.14.17",
