@@ -1,4 +1,4 @@
-# <img src="https://i.imgur.com/NcT3qgf.png" width="40%">
+# <img src="https://i.imgur.com/NcT3qgf.png" width="65%">
 
 [![Build Status](https://api.cirrus-ci.com/github/soundcloud/periskop.svg)](https://cirrus-ci.com/github/soundcloud/periskop)
 
