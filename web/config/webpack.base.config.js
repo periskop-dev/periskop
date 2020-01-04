@@ -1,10 +1,8 @@
 const webpack = require("webpack");
 const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
-const ExtractTextPlugin = require('extract-text-webpack-plugin');
+const ExtractTextPlugin = require('mini-css-extract-plugin');
 const METADATA = require('./metadata.js');
-
-const extractLESSPlugin = new ExtractTextPlugin('css/[name].[contenthash].css');
 
 module.exports = function (env) {
     return {
@@ -64,16 +62,17 @@ module.exports = function (env) {
                 },
                 {
                     test: /\.less$/,
-                    use: extractLESSPlugin.extract({
-                        fallback: 'style-loader',
-                        use: [
-                            'css-loader',
-                            'less-loader'
-                        ],
-                        // fix wrong path generation in css file
-                        // http://stackoverflow.com/questions/37277700/separate-fonts-and-css-using-webpack/37293335#37293335
-                        publicPath: '../'
-                    })
+                    use: [
+                      {
+                        loader: 'style-loader', // creates style nodes from JS strings
+                      },
+                      {
+                        loader: 'css-loader', // translates CSS into CommonJS
+                      },
+                      {
+                        loader: 'less-loader', // compiles Less to CSS
+                      },
+                    ],
                 },
                 {
                     test: /\.css$/,
@@ -105,8 +104,6 @@ module.exports = function (env) {
                 React: 'react',
                 ReactDOM: 'react-dom'
             }),
-
-            extractLESSPlugin,
 
             // insert bundled script and metadata into index.html
             new HtmlWebpackPlugin({
