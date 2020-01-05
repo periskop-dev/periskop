@@ -11,7 +11,7 @@ import * as RemoteData from "data/remote-data"
 import { StoreState, AggregatedError } from "data/types"
 import { fetchErrors, setActiveError } from "data/errors"
 
-import { Grid, Row, Col } from "react-bootstrap"
+import { Row, Col, Container } from "react-bootstrap"
 
 interface ConnectedProps {
   errors: RemoteData.RemoteData<any, AggregatedError[]>,
@@ -90,7 +90,7 @@ class App extends React.Component<Props> {
   render() {
     return (
       <div className="app-component">
-          <Grid fluid className="app-component-grid">
+          <Container fluid className="app-component-grid">
             <Row className="app-component-row">
               <Col xs={3} id="left-column">
                 {this.renderSideBar()}
@@ -99,7 +99,7 @@ class App extends React.Component<Props> {
                 {this.renderError()}
               </Col>
             </Row>
-          </Grid>
+          </Container>
         </div>
     )
   }

@@ -5,7 +5,7 @@ import { bindActionCreators, Dispatch, AnyAction } from "redux";
 import { StoreState } from "data/types";
 import { connect } from "react-redux";
 import { fetchServices } from "data/services";
-import { Grid, Row, Col, ListGroup, ListGroupItem, Well } from "react-bootstrap";
+import { Row, Col, ListGroup, ListGroupItem, Card, Container } from "react-bootstrap";
 
 interface ConnectedProps {
   services: RemoteData.RemoteData<any, string[]>
@@ -54,18 +54,18 @@ class Home extends React.Component<Props, {}> {
   render() {
     return (
       <div>
-          <Grid fluid>
+          <Container fluid>
             <Row className="show-grid">
-              <Col xs={8} xsOffset={2}>
-              <Well>
+              <Col xs={8} lg={2}>
+              <Card card-body bg-light>
                 <p>
                   <strong>Select a service</strong>
                 </p>
                 {this.renderServices()}
-              </Well>
+              </Card>
               </Col>
             </Row>
-          </Grid>
+          </Container>
         </div>
     )
   }

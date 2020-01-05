@@ -10,7 +10,7 @@ import * as RemoteData from "data/remote-data"
 
 import * as moment from "moment"
 
-import { Navbar, NavItem, Nav, MenuItem, NavDropdown, Glyphicon } from "react-bootstrap"
+import { Navbar, NavItem, Nav, NavDropdown } from "react-bootstrap"
 
 interface ConnectedProps {
   services: RemoteData.RemoteData<any, string[]>,
@@ -50,7 +50,7 @@ class NavbarComponent extends React.Component<Props, {}> {
 
   renderServicesInDropdown() {
     if (RemoteData.isSuccess(this.props.services)) {
-      return this.props.services.data.map((service, index) => <MenuItem key={index} onClick={_ => this.handleServiceSelect(service)}>{service}</MenuItem>)
+      return this.props.services.data.map((service, index) => <NavDropdown.Item key={index} onClick={_ => this.handleServiceSelect(service)}>{service}</NavDropdown.Item>)
     }
   }
 
@@ -63,11 +63,11 @@ class NavbarComponent extends React.Component<Props, {}> {
   renderRefreshButton() {
     if (this.props.activeService) {
       return (
-        <NavItem eventKey={1} >
+        <Nav.Item>
           <button className="btn btn-xs btn-default" onClick={this.handleRefreshClick}>
-            <Glyphicon glyph="refresh" /> Refresh
+            Refresh
           </button>
-        </NavItem>
+        </Nav.Item>
       )
     }
   }
@@ -75,27 +75,24 @@ class NavbarComponent extends React.Component<Props, {}> {
   render() {
     return (
         <Navbar
-          fluid
-          inverse
+          bg="dark"
           collapseOnSelect
-          fixedTop
+          fixed="top"
         >
-        <Navbar.Header>
-          <Navbar.Brand>
-            <a href="/">Periskop</a>
-          </Navbar.Brand>
-          <Navbar.Toggle/>
-        </Navbar.Header>
+        <Navbar.Brand>
+          <a href="/">Periskop</a>
+        </Navbar.Brand>
+        <Navbar.Toggle/>
         <Navbar.Collapse>
           <Nav>
             <NavDropdown title={this.props.activeService ? this.props.activeService : "Service"} id="project-nav-dropdown">
             {this.renderServicesInDropdown()}
             </NavDropdown>
           </Nav>
-          <Nav pullRight>
+          <Nav className="justify-content-end">
             {this.renderRefreshButton()}
           </Nav>
-          <Navbar.Text pullRight>{this.renderUpdatedAt()}</Navbar.Text>
+          <Navbar.Text>{this.renderUpdatedAt()}</Navbar.Text>
         </Navbar.Collapse>
       </Navbar>
     )

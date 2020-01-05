@@ -1,4 +1,4 @@
-import "SideBar.less"
+import "SideBar.scss"
 import * as React from "react";
 import { ListGroup, ListGroupItem } from "react-bootstrap";
 
