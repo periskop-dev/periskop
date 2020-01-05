@@ -1,3 +1,4 @@
+import "Navbar.scss"
 import * as React from "react"
 import { withRouter, RouteComponentProps } from "react-router"
 import { bindActionCreators, Dispatch, AnyAction } from "redux"
@@ -10,7 +11,7 @@ import * as RemoteData from "data/remote-data"
 
 import * as moment from "moment"
 
-import { Navbar, NavItem, Nav, MenuItem, NavDropdown, Glyphicon } from "react-bootstrap"
+import { Navbar, NavItem, Nav, NavDropdown, Button } from "react-bootstrap"
 
 interface ConnectedProps {
   services: RemoteData.RemoteData<any, string[]>,
@@ -50,7 +51,7 @@ class NavbarComponent extends React.Component<Props, {}> {
 
   renderServicesInDropdown() {
     if (RemoteData.isSuccess(this.props.services)) {
-      return this.props.services.data.map((service, index) => <MenuItem key={index} onClick={_ => this.handleServiceSelect(service)}>{service}</MenuItem>)
+      return this.props.services.data.map((service, index) => <NavDropdown.Item key={index} onClick={_ => this.handleServiceSelect(service)}>{service}</NavDropdown.Item>)
     }
   }
 
@@ -63,11 +64,11 @@ class NavbarComponent extends React.Component<Props, {}> {
   renderRefreshButton() {
     if (this.props.activeService) {
       return (
-        <NavItem eventKey={1} >
-          <button className="btn btn-xs btn-default" onClick={this.handleRefreshClick}>
-            <Glyphicon glyph="refresh" /> Refresh
-          </button>
-        </NavItem>
+        <Nav.Item>
+          <Button variant="outline-info" onClick={this.handleRefreshClick}>
+            Refresh
+          </Button>
+        </Nav.Item>
       )
     }
   }
@@ -75,27 +76,25 @@ class NavbarComponent extends React.Component<Props, {}> {
   render() {
     return (
         <Navbar
-          fluid
-          inverse
+          bg="dark"
+          variant="dark"
           collapseOnSelect
-          fixedTop
+          fixed="top"
         >
-        <Navbar.Header>
-          <Navbar.Brand>
-            <a href="/">Periskop</a>
-          </Navbar.Brand>
-          <Navbar.Toggle/>
-        </Navbar.Header>
+        <Navbar.Brand href="/">
+          Periskop
+        </Navbar.Brand>
+        <Navbar.Toggle/>
         <Navbar.Collapse>
-          <Nav>
+          <Nav className="mr-auto">
             <NavDropdown title={this.props.activeService ? this.props.activeService : "Service"} id="project-nav-dropdown">
-            {this.renderServicesInDropdown()}
+              {this.renderServicesInDropdown()}
             </NavDropdown>
           </Nav>
-          <Nav pullRight>
+          <Navbar.Text className="updated-at-text">{this.renderUpdatedAt()}</Navbar.Text>
+          <Nav>
             {this.renderRefreshButton()}
           </Nav>
-          <Navbar.Text pullRight>{this.renderUpdatedAt()}</Navbar.Text>
         </Navbar.Collapse>
       </Navbar>
     )

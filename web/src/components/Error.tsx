@@ -1,5 +1,5 @@
 import * as React from "react"
-import { ListGroup, ListGroupItem, Table } from "react-bootstrap"
+import { ListGroup, Table } from "react-bootstrap"
 import * as moment from "moment"
 import { AggregatedError, Error, HttpContext, Headers } from "data/types"
 
@@ -13,11 +13,11 @@ const ErrorComponent =  (props: Props) => {
     if (error == null) return
 
     return (
-      <ListGroup>
-        <ListGroupItem>
+      <ListGroup variant="flush">
+        <ListGroup.Item>
           <h4 className="list-group-item-heading"> Class</h4>
-          <pre>{ error.error.class }</pre>
-        </ListGroupItem>
+          { error.error.class }
+        </ListGroup.Item>
         { renderMessage(error.error.message) }
         { renderCurl(error.http_context) }
         { renderStackTrace(error.error.stacktrace) }
@@ -33,10 +33,10 @@ const ErrorComponent =  (props: Props) => {
     }
     const trace =  stackTrace.map((line) => line + "\n")
     return (
-      <ListGroupItem>
+      <ListGroup.Item>
         <h4 className="list-group-item-heading"> Trace</h4>
-        <pre>{ trace }</pre>
-    </ListGroupItem>
+        <pre className="pre-scrollable"><code>{ trace }</code></pre>
+    </ListGroup.Item>
     )
   }
 
@@ -50,10 +50,10 @@ const ErrorComponent =  (props: Props) => {
     }
 
     return (
-      <ListGroupItem>
+      <ListGroup.Item>
         <h4 className="list-group-item-heading"> Cause</h4>
         { renderError(cause) }
-      </ListGroupItem>
+      </ListGroup.Item>
     )
   }
 
@@ -63,10 +63,10 @@ const ErrorComponent =  (props: Props) => {
     }
 
     return (
-      <ListGroupItem>
+      <ListGroup.Item>
         <h4 className="list-group-item-heading"> Message</h4>
-        <pre>{ message }</pre>
-      </ListGroupItem>
+        { message }
+      </ListGroup.Item>
     )
   }
 
@@ -82,10 +82,10 @@ const ErrorComponent =  (props: Props) => {
     }, "")
 
     return (
-      <ListGroupItem>
+      <ListGroup.Item>
         <h4 className="list-group-item-heading"> Curl</h4>
         <pre>curl -X { context.request_method } {headersString} {context.request_url}</pre>
-      </ListGroupItem>
+      </ListGroup.Item>
     )
   }
 
@@ -114,27 +114,27 @@ const ErrorComponent =  (props: Props) => {
     }
 
     return (
-      <ListGroupItem>
+      <ListGroup.Item>
         <h4 className="list-group-item-heading"> HTTP Context</h4>
         <ListGroup>
-          <ListGroupItem>
+          <ListGroup.Item>
             <h4 className="list-group-item-heading"> Url</h4>
             {context.request_url}
-          </ListGroupItem>
-          <ListGroupItem>
+          </ListGroup.Item>
+          <ListGroup.Item>
             <h4 className="list-group-item-heading"> Method</h4>
             {context.request_method}
-          </ListGroupItem>
-          <ListGroupItem>
+          </ListGroup.Item>
+          <ListGroup.Item>
             <h4 className="list-group-item-heading"> Headers</h4>
             <Table striped>
               <tbody>
                 { renderContextHeaders(context) }
               </tbody>
             </Table>
-          </ListGroupItem>
+          </ListGroup.Item>
         </ListGroup>
-      </ListGroupItem>
+      </ListGroup.Item>
     )
   }
 
@@ -143,23 +143,24 @@ const ErrorComponent =  (props: Props) => {
       <div className={"grid-component"}>
         <h3 className="list-group-item-heading"> Summary</h3>
         <ListGroup>
-          <ListGroupItem>
+          <ListGroup.Item>
             <h4 className="list-group-item-heading"> Key</h4>
             {props.activeError.aggregation_key}
-          </ListGroupItem>
-          <ListGroupItem>
+          </ListGroup.Item>
+          <ListGroup.Item>
             <h4 className="list-group-item-heading"> Count</h4>
             {props.activeError.total_count}
-          </ListGroupItem>
-          <ListGroupItem>
+          </ListGroup.Item>
+          <ListGroup.Item>
             <h4 className="list-group-item-heading"> Severity</h4>
             {props.activeError.severity}
-          </ListGroupItem>
-          <ListGroupItem>
+          </ListGroup.Item>
+          <ListGroup.Item>
             <h4 className="list-group-item-heading"> Last Occurrence</h4>
             {renderLastOccurrence(props.activeError.latest_errors[0].timestamp)}
-          </ListGroupItem>
+          </ListGroup.Item>
         </ListGroup>
+        <br/>
         <h3 className="list-group-item-heading"> Last Exception</h3>
         {renderError(props.activeError.latest_errors[0]) }
       </div>

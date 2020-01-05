@@ -1,0 +1,63 @@
+@import "~bootstrap/scss/bootstrap";
+
+.list-group-item:focus,.list-group-item:active {
+  outline: none !important;
+  box-shadow: none;
+}
+
+.list-group-item {
+  word-break: break-all;
+}
+
+.list-group-item.active, .list-group-item.active:hover, .list-group-item.active:focus {
+  background: linear-gradient(rgba(255,119,0, 0.5)  , rgba(255,51,0, 0.5));
+  color: #F2F2F2;
+  border-color: #666666;
+}
+
+body {
+  background-color: #E5E5E5;
+  width: 100%;
+  height: 100vh;
+}
+
+pre {
+  background-color: #eee;
+  max-height: 400px;
+}
+
+#app,
+.app-container,
+.app-container > div,
+.app-content,
+.app-component,
+.app-component-grid,
+.app-component-row {
+  height: 100%;
+}
+
+.app-container {
+  padding-top: 70px;
+}
+
+#left-column {
+  height: calc(100% - $navbar-margin-bottom);
+  overflow-y: scroll;
+}
+
+#right-column {
+  height: 100%;
+  overflow-y: scroll;
+}
+
+td {
+  overflow: scroll;
+}
+
+th {
+  width: 10%;
+}
+
+table {
+  table-layout: fixed;
+}
