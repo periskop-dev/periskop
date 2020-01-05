@@ -1,7 +1,6 @@
 const webpack = require("webpack");
 const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
-const ExtractTextPlugin = require('mini-css-extract-plugin');
 const METADATA = require('./metadata.js');
 
 module.exports = function (env) {
@@ -64,7 +63,7 @@ module.exports = function (env) {
                     test: /\.less$/,
                     use: [
                       {
-                        loader: 'style-loader', // creates style nodes from JS strings
+                        loader: "style-loader",
                       },
                       {
                         loader: 'css-loader', // translates CSS into CommonJS
@@ -76,19 +75,29 @@ module.exports = function (env) {
                 },
                 {
                     test: /\.css$/,
-                    use: {
-                        loader: 'css-loader'
-                    }
+                    use: [
+                        {
+                          loader: 'css-loader', // translates CSS into CommonJS
+                        },
+                      ],
                 },
                 {
                     test: /\.(gif|png|jpg|jpeg|svg|ico)($|\?)/,
                     // embed images and fonts smaller than 5kb
-                    loader: 'url-loader?limit=5000&hash=sha512&digest=hex&size=16&name=images/[name]-[hash].[ext]'
+                    loader: 'url-loader',
+                    options: {
+                      limit: 5000,
+                      esModule: false,
+                    },
                 },
                 {
                     test: /\.(woff|woff2|eot|ttf)($|\?)/,
                     // embed images and fonts smaller than 5kb
-                    loader: 'url-loader?limit=5000&hash=sha512&digest=hex&size=16&name=fonts/[name]-[hash].[ext]'
+                    loader: 'url-loader',
+                    options: {
+                      limit: 5000,
+                      esModule: false,
+                    },
                 }
             ]
         },
@@ -112,7 +121,6 @@ module.exports = function (env) {
                 metadata: METADATA,
                 favicon: 'src/favicon.ico'
             }),
-
         ]
     }
 };
