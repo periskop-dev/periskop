@@ -1,4 +1,5 @@
 const webpack = require("webpack");
+const path = require('path');
 const webpackMerge = require('webpack-merge');
 const baseConfig = require('./webpack.base.config.js');
 const METADATA = require('./metadata.js');
@@ -6,6 +7,10 @@ const METADATA = require('./metadata.js');
 module.exports = function (env) {
     return webpackMerge(baseConfig(), {
         devtool: 'inline-source-map',
+        output: {
+            path: path.resolve(__dirname, '../dist'),
+            filename: '[name].[hash].js'
+        },
 
         // Webpack Development Server config
         devServer: {
@@ -20,14 +25,6 @@ module.exports = function (env) {
         },
 
         plugins: [
-            // separate all libs from node modules in a vendor file
-            new webpack.optimize.CommonsChunkPlugin({
-                name: 'vendor',
-                minChunks: function (module) {
-                    // this assumes your vendor imports exist in the node_modules directory
-                    return module.context && module.context.indexOf('node_modules') !== -1;
-                }
-            })
         ]
     })
 };
