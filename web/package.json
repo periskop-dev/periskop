@@ -28,7 +28,7 @@
   },
   "devDependencies": {
     "@types/jasmine": "~3.5.0",
-    "@types/node": "~6.0.60",
+    "@types/node": "~13.1.4",
     "@types/react": "~16.9.17",
     "@types/react-addons-test-utils": "~0.14.17",
     "@types/react-bootstrap": "^0.32.20",
