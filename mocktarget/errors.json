@@ -23,6 +23,25 @@
                             "host": "badrequest.org"
                         }
                     }
+                },
+                {
+                    "error": {
+                        "class": "java.lang.RuntimeException",
+                        "message": "Nooooes!",
+                        "stacktrace": [],
+                        "cause": null
+                    },
+                    "uuid": "7C49DB3E-8D61-457B-BCD8-10E86D4E014E",
+                    "timestamp": "2019-10-11T12:47:25.595Z",
+                    "severity": "error",
+                    "http_context": {
+                        "request_method": "GET",
+                        "request_url": "http://badrequest.org/another-endpoint",
+                        "request_headers": {
+                            "accept": "application/json",
+                            "host": "badrequest.org"
+                        }
+                    }
                 }
             ]
         },

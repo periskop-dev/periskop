@@ -7,12 +7,14 @@ export const FETCH = "periskop/errors/FETCH"
 export const FETCH_SUCCESS = "periskop/errors/FETCH_SUCCESS"
 export const FETCH_FAILURE = "periskop/errors/FETCH_FAILURE"
 export const SET_ACTIVE_ERROR = "periskop/errors/SET_ACTIVE_ERROR"
+export const SET_CURRENT_EXCEPTION_INDEX = "periskop/errors/SET_CURRENT_EXCEPTION_INDEX"
 
 export type ErrorsAction =
   | { type: typeof FETCH; service: string }
   | { type: typeof FETCH_SUCCESS; errors: AggregatedError[] }
   | { type: typeof FETCH_FAILURE; error: any }
   | { type: typeof SET_ACTIVE_ERROR; errorKey: string }
+  | { type: typeof SET_CURRENT_EXCEPTION_INDEX; index: number }
 
 export const fetchErrors = (service: string) => {
   return(
@@ -33,6 +35,10 @@ export const setActiveError = (errorKey: string) => {
   return { type: SET_ACTIVE_ERROR, errorKey }
 }
 
+export const setCurrentExceptionIndex = (index: number) => {
+  return { type: SET_CURRENT_EXCEPTION_INDEX, index }
+}
+
 export function fetchingErrors(service: string): ErrorsAction {
   return { type: FETCH, service }
 }
@@ -48,7 +54,8 @@ export function fetchedErrorsFailed(error: any): ErrorsAction {
 const initialState: ErrorsState = {
   errors: RemoteData.idle(),
   activeError: undefined,
-  updatedAt: undefined
+  updatedAt: undefined,
+  latestExceptionIndex: 0
 }
 
 function errorsReducer(state = initialState, action: ErrorsAction) {
@@ -72,16 +79,22 @@ function errorsReducer(state = initialState, action: ErrorsAction) {
       return {
         errors: RemoteData.fail(action.error)
       }
-    case SET_ACTIVE_ERROR:
-      switch (state.errors.status) {
-        case RemoteData.SUCCESS:
-          return {
-            ...state,
-            activeError: state.errors.data.find(e => e.aggregation_key === action.errorKey)
+      case SET_ACTIVE_ERROR:
+        switch (state.errors.status) {
+          case RemoteData.SUCCESS:
+            return {
+              ...state,
+              activeError: state.errors.data.find(e => e.aggregation_key === action.errorKey),
+              latestExceptionIndex: 0
+            }
+          default: {
+            return state
           }
-        default: {
-          return state
         }
+    case SET_CURRENT_EXCEPTION_INDEX:
+      return {
+        ...state,
+        latestExceptionIndex: action.index
       }
     default:
       return state
