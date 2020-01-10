@@ -22,12 +22,16 @@ type Props = ConnectedProps & DispatchProps
 
 
 const ErrorComponent = (props: Props) => {
+  const calculateNewIndex = (index: number, inc: number, size: number) => {
+    return (index + inc % size + size) % size
+  }
+
   const showPreviousException = () => {
-    props.setCurrentExceptionIndex((props.latestExceptionIndex - 1) % props.activeError.latest_errors.length)
+    props.setCurrentExceptionIndex(calculateNewIndex(props.latestExceptionIndex, -1, props.activeError.latest_errors.length))
   }
 
   const showNextException = () => {
-    props.setCurrentExceptionIndex((props.latestExceptionIndex + 1) % props.activeError.latest_errors.length)
+    props.setCurrentExceptionIndex(calculateNewIndex(props.latestExceptionIndex, 1, props.activeError.latest_errors.length))
   }
 
   const renderError = (error: Error) => {
