@@ -1,13 +1,38 @@
 import * as React from "react"
-import { ListGroup, Table } from "react-bootstrap"
+import { ListGroup, Table, Button, Badge } from "react-bootstrap"
 import * as moment from "moment"
-import { AggregatedError, Error, HttpContext, Headers } from "data/types"
+import { AggregatedError, Error, HttpContext, Headers, StoreState } from "data/types"
+import { ButtonGroup } from "react-bootstrap"
+import { setCurrentExceptionIndex } from "data/errors"
+import { bindActionCreators, Dispatch, AnyAction } from "redux"
+import { connect } from "react-redux"
+import { RouteComponentProps } from "react-router"
 
-interface Props {
-  activeError: AggregatedError
+
+interface ConnectedProps {
+  activeError: AggregatedError,
+  latestExceptionIndex: number,
 }
 
-const ErrorComponent =  (props: Props) => {
+interface DispatchProps {
+  setCurrentExceptionIndex: (number) => void
+}
+
+type Props = ConnectedProps & DispatchProps
+
+
+const ErrorComponent = (props: Props) => {
+  const calculateNewIndex = (index: number, inc: number, size: number) => {
+    return (index + inc % size + size) % size
+  }
+
+  const showPreviousException = () => {
+    props.setCurrentExceptionIndex(calculateNewIndex(props.latestExceptionIndex, -1, props.activeError.latest_errors.length))
+  }
+
+  const showNextException = () => {
+    props.setCurrentExceptionIndex(calculateNewIndex(props.latestExceptionIndex, 1, props.activeError.latest_errors.length))
+  }
 
   const renderError = (error: Error) => {
     if (error == null) return
@@ -102,7 +127,7 @@ const ErrorComponent =  (props: Props) => {
     if (context.request_headers == null) {
       return ""
     } else {
-      return Object.keys(context.request_headers).map(function(key) {
+      return Object.keys(context.request_headers).map((key) => {
         return renderContextHeadersRow(key, context.request_headers[key])
       })
     }
@@ -157,21 +182,36 @@ const ErrorComponent =  (props: Props) => {
           </ListGroup.Item>
           <ListGroup.Item>
             <h4 className="list-group-item-heading"> Last Occurrence</h4>
-            {renderLastOccurrence(props.activeError.latest_errors[0].timestamp)}
+            {renderLastOccurrence(props.activeError.latest_errors[props.latestExceptionIndex].timestamp)}
           </ListGroup.Item>
         </ListGroup>
         <br/>
-        <h3 className="list-group-item-heading"> Last Exception</h3>
-        {renderError(props.activeError.latest_errors[0]) }
+        <ButtonGroup className="float-right">
+          <Button variant="outline-dark" size="sm" onClick={() => showPreviousException()}>Previous</Button>
+          <Button variant="outline-dark" size="sm" onClick={() => showNextException()} >Next</Button>
+        </ButtonGroup>
+        <h3 className="list-group-item-heading"> Latest Occurences <Badge variant="light">{props.latestExceptionIndex+1 + "/" + props.activeError.latest_errors.length}</Badge></h3>
+        {renderError(props.activeError.latest_errors[props.latestExceptionIndex]) }
       </div>
     )
   }
 
-    return (
-      <div>
-        { renderAggregatedError() }
-      </div>
-    )
-  }
+  return (
+    <div>
+      { renderAggregatedError() }
+    </div>
+  )
+}
 
-export default ErrorComponent
+const mapStateToProps = (state: StoreState) => {
+  return {
+    activeError: state.errorsReducer.activeError,
+    latestExceptionIndex: state.errorsReducer.latestExceptionIndex,
+  }
+}
+
+const matchDispatchToProps = (dispatch: Dispatch<AnyAction>): DispatchProps => {
+  return bindActionCreators({ setCurrentExceptionIndex }, dispatch);
+}
+
+export default connect<ConnectedProps, {}, RouteComponentProps<{service: string}>>(mapStateToProps, matchDispatchToProps)(ErrorComponent)
