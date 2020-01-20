@@ -54,7 +54,7 @@
     "phantomjs-prebuilt": "~2.1.14",
     "react-addons-test-utils": "~15.6.2",
     "rimraf": "~2.6.1",
-    "sass-loader": "^8.0.0",
+    "sass-loader": "^8.0.2",
     "source-map-loader": "~0.2.0",
     "style-loader": "~0.23.1",
     "ts-loader": "~6.2.1",
