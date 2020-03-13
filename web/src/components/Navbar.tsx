@@ -1,4 +1,5 @@
 import "Navbar.scss"
+import Logo from "../img/logo.png"
 import * as React from "react"
 import { withRouter, RouteComponentProps } from "react-router"
 import { bindActionCreators, Dispatch, AnyAction } from "redux"
@@ -82,7 +83,7 @@ class NavbarComponent extends React.Component<Props, {}> {
           fixed="top"
         >
         <Navbar.Brand href="/">
-        <img src='src/img/PERISKOP_EXPORT_TRANSPARENT.png' width='130' height="20"></img>
+        <img src={Logo} width='130' height="20"></img>
         </Navbar.Brand>
         <Navbar.Toggle/>
         <Navbar.Collapse>
