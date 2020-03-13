@@ -82,7 +82,7 @@ class NavbarComponent extends React.Component<Props, {}> {
           fixed="top"
         >
         <Navbar.Brand href="/">
-          Periskop
+        <img src='src/img/PERISKOP_EXPORT_TRANSPARENT.png' width='130' height="20"></img>
         </Navbar.Brand>
         <Navbar.Toggle/>
         <Navbar.Collapse>
