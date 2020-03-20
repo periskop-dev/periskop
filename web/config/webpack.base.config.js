@@ -95,7 +95,7 @@ module.exports = function (env) {
                 {
                     test: /\.(gif|png|jpg|jpeg|svg|ico)($|\?)/,
                     // embed images and fonts smaller than 5kb
-                    loader: 'url-loader',
+                    loader: 'file-loader',
                     options: {
                       limit: 5000,
                       esModule: false,
