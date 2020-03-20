@@ -26,7 +26,7 @@ The format for scraped errors is defined in [a proto3 IDL](representation/errors
 
 The UI allows navigating and inspecting exceptions as they occur.
 
-![ui](https://i.imgur.com/7Opk1x0.png)
+![ui](https://i.imgur.com/Tljxd80.png)
 
 ## Client Libraries
 

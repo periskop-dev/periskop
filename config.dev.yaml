@@ -1,7 +1,8 @@
 services:
   - name: mock-target
-    service_discovery:
-      name: localhost
+    dns_sd_configs:
+      names:
+        - localhost
       refresh_interval: 45s
       type: A
       port: 7778
