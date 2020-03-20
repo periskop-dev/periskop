@@ -1,10 +1,7 @@
 const webpack = require("webpack");
 const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
-const ExtractTextPlugin = require('extract-text-webpack-plugin');
 const METADATA = require('./metadata.js');
-
-const extractLESSPlugin = new ExtractTextPlugin('css/[name].[contenthash].css');
 
 module.exports = function (env) {
     return {
@@ -64,32 +61,54 @@ module.exports = function (env) {
                 },
                 {
                     test: /\.less$/,
-                    use: extractLESSPlugin.extract({
-                        fallback: 'style-loader',
-                        use: [
-                            'css-loader',
-                            'less-loader'
-                        ],
-                        // fix wrong path generation in css file
-                        // http://stackoverflow.com/questions/37277700/separate-fonts-and-css-using-webpack/37293335#37293335
-                        publicPath: '../'
-                    })
+                    use: [
+                      {
+                        loader: "style-loader",
+                      },
+                      {
+                        loader: 'css-loader', // translates CSS into CommonJS
+                      },
+                      {
+                        loader: 'less-loader', // compiles Less to CSS
+                      },
+                    ],
                 },
                 {
+                    test: /\.s[ac]ss$/i,
+                    use: [
+                      // Creates `style` nodes from JS strings
+                      'style-loader',
+                      // Translates CSS into CommonJS
+                      'css-loader',
+                      // Compiles Sass to CSS
+                      'sass-loader',
+                    ],
+                  },
+                {
                     test: /\.css$/,
-                    use: {
-                        loader: 'css-loader'
-                    }
+                    use: [
+                        {
+                          loader: 'css-loader', // translates CSS into CommonJS
+                        },
+                      ],
                 },
                 {
                     test: /\.(gif|png|jpg|jpeg|svg|ico)($|\?)/,
                     // embed images and fonts smaller than 5kb
-                    loader: 'url-loader?limit=5000&hash=sha512&digest=hex&size=16&name=images/[name]-[hash].[ext]'
+                    loader: 'file-loader',
+                    options: {
+                      limit: 5000,
+                      esModule: false,
+                    },
                 },
                 {
                     test: /\.(woff|woff2|eot|ttf)($|\?)/,
                     // embed images and fonts smaller than 5kb
-                    loader: 'url-loader?limit=5000&hash=sha512&digest=hex&size=16&name=fonts/[name]-[hash].[ext]'
+                    loader: 'url-loader',
+                    options: {
+                      limit: 5000,
+                      esModule: false,
+                    },
                 }
             ]
         },
@@ -106,8 +125,6 @@ module.exports = function (env) {
                 ReactDOM: 'react-dom'
             }),
 
-            extractLESSPlugin,
-
             // insert bundled script and metadata into index.html
             new HtmlWebpackPlugin({
                 template: 'src/index.html',
@@ -115,7 +132,6 @@ module.exports = function (env) {
                 metadata: METADATA,
                 favicon: 'src/favicon.ico'
             }),
-
         ]
     }
 };

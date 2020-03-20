@@ -1,6 +1,6 @@
-import "SideBar.less"
+import "SideBar.scss"
 import * as React from "react";
-import { ListGroup, ListGroupItem } from "react-bootstrap";
+import { ListGroup, Badge } from "react-bootstrap";
 
 import { bindActionCreators, Dispatch, AnyAction } from "redux"
 import { connect } from "react-redux"
@@ -41,16 +41,16 @@ const SideBar = (props: Props) => {
     } else {
       return props.errors.map((error, index) => {
         return (
-          <ListGroupItem className={"sidebar-item" + " " + sidebarItemClass(error)} onClick={_ => props.handleErrorSelect(error.aggregation_key)} active={ props.activeError === undefined ? false : error.aggregation_key === props.activeError.aggregation_key } key={index}>
-            {error.aggregation_key} <span className="badge">{error.total_count}</span>
-          </ListGroupItem>
+          <ListGroup.Item action className={"sidebar-item" + " " + sidebarItemClass(error)} onClick={_ => props.handleErrorSelect(error.aggregation_key)} active={ props.activeError === undefined ? false : error.aggregation_key === props.activeError.aggregation_key } key={index}>
+            {error.aggregation_key} <Badge variant="secondary" className="float-right">{error.total_count}</Badge>
+          </ListGroup.Item>
         )
       })
     }
   }
 
   return (
-    <div className={"grid-component"}>
+    <div className="grid-component">
       <ListGroup>
         {renderNavItems()}
       </ListGroup>
