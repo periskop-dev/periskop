@@ -182,7 +182,7 @@ const ErrorComponent = (props: Props) => {
           </ListGroup.Item>
           <ListGroup.Item>
             <h4 className="list-group-item-heading"> Last Occurrence</h4>
-            {renderLastOccurrence(props.activeError.latest_errors[props.latestExceptionIndex].timestamp)}
+            {renderLastOccurrence(props.activeError.latest_errors[0].timestamp)}
           </ListGroup.Item>
         </ListGroup>
         <br/>
