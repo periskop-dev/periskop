@@ -22,6 +22,12 @@ At the moment, only DNS service discovery is supported. See the [sample configur
 
 The format for scraped errors is defined in [a proto3 IDL](representation/errors.proto). Currently the only supported protocol is snake_cased JSON over HTTP ([example](scraper/sample-response1.json)).
 
+## UI
+
+The UI allows navigating and inspecting exceptions as they occur.
+
+![ui](https://i.imgur.com/Tljxd80.png)
+
 ## Client Libraries
 
   - [periskop-scala](https://github.com/soundcloud/periskop-scala)
