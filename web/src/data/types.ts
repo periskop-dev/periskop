@@ -26,7 +26,7 @@ export interface AggregatedError {
   "aggregation_key"?: string,
   "total_count"?: number,
   "severity"?: string,
-  "latest_errors"?: Error
+  "latest_errors"?: Error[]
 }
 
 export type ServicesState = {
@@ -37,7 +37,8 @@ export type ErrorsState = {
   errors: RemoteData.RemoteData<any, AggregatedError[]>
   activeError?: AggregatedError,
   updatedAt?: number,
-  activeService?: string
+  activeService?: string,
+  latestExceptionIndex: number
 }
 
 export type StoreState = {

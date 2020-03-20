@@ -31,12 +31,6 @@ Running the web component:
 make run-web
 ```
 
-Run everything (note that a different port will be used):
-
-```bash
-make run
-```
-
 Periskop needs something to scrape in order to show errors in the UI. In development, a mock target returning
 static responses can be used for this purpose (periskop is configured to point to it by default). To run the mock
 server:
@@ -44,6 +38,8 @@ server:
 ```bash
 make run-mock-target
 ```
+
+Now you can point your browser to `http://localhost:3000`
 
 ## Testing
 

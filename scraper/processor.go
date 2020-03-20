@@ -8,6 +8,8 @@ import (
 	"time"
 )
 
+const httpClientTimeoutSeconds = 30
+
 type Request struct {
 	Target        string
 	ResultChannel chan<- []errorAggregate
@@ -72,7 +74,7 @@ func defaultErrorsFetcher() ErrorsFetcher {
 
 func fetch(target string) ([]byte, error) {
 	var netClient = &http.Client{
-		Timeout: time.Second * 30,
+		Timeout: time.Second * httpClientTimeoutSeconds,
 	}
 	resp, err := netClient.Get(target)
 	if err != nil {

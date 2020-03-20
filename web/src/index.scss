@@ -1,3 +1,5 @@
+$font-size-base: 0.9rem !default;
+
 @import "~bootstrap/scss/bootstrap";
 
 .list-group-item:focus,.list-group-item:active {
@@ -45,7 +47,7 @@ pre {
 }
 
 #left-column {
-  height: calc(100% - $navbar-margin-bottom);
+  height: calc(100% - 70px);
   overflow-y: scroll;
 }
 
