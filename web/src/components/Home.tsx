@@ -57,7 +57,7 @@ class Home extends React.Component<Props, {}> {
           <Container fluid>
             <Row className="show-grid">
               <Col md={{ span: 8, offset: 2 }}>
-                <Card card-body bg-light>
+                <Card bg="light">
                   <Card.Header as="h5">Select a service</Card.Header>
                   <Card.Body>
                     {this.renderServices()}
