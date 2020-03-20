@@ -10,8 +10,8 @@ require (
 	github.com/matttproud/golang_protobuf_extensions v1.0.1
 	github.com/miekg/dns v1.0.4
 	github.com/prometheus/client_golang v1.3.0
-	github.com/prometheus/client_model v0.2.0
-	github.com/prometheus/common v0.7.0
+	github.com/prometheus/client_model v0.1.0
+	github.com/prometheus/common v0.8.0
 	github.com/prometheus/procfs v0.0.8
 	github.com/prometheus/prometheus v2.5.0+incompatible
 	golang.org/x/crypto v0.0.0-20190308221718-c2843e01d9a2
