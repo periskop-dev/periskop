@@ -31,6 +31,7 @@ The UI allows navigating and inspecting exceptions as they occur.
 ## Client Libraries
 
   - [periskop-scala](https://github.com/soundcloud/periskop-scala)
+  - [periskop-go](https://github.com/soundcloud/periskop-go)
 
 ## Contributing
 
