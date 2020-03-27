@@ -10,7 +10,12 @@
                         "class": "java.lang.RuntimeException",
                         "message": "Nooooes!",
                         "stacktrace": [],
-                        "cause": null
+                        "cause": {
+                          "class": "java.lang.CauseException",
+                          "message": "I caused this",
+                          "stacktrace": [],
+                          "cause": null
+                        }
                     },
                     "uuid": "e81e56ff-7f65-4279-817f-dd607585b9e0",
                     "timestamp": "2019-10-11T12:46:25.595Z",

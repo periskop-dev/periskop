@@ -22,10 +22,10 @@ type errorWithContext struct {
 }
 
 type errorInstance struct {
-	Class      string   `json:"class"`
-	Message    string   `json:"message"`
-	Stacktrace []string `json:"stacktrace"`
-	Cause      *error   `json:"error"`
+	Class      string         `json:"class"`
+	Message    string         `json:"message"`
+	Stacktrace []string       `json:"stacktrace"`
+	Cause      *errorInstance `json:"cause"`
 }
 
 type httpContext struct {

@@ -131,7 +131,7 @@ func toRepositoryErrorsWithContent(occurrences []errorWithContext) []repository.
 				Class:      occurrence.Error.Class,
 				Message:    occurrence.Error.Message,
 				Stacktrace: occurrence.Error.Stacktrace,
-				Cause:      nil, //TODO map the cause recursively
+				Cause:      toRepositoryErrorCause(&occurrence.Error),
 			},
 			HTTPContext: repository.HTTPContext{
 				RequestHeaders: occurrence.HTTPContext.RequestHeaders,
@@ -148,4 +148,16 @@ func severityWithFallback(severity string) string {
 		return "error"
 	}
 	return severity
+}
+
+func toRepositoryErrorCause(errorInstance *errorInstance) *repository.ErrorInstance {
+	if errorInstance.Cause == nil {
+		return nil
+	}
+	return &repository.ErrorInstance{
+		Class:      errorInstance.Cause.Class,
+		Message:    errorInstance.Cause.Message,
+		Stacktrace: errorInstance.Cause.Stacktrace,
+		Cause:      toRepositoryErrorCause(errorInstance.Cause),
+	}
 }
