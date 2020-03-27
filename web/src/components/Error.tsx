@@ -1,7 +1,7 @@
 import * as React from "react"
 import { ListGroup, Table, Button, Badge } from "react-bootstrap"
 import * as moment from "moment"
-import { AggregatedError, Error, HttpContext, Headers, StoreState } from "data/types"
+import { AggregatedError, Error, HttpContext, Headers, StoreState, ErrorInstance } from "data/types"
 import { ButtonGroup } from "react-bootstrap"
 import { setCurrentExceptionIndex } from "data/errors"
 import { bindActionCreators, Dispatch, AnyAction } from "redux"
@@ -34,19 +34,29 @@ const ErrorComponent = (props: Props) => {
     props.setCurrentExceptionIndex(calculateNewIndex(props.latestExceptionIndex, 1, props.activeError.latest_errors.length))
   }
 
+  const renderErrorInstance = (errorInstance: ErrorInstance) => {
+    if (!errorInstance) return ""
+
+    return (
+      <div>
+        <ListGroup.Item>
+          <h4 className="list-group-item-heading"> Class</h4>
+          { errorInstance.class }
+        </ListGroup.Item>
+        { renderMessage(errorInstance.message) }
+        { renderStackTrace(errorInstance.stacktrace) }
+        { renderCause(errorInstance.cause) }
+      </div>
+    )
+  }
+
   const renderError = (error: Error) => {
-    if (error == null) return
+    if (!error) return ""
 
     return (
       <ListGroup variant="flush">
-        <ListGroup.Item>
-          <h4 className="list-group-item-heading"> Class</h4>
-          { error.error.class }
-        </ListGroup.Item>
-        { renderMessage(error.error.message) }
         { renderCurl(error.http_context) }
-        { renderStackTrace(error.error.stacktrace) }
-        { renderCause(error.error.cause) }
+        { renderErrorInstance(error.error) }
         { renderHttpContext(error.http_context) }
       </ListGroup>
     )
@@ -69,15 +79,15 @@ const ErrorComponent = (props: Props) => {
     return moment(new Date(ts * 1000)).fromNow()
   }
 
-  const renderCause = (cause: Error) => {
-    if (cause === null) {
+  const renderCause = (cause: ErrorInstance) => {
+    if (!cause) {
       return ""
     }
 
     return (
       <ListGroup.Item>
         <h4 className="list-group-item-heading"> Cause</h4>
-        { renderError(cause) }
+        { renderErrorInstance(cause) }
       </ListGroup.Item>
     )
   }

@@ -10,13 +10,15 @@ export interface HttpContext {
   "request_url"?: string
 }
 
+export interface ErrorInstance {
+  "class"?: string,
+  "message"?: string,
+  "stacktrace"?: string[],
+  "cause"?: ErrorInstance
+}
+
 export interface Error {
-  "error"?: {
-    "class"?: string,
-    "message"?: string,
-    "stacktrace"?: string[],
-    "cause"?: Error
-  },
+  "error"?: ErrorInstance,
   "timestamp"?: number,
   "severity"?: string,
   "http_context"?: HttpContext
