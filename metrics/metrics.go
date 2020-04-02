@@ -39,11 +39,21 @@ var (
 		},
 		[]string{"type"},
 	)
+	// ScrappedErrorTotal is a Prometheus gauge to track the number of times that an scrapped aggregated error is produced.
+	ScrappedAggregatedErrorTotal = prometheus.NewGaugeVec(
+		prometheus.GaugeOpts{
+			Namespace: PrometheusNamespace,
+			Name:      "scrapped_aggregated_error_total",
+			Help:      "Total number errors of an scrapped aggregated error.",
+		},
+		[]string{"service_name", "severity", "aggregation_key"},
+	)
 )
 
 func init() {
 	prometheus.MustRegister(InstancesScrapped)
 	prometheus.MustRegister(ErrorsScrapped)
 	prometheus.MustRegister(ServiceErrors)
+	prometheus.MustRegister(ScrappedAggregatedErrorTotal)
 	prometheus.MustRegister(prometheus.NewBuildInfoCollector())
 }
