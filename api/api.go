@@ -25,8 +25,12 @@ func NewHandler(r *repository.ErrorsRepository) http.Handler {
 		if len(path) == 0 {
 			servicesList(w, r)
 		} else if service, err := extractServiceName(path); err == nil {
-			errorsForService(w, r, service, numberOfOccurrencesPerError)
+			err = errorsForService(w, r, service, numberOfOccurrencesPerError)
+			if err != nil {
+				metrics.ErrorCollector.ReportWithHTTPRequest(err, req)
+			}
 		} else {
+			metrics.ErrorCollector.ReportWithHTTPRequest(err, req)
 			http.NotFound(w, req)
 		}
 	})
@@ -40,25 +44,29 @@ func extractServiceName(url string) (string, error) {
 }
 
 func errorsForService(w http.ResponseWriter, r *repository.ErrorsRepository,
-	service string, numberOfOccurrencesPerError int) {
-	if repoErrors, err := (*r).GetErrors(service, numberOfOccurrencesPerError); err == nil {
-		renderJSON(w, repoErrors)
+	service string, numberOfOccurrencesPerError int) error {
+	repoErrors, err := (*r).GetErrors(service, numberOfOccurrencesPerError)
+	if err == nil {
+		err = renderJSON(w, repoErrors)
 	} else {
 		metrics.ServiceErrors.WithLabelValues("get_errors").Inc()
 		http.Error(w, err.Error(), 404)
 	}
+	return err
 }
 
 func servicesList(w http.ResponseWriter, r *repository.ErrorsRepository) {
 	renderJSON(w, (*r).GetServices())
 }
 
-func renderJSON(w http.ResponseWriter, value interface{}) {
-	if valueJSON, err := json.Marshal(value); err == nil {
+func renderJSON(w http.ResponseWriter, value interface{}) error {
+	valueJSON, err := json.Marshal(value)
+	if err == nil {
 		w.Header().Set("Content-Type", "application/json")
 		fmt.Fprintln(w, string(valueJSON))
 	} else {
 		metrics.ServiceErrors.WithLabelValues("render_json").Inc()
 		http.Error(w, err.Error(), 500)
 	}
+	return err
 }
