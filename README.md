@@ -28,6 +28,15 @@ The UI allows navigating and inspecting exceptions as they occur.
 
 ![ui](https://i.imgur.com/Tljxd80.png)
 
+## Building & Running
+We are looking into distributing Periskop via Docker Hub.
+In the meantime, you can build and run Periskop from source:
+
+```
+docker build --tag periskop .
+docker run -v path/to/config.yaml:/etc/periskop/periskop.yaml -p 8080:8080 periskop
+```
+
 ## Client Libraries
 
   - [periskop-scala](https://github.com/soundcloud/periskop-scala)

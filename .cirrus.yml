@@ -31,3 +31,7 @@ task:
     folder: $GOPATH/pkg/mod
   build_script: make build-api
   test_script: make test-api
+
+docker_builder:
+  name: Build Docker Image
+  build_script: docker build --tag periskop .
