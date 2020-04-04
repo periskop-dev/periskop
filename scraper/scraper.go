@@ -133,7 +133,7 @@ func toRepositoryErrorsWithContent(occurrences []errorWithContext) []repository.
 				Stacktrace: occurrence.Error.Stacktrace,
 				Cause:      toRepositoryErrorCause(&occurrence.Error),
 			},
-			HTTPContext: toRepositoryHttpContext(occurrence.HTTPContext),
+			HTTPContext: toRepositoryHTTPContext(occurrence.HTTPContext),
 		})
 	}
 	return errors
@@ -158,7 +158,7 @@ func toRepositoryErrorCause(errorInstance *errorInstance) *repository.ErrorInsta
 	}
 }
 
-func toRepositoryHttpContext(httpContext *httpContext) *repository.HTTPContext {
+func toRepositoryHTTPContext(httpContext *httpContext) *repository.HTTPContext {
 	if httpContext == nil {
 		return nil
 	}
