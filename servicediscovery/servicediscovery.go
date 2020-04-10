@@ -3,8 +3,10 @@ package servicediscovery
 import (
 	"context"
 
-	"github.com/prometheus/prometheus/discovery/dns"
-	"github.com/prometheus/prometheus/discovery/targetgroup"
+	gokit_log "github.com/go-kit/kit/log"
+	"github.com/prometheus/common/log"
+	prometheus_discovery "github.com/prometheus/prometheus/discovery"
+	prometheus_sd_config "github.com/prometheus/prometheus/discovery/config"
 	"github.com/soundcloud/periskop/config"
 )
 
@@ -18,32 +20,48 @@ func EmptyResolvedAddresses() ResolvedAddresses {
 	}
 }
 
-type SRVResolver struct {
-	dnsConfig dns.SDConfig
+type Resolver struct {
+	sdConfig map[string]prometheus_sd_config.ServiceDiscoveryConfig
 }
 
-func NewResolver(c config.Service) SRVResolver {
-	return SRVResolver{
-		dnsConfig: c.DNSServiceDiscovery,
+func NewResolver(service config.Service) Resolver {
+	sdConfig := map[string]prometheus_sd_config.ServiceDiscoveryConfig{
+		service.Name: service.ServiceDiscovery,
+	}
+
+	return Resolver{
+		sdConfig: sdConfig,
 	}
 }
 
-func (r SRVResolver) Resolve() <-chan ResolvedAddresses {
-	out := make(chan ResolvedAddresses)
-
-	srvDiscovery := dns.NewDiscovery(r.dnsConfig, nil)
+func (r Resolver) Resolve() <-chan ResolvedAddresses {
 	ctx := context.Background()
-	groups := make(chan []*targetgroup.Group)
-	go srvDiscovery.Run(ctx, groups)
+	out := make(chan ResolvedAddresses)
+	manager := prometheus_discovery.NewManager(ctx, gokit_log.NewNopLogger())
+
+	err := manager.ApplyConfig(r.sdConfig)
+	if err != nil {
+		log.Fatal("Could not apply SD configuration")
+	}
+
+	go func() {
+		err = manager.Run()
+	}()
+
+	if err != nil {
+		log.Error("Could not initialize SD manager")
+	}
 
 	go func() {
 		for {
 			var addresses []string
-			groupArr := <-groups
-			for i := 0; i < len(groupArr); i++ {
-				group := groupArr[i]
-				for _, target := range group.Targets {
-					addresses = append(addresses, string(target["__address__"]))
+			groups := <-manager.SyncCh()
+			for _, groupArr := range groups {
+				for i := 0; i < len(groupArr); i++ {
+					group := groupArr[i]
+					for _, target := range group.Targets {
+						addresses = append(addresses, string(target["__address__"]))
+					}
 				}
 			}
 			out <- ResolvedAddresses{
