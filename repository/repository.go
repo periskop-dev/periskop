@@ -18,7 +18,7 @@ type ErrorWithContext struct {
 	UUID        string        `json:"uuid"`
 	Timestamp   int64         `json:"timestamp"`
 	Severity    string        `json:"severity"`
-	HTTPContext HTTPContext   `json:"http_context"`
+	HTTPContext *HTTPContext  `json:"http_context"`
 }
 
 type ErrorInstance struct {
