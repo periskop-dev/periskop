@@ -24,7 +24,7 @@ message Error {
     string class = 1;
     string message = 2;
     repeated string stacktrace = 3; // An ordered list of stack trace lines
-    Error cause = 4; // For exceptions triggered by other exceptions
+    Error cause = 4; // Optional, for exceptions triggered by other exceptions
 }
 
 message HttpContext {
