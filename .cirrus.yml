@@ -13,7 +13,7 @@ task:
   name: Lint Api
   container:
     image: golangci/golangci-lint:latest
-  lint_script: golangci-lint run -v --out-format json > lint-report.json
+  lint_script: golangci-lint run --timeout=10m -v --out-format json > lint-report.json
   always:
     golangci_artifacts:
       path: lint-report.json
