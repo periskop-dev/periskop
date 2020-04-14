@@ -42,7 +42,7 @@ groups:
 - name: periskop
   rules:
   - alert: TooManyErrors
-    expr: periskop_scrapped_aggregated_error_total{severity="error"} > 1000
+    expr: periskop_error_occurrences{severity="error"} > 1000
     for: 5m
     labels:
       severity: critical    
