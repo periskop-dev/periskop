@@ -4,9 +4,9 @@ import (
 	"context"
 
 	gokit_log "github.com/go-kit/kit/log"
+	prometheus_discovery "github.com/modularise/prometheus-discovery/discovery"
+	prometheus_discovery_config "github.com/modularise/prometheus-discovery/discovery/config"
 	"github.com/prometheus/common/log"
-	prometheus_discovery "github.com/prometheus/prometheus/discovery"
-	prometheus_sd_config "github.com/prometheus/prometheus/discovery/config"
 	"github.com/soundcloud/periskop/config"
 )
 
@@ -21,11 +21,11 @@ func EmptyResolvedAddresses() ResolvedAddresses {
 }
 
 type Resolver struct {
-	sdConfig map[string]prometheus_sd_config.ServiceDiscoveryConfig
+	sdConfig map[string]prometheus_discovery_config.ServiceDiscoveryConfig
 }
 
 func NewResolver(service config.Service) Resolver {
-	sdConfig := map[string]prometheus_sd_config.ServiceDiscoveryConfig{
+	sdConfig := map[string]prometheus_discovery_config.ServiceDiscoveryConfig{
 		service.Name: service.ServiceDiscovery,
 	}
 
