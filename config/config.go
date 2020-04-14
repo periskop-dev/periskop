@@ -5,7 +5,8 @@ import (
 	"io/ioutil"
 	"time"
 
-	"github.com/prometheus/prometheus/discovery/dns"
+	prometheus_discovery_config "github.com/modularise/prometheus-discovery/discovery/config"
+
 	yaml "gopkg.in/yaml.v2"
 )
 
@@ -14,9 +15,9 @@ type PeriskopConfig struct {
 }
 
 type Service struct {
-	Name                string       `yaml:"name"`
-	DNSServiceDiscovery dns.SDConfig `yaml:"dns_sd_configs"`
-	Scraper             Scraper      `yaml:"scraper"`
+	Name             string                                             `yaml:"name"`
+	ServiceDiscovery prometheus_discovery_config.ServiceDiscoveryConfig `yaml:",inline"`
+	Scraper          Scraper                                            `yaml:"scraper"`
 }
 
 type Scraper struct {
