@@ -48,6 +48,25 @@ docker run -v path/to/config.yaml:/etc/periskop/periskop.yaml -p 8080:8080 peris
   - [periskop-scala](https://github.com/soundcloud/periskop-scala)
   - [periskop-go](https://github.com/soundcloud/periskop-go)
 
+## Alert reported exceptions
+
+All reported errors are instrumented with [Prometheus](https://prometheus.io) which provides alerting capabilities using [Alertmanager](https://prometheus.io/docs/alerting/alertmanager/). You can configure an alert when you reach some threshold of errors. Here's an example:
+
+```yaml
+groups:
+- name: periskop
+  rules:
+  - alert: TooManyErrors
+    expr: periskop_error_occurrences{severity="error"} > 1000
+    for: 5m
+    labels:
+      severity: critical    
+    annotations:
+      summary: "Too many errors on {{ $labels.service_name }}"
+      description: "Errors for {{ $labels.service_name }}({{ $labels.aggregation_key }}) is {{ $value }}"
+      dashboard: "https://periskop.example.com/#/{{ $labels.service_name }}/errors/{{ $labels.aggregation_key }}"
+```
+
 ## Contributing
 
 Please see [CONTRIBUTING.md](CONTRIBUTING.md)

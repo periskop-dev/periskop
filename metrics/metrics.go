@@ -39,11 +39,21 @@ var (
 		},
 		[]string{"type"},
 	)
+	// ErrorOccurrences is a Prometheus gauge to track the number of times that an scrapped aggregated error is produced.
+	ErrorOccurrences = prometheus.NewGaugeVec(
+		prometheus.GaugeOpts{
+			Namespace: PrometheusNamespace,
+			Name:      "error_occurrences",
+			Help:      "Number of occurrences per service, error type and severity.",
+		},
+		[]string{"service_name", "severity", "aggregation_key"},
+	)
 )
 
 func init() {
 	prometheus.MustRegister(InstancesScrapped)
 	prometheus.MustRegister(ErrorsScrapped)
 	prometheus.MustRegister(ServiceErrors)
+	prometheus.MustRegister(ErrorOccurrences)
 	prometheus.MustRegister(prometheus.NewBuildInfoCollector())
 }
