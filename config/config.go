@@ -16,7 +16,7 @@ type PeriskopConfig struct {
 
 type Service struct {
 	Name             string                                             `yaml:"name"`
-	ServiceDiscovery prometheus_discovery_config.ServiceDiscoveryConfig `yaml:"service_discovery"`
+	ServiceDiscovery prometheus_discovery_config.ServiceDiscoveryConfig `yaml:",inline"`
 	Scraper          Scraper                                            `yaml:"scraper"`
 }
 

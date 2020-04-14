@@ -1,12 +1,11 @@
 services:
 - name: mock-target
-  service_discovery:
-    dns_sd_configs:
-    - names:
-      - localhost
-      refresh_interval: 10s
-      type: A
-      port: 7778
+  dns_sd_configs:
+  - names:
+    - localhost
+    refresh_interval: 10s
+    type: A
+    port: 7778
   scraper:
     endpoint: "/errors"
     refresh_interval: 10s
