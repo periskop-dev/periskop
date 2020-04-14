@@ -11,7 +11,7 @@ import (
 	"github.com/soundcloud/periskop/repository"
 )
 
-func NewHandler(r repository.ErrorsRepository) http.Handler {
+func NewHandler(r *repository.ErrorsRepository) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
 		// Allow CORS requests for local development since API and frontend run on different ports
 		origin := req.Header.Get("Origin")
@@ -39,9 +39,9 @@ func extractServiceName(url string) (string, error) {
 	return "", errors.New("invalid path")
 }
 
-func errorsForService(w http.ResponseWriter, r repository.ErrorsRepository,
+func errorsForService(w http.ResponseWriter, r *repository.ErrorsRepository,
 	service string, numberOfOccurrencesPerError int) {
-	if repoErrors, err := r.GetErrors(service, numberOfOccurrencesPerError); err == nil {
+	if repoErrors, err := (*r).GetErrors(service, numberOfOccurrencesPerError); err == nil {
 		renderJSON(w, repoErrors)
 	} else {
 		metrics.ServiceErrors.WithLabelValues("get_errors").Inc()
@@ -49,8 +49,8 @@ func errorsForService(w http.ResponseWriter, r repository.ErrorsRepository,
 	}
 }
 
-func servicesList(w http.ResponseWriter, r repository.ErrorsRepository) {
-	renderJSON(w, r.GetServices())
+func servicesList(w http.ResponseWriter, r *repository.ErrorsRepository) {
+	renderJSON(w, (*r).GetServices())
 }
 
 func renderJSON(w http.ResponseWriter, value interface{}) {

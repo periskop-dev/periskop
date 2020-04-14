@@ -61,7 +61,7 @@ func main() {
 	fs := http.FileServer(http.Dir(webFolder))
 	http.Handle("/", fs)
 
-	http.Handle("/services/", api.NewHandler(repo))
+	http.Handle("/services/", api.NewHandler(&repo))
 	http.Handle("/metrics", promhttp.Handler())
 
 	address := fmt.Sprintf(":%s", *port)
