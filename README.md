@@ -16,7 +16,13 @@ A UI component is provided for convenience.
 
 Errors are scraped and aggregated using a configured endpoint from each of the instances discovered via service discovery.
 
-At the moment, only DNS service discovery is supported. See the [sample configuration](config.dev.yaml).
+Periskop supports all service discovery mechanisms supported by Prometheus. The configuration format for service discovery
+mirrors the one from Prometheus. See [Prometheus's official documentation](https://prometheus.io/docs/prometheus/latest/configuration/configuration/)
+for reference.
+
+At the moment, only DNS has been fully tested, we are working on properly testing the remaining methods.
+
+A full example of service configuration for Periskop can be found in the [sample configuration](config.dev.yaml).
 
 ## Format
 

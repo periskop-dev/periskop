@@ -1,22 +1,15 @@
 module github.com/soundcloud/periskop
 
 require (
-	github.com/beorn7/perks v1.0.1
-	github.com/go-kit/kit v0.9.0
-	github.com/go-logfmt/logfmt v0.5.0
-	github.com/go-stack/stack v1.8.0
-	github.com/golang/protobuf v1.3.2
-	github.com/kr/logfmt v0.0.0-20140226030751-b84e30acd515
-	github.com/matttproud/golang_protobuf_extensions v1.0.1
-	github.com/miekg/dns v1.0.4
-	github.com/prometheus/client_golang v1.3.0
-	github.com/prometheus/client_model v0.1.0
-	github.com/prometheus/common v0.8.0
-	github.com/prometheus/procfs v0.0.8
-	github.com/prometheus/prometheus v2.5.0+incompatible
-	golang.org/x/crypto v0.0.0-20190308221718-c2843e01d9a2
-	golang.org/x/net v0.0.0-20190613194153-d28f0bde5980
-	gopkg.in/yaml.v2 v2.2.7
+	github.com/Azure/go-autorest/autorest/adal v0.8.3 // indirect
+	github.com/aws/aws-sdk-go v1.30.7 // indirect
+	github.com/go-kit/kit v0.10.0
+	github.com/gophercloud/gophercloud v0.10.0 // indirect
+	github.com/modularise/prometheus-discovery v0.0.0-20200412084324-350a8c75636d
+	github.com/prometheus/client_golang v1.5.1
+	google.golang.org/api v0.21.0 // indirect
+	gopkg.in/yaml.v2 v2.2.8
+	k8s.io/utils v0.0.0-20200411171748-3d5a2fe318e4 // indirect
 
 )
 

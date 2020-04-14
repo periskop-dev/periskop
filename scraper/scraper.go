@@ -36,13 +36,13 @@ func combine(first []errorWithContext, second []errorWithContext) []errorWithCon
 }
 
 type Scraper struct {
-	Resolver      servicediscovery.SRVResolver
+	Resolver      servicediscovery.Resolver
 	Repository    *repository.ErrorsRepository
 	ServiceConfig config.Service
 	processor     Processor
 }
 
-func NewScraper(resolver servicediscovery.SRVResolver, r *repository.ErrorsRepository,
+func NewScraper(resolver servicediscovery.Resolver, r *repository.ErrorsRepository,
 	serviceConfig config.Service, processor Processor) Scraper {
 	return Scraper{
 		Resolver:      resolver,
