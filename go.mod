@@ -7,7 +7,6 @@ require (
 	github.com/gophercloud/gophercloud v0.10.0 // indirect
 	github.com/modularise/prometheus-discovery v0.0.0-20200412084324-350a8c75636d
 	github.com/prometheus/client_golang v1.5.1
-	github.com/prometheus/common v0.9.1
 	google.golang.org/api v0.21.0 // indirect
 	gopkg.in/yaml.v2 v2.2.8
 	k8s.io/utils v0.0.0-20200411171748-3d5a2fe318e4 // indirect

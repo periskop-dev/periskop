@@ -3,10 +3,11 @@ package servicediscovery
 import (
 	"context"
 
+	"log"
+
 	gokit_log "github.com/go-kit/kit/log"
 	prometheus_discovery "github.com/modularise/prometheus-discovery/discovery"
 	prometheus_discovery_config "github.com/modularise/prometheus-discovery/discovery/config"
-	"github.com/prometheus/common/log"
 	"github.com/soundcloud/periskop/config"
 )
 
@@ -49,7 +50,7 @@ func (r Resolver) Resolve() <-chan ResolvedAddresses {
 	}()
 
 	if err != nil {
-		log.Error("Could not initialize SD manager")
+		log.Fatal("Could not initialize SD manager")
 	}
 
 	go func() {
