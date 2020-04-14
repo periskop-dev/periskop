@@ -2,6 +2,7 @@ package repository
 
 import (
 	"fmt"
+	"sync"
 
 	"github.com/soundcloud/periskop/metrics"
 )
@@ -41,18 +42,22 @@ type ErrorsRepository interface {
 }
 
 func NewInMemory() ErrorsRepository {
-	var r inMemoryRepository
-	r.AggregatedError = make(map[string][]ErrorAggregate)
-	return r
+	return inMemoryRepository{
+		AggregatedError: make(map[string][]ErrorAggregate),
+		m:               &sync.RWMutex{},
+	}
 }
 
 type inMemoryRepository struct {
+	m *sync.RWMutex
 	// map service name -> errors
 	AggregatedError map[string][]ErrorAggregate
 }
 
 func (r inMemoryRepository) StoreErrors(serviceName string, errors []ErrorAggregate) {
+	r.m.Lock()
 	r.AggregatedError[serviceName] = errors
+	r.m.Unlock()
 }
 
 func (r inMemoryRepository) GetServices() []string {
