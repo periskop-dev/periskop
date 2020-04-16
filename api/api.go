@@ -23,7 +23,10 @@ func NewHandler(r *repository.ErrorsRepository) http.Handler {
 		numberOfOccurrencesPerError := 10
 
 		if len(path) == 0 {
-			servicesList(w, r)
+			err := servicesList(w, r)
+			if err != nil {
+				metrics.ErrorCollector.ReportWithHTTPRequest(err, req)
+			}
 		} else if service, err := extractServiceName(path); err == nil {
 			err = errorsForService(w, r, service, numberOfOccurrencesPerError)
 			if err != nil {
@@ -55,8 +58,8 @@ func errorsForService(w http.ResponseWriter, r *repository.ErrorsRepository,
 	return err
 }
 
-func servicesList(w http.ResponseWriter, r *repository.ErrorsRepository) {
-	renderJSON(w, (*r).GetServices())
+func servicesList(w http.ResponseWriter, r *repository.ErrorsRepository) error {
+	return renderJSON(w, (*r).GetServices())
 }
 
 func renderJSON(w http.ResponseWriter, value interface{}) error {
