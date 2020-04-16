@@ -2,6 +2,7 @@ package repository
 
 import (
 	"fmt"
+	"sync"
 
 	"github.com/soundcloud/periskop/metrics"
 )
@@ -41,30 +42,33 @@ type ErrorsRepository interface {
 }
 
 func NewInMemory() ErrorsRepository {
-	var r inMemoryRepository
-	r.AggregatedError = make(map[string][]ErrorAggregate)
-	return r
+	return &inMemoryRepository{
+		AggregatedError: sync.Map{},
+	}
 }
 
 type inMemoryRepository struct {
 	// map service name -> errors
-	AggregatedError map[string][]ErrorAggregate
+	AggregatedError sync.Map
 }
 
-func (r inMemoryRepository) StoreErrors(serviceName string, errors []ErrorAggregate) {
-	r.AggregatedError[serviceName] = errors
+func (r *inMemoryRepository) StoreErrors(serviceName string, errors []ErrorAggregate) {
+	r.AggregatedError.Store(serviceName, errors)
 }
 
-func (r inMemoryRepository) GetServices() []string {
-	keys := make([]string, 0, len(r.AggregatedError))
-	for k := range r.AggregatedError {
+func (r *inMemoryRepository) GetServices() []string {
+	keys := make([]string, 0)
+	r.AggregatedError.Range(func(key, value interface{}) bool {
+		k, _ := key.(string)
 		keys = append(keys, k)
-	}
+		return true
+	})
 	return keys
 }
 
-func (r inMemoryRepository) GetErrors(serviceName string, numberOfErrors int) ([]ErrorAggregate, error) {
-	if value, ok := r.AggregatedError[serviceName]; ok {
+func (r *inMemoryRepository) GetErrors(serviceName string, numberOfErrors int) ([]ErrorAggregate, error) {
+	if value, ok := r.AggregatedError.Load(serviceName); ok {
+		value, _ := value.([]ErrorAggregate)
 		result := make([]ErrorAggregate, 0, len(value))
 		for _, errorObj := range value {
 			topCap := len(errorObj.LatestErrors)

@@ -11,7 +11,7 @@ import (
 
 func TestRandomPathReturnNotFound(t *testing.T) {
 	r := repository.NewInMemory()
-	handler := NewHandler(r)
+	handler := NewHandler(&r)
 
 	req, _ := http.NewRequest("GET", "/whatever", nil)
 	rr := httptest.NewRecorder()
@@ -25,7 +25,7 @@ func TestRandomPathReturnNotFound(t *testing.T) {
 
 func TestServicesWithEmptyRepoReturnsSuccess(t *testing.T) {
 	r := repository.NewInMemory()
-	handler := NewHandler(r)
+	handler := NewHandler(&r)
 
 	req, _ := http.NewRequest("GET", "/services/", nil)
 	rr := httptest.NewRecorder()
@@ -39,7 +39,7 @@ func TestServicesWithEmptyRepoReturnsSuccess(t *testing.T) {
 
 func TestServicesWithEmptyRepoReturnsEmptyArray(t *testing.T) {
 	r := repository.NewInMemory()
-	handler := NewHandler(r)
+	handler := NewHandler(&r)
 
 	req, _ := http.NewRequest("GET", "/services/", nil)
 	rr := httptest.NewRecorder()
@@ -56,7 +56,7 @@ func TestServicesWithNonEmptyRepoReturnsServiceNames(t *testing.T) {
 	r := repository.NewInMemory()
 	r.StoreErrors("api-test", []repository.ErrorAggregate{})
 
-	handler := NewHandler(r)
+	handler := NewHandler(&r)
 
 	req, _ := http.NewRequest("GET", "/services/", nil)
 	rr := httptest.NewRecorder()
@@ -71,7 +71,7 @@ func TestServicesWithNonEmptyRepoReturnsServiceNames(t *testing.T) {
 
 func TestErrorsForUnknownServiceReturnsNotFound(t *testing.T) {
 	r := repository.NewInMemory()
-	handler := NewHandler(r)
+	handler := NewHandler(&r)
 
 	req, _ := http.NewRequest("GET", "/services/api-test/erros/", nil)
 	rr := httptest.NewRecorder()
@@ -87,7 +87,7 @@ func TestErrorsForKnownServiceReturnsSuccess(t *testing.T) {
 	r := repository.NewInMemory()
 	r.StoreErrors("api-test", []repository.ErrorAggregate{})
 
-	handler := NewHandler(r)
+	handler := NewHandler(&r)
 
 	req, _ := http.NewRequest("GET", "/services/api-test/errors/", nil)
 	rr := httptest.NewRecorder()
@@ -114,7 +114,7 @@ func TestErrorsForKnownServiceReturnsErrors(t *testing.T) {
 			},
 		}})
 
-	handler := NewHandler(r)
+	handler := NewHandler(&r)
 
 	req, _ := http.NewRequest("GET", "/services/api-test/errors/", nil)
 	rr := httptest.NewRecorder()
