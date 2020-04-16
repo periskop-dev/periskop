@@ -10,12 +10,9 @@ services:
     endpoint: "/errors"
     refresh_interval: 10s
 - name: periskop
-  dns_sd_configs:
-  - names:
-    - localhost
-    refresh_interval: 10s
-    type: A
-    port: 7777
+  static_configs:
+  - targets:
+    - localhost:7777
   scraper:
     endpoint: "/errors"
     refresh_interval: 10s
