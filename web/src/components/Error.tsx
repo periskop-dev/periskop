@@ -134,14 +134,28 @@ const ErrorComponent = (props: Props) => {
   }
 
   const renderContextHeaders = (context: HttpContext) => {
-    if (context.request_headers == null) {
-      return ""
+    let headers: Headers = context.request_headers == null ? {} : context.request_headers
+    
+    if (Object.keys(headers).length === 0) {
+      return "";
     } else {
-      return Object.keys(context.request_headers).map((key) => {
-        return renderContextHeadersRow(key, context.request_headers[key])
-      })
+      return (
+        <ListGroup.Item>
+          <h4 className="list-group-item-heading"> Headers</h4>
+          <Table striped>
+            <tbody>
+              {Object.keys(context.request_headers).map((key) => {
+                return renderContextHeadersRow(
+                  key,
+                  context.request_headers[key]
+                );
+              })}
+            </tbody>
+          </Table>
+        </ListGroup.Item>
+      );
     }
-  }
+  };
 
   const renderHttpContext = (context: HttpContext) => {
     if (context == null) {
@@ -160,14 +174,7 @@ const ErrorComponent = (props: Props) => {
             <h4 className="list-group-item-heading"> Method</h4>
             {context.request_method}
           </ListGroup.Item>
-          <ListGroup.Item>
-            <h4 className="list-group-item-heading"> Headers</h4>
-            <Table striped>
-              <tbody>
-                { renderContextHeaders(context) }
-              </tbody>
-            </Table>
-          </ListGroup.Item>
+          {renderContextHeaders(context)}
         </ListGroup>
       </ListGroup.Item>
     )
