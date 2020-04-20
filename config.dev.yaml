@@ -9,3 +9,10 @@ services:
   scraper:
     endpoint: "/errors"
     refresh_interval: 10s
+- name: periskop
+  static_configs:
+  - targets:
+    - localhost:7777
+  scraper:
+    endpoint: "/errors"
+    refresh_interval: 10s

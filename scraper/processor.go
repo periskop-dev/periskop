@@ -6,6 +6,9 @@ import (
 	"net/http"
 	"sync"
 	"time"
+
+	"github.com/soundcloud/periskop-go"
+	"github.com/soundcloud/periskop/metrics"
 )
 
 const httpClientTimeoutSeconds = 30
@@ -60,11 +63,19 @@ func defaultErrorsFetcher() ErrorsFetcher {
 	return func(target string) ([]errorAggregate, error) {
 		body, err := fetch(target)
 		if err != nil {
+			metrics.ErrorCollector.ReportWithHTTPContext(err, &periskop.HTTPContext{
+				RequestMethod: "GET",
+				RequestURL:    target,
+			})
 			return nil, err
 		}
 
 		var responsePayload responsePayload
 		if err := json.Unmarshal(body, &responsePayload); err != nil {
+			metrics.ErrorCollector.ReportWithHTTPContext(err, &periskop.HTTPContext{
+				RequestMethod: "GET",
+				RequestURL:    target,
+			})
 			return nil, err
 		}
 

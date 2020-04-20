@@ -9,9 +9,11 @@ import (
 	"path/filepath"
 
 	"github.com/prometheus/client_golang/prometheus/promhttp"
+	"github.com/soundcloud/periskop-go"
 
 	"github.com/soundcloud/periskop/api"
 	"github.com/soundcloud/periskop/config"
+	"github.com/soundcloud/periskop/metrics"
 	"github.com/soundcloud/periskop/repository"
 	"github.com/soundcloud/periskop/scraper"
 	"github.com/soundcloud/periskop/servicediscovery"
@@ -61,8 +63,12 @@ func main() {
 	fs := http.FileServer(http.Dir(webFolder))
 	http.Handle("/", fs)
 
+	errorExporter := periskop.NewErrorExporter(&metrics.ErrorCollector)
+	periskopHandler := periskop.NewHandler(errorExporter)
+
 	http.Handle("/services/", api.NewHandler(&repo))
 	http.Handle("/metrics", promhttp.Handler())
+	http.Handle("/errors", periskopHandler)
 
 	address := fmt.Sprintf(":%s", *port)
 	log.Printf("Serving on address %s", address)

@@ -2,6 +2,7 @@ package metrics
 
 import (
 	"github.com/prometheus/client_golang/prometheus"
+	"github.com/soundcloud/periskop-go"
 )
 
 const (
@@ -48,6 +49,7 @@ var (
 		},
 		[]string{"service_name", "severity", "aggregation_key"},
 	)
+	ErrorCollector = periskop.NewErrorCollector()
 )
 
 func init() {
