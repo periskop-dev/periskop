@@ -63,7 +63,7 @@ class App extends React.Component<Props> {
   }
 
   handlerErrorSelect(errorKey: string) {
-    this.props.history.push(`/${this.props.match.params.service}/errors/${errorKey}`)
+    this.props.history.push(`/${this.props.match.params.service}/errors/${encodeURIComponent(errorKey)}`)
   }
 
   renderSideBar() {
