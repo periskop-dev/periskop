@@ -41,7 +41,7 @@ const SideBar = (props: Props) => {
     } else {
       return props.errors.map((error, index) => {
         return (
-          <ListGroup.Item action className={"sidebar-item" + " " + sidebarItemClass(error)} onClick={_ => props.handleErrorSelect(error.aggregation_key)} active={ props.activeError === undefined ? false : error.aggregation_key === props.activeError.aggregation_key } key={index}>
+          <ListGroup.Item action className={"sidebar-item" + " " + sidebarItemClass(error)} onClick={_ => props.handleErrorSelect(encodeURI(error.aggregation_key))} active={ props.activeError === undefined ? false : error.aggregation_key === props.activeError.aggregation_key } key={index}>
             {error.aggregation_key} <Badge variant="secondary" className="float-right">{error.total_count}</Badge>
           </ListGroup.Item>
         )
