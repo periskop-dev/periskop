@@ -51,10 +51,11 @@ class App extends React.Component<Props> {
     }
 
     if (RemoteData.isSuccess(this.props.errors)) {
-      let activeError = this.props.errors.data.find(e => e.aggregation_key === this.props.match.params.errorKey)
+      let decodedErrorKey = decodeURIComponent(this.props.match.params.errorKey)
+      let activeError = this.props.errors.data.find(e => e.aggregation_key === decodedErrorKey)
       if (
         activeError !== undefined &&
-        (this.props.activeError !== this.props.match.params.errorKey) &&
+        (this.props.activeError !== decodedErrorKey) &&
         !RemoteData.isLoading(this.props.errors)) {
           this.props.setActiveError(activeError.aggregation_key)
       }
