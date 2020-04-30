@@ -1,4 +1,5 @@
 import * as RemoteData from "data/remote-data";
+import { SORT_FILTERS } from "components/SideBar"
 
 export type Headers = {
   [key: string]: any
@@ -35,12 +36,15 @@ export type ServicesState = {
   services: RemoteData.RemoteData<any, string[]>
 } 
 
+export type SortFilters = keyof typeof SORT_FILTERS
+
 export type ErrorsState = {
   errors: RemoteData.RemoteData<any, AggregatedError[]>
   activeError?: AggregatedError,
   updatedAt?: number,
   activeService?: string,
   latestExceptionIndex: number
+  activeSortFilter: SortFilters,  
 }
 
 export type StoreState = {

@@ -9,3 +9,10 @@
 .sidebar-item-info {
     border-left: 3px solid #4ccfdecd;
 }
+
+.grid-component {
+    &-actions {
+        display: flex;
+        padding-bottom: 15px;
+    }
+}

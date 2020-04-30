@@ -1,13 +1,15 @@
 import { Dispatch } from "redux";
 import * as RemoteData from "data/remote-data";
 import { registerReducer } from "data/store"
-import { AggregatedError, ErrorsState } from "data/types"
+import { AggregatedError, ErrorsState, SortFilters } from "data/types"
+import { errorSortByLatestOccurrence, errorSortByEventCount } from "util/errors"
 
 export const FETCH = "periskop/errors/FETCH"
 export const FETCH_SUCCESS = "periskop/errors/FETCH_SUCCESS"
 export const FETCH_FAILURE = "periskop/errors/FETCH_FAILURE"
 export const SET_ACTIVE_ERROR = "periskop/errors/SET_ACTIVE_ERROR"
 export const SET_CURRENT_EXCEPTION_INDEX = "periskop/errors/SET_CURRENT_EXCEPTION_INDEX"
+export const SET_ERRORS_SORT_FILTER = "periskop/errors/SET_ERRORS_SORT_FILTER"
 
 export type ErrorsAction =
   | { type: typeof FETCH; service: string }
@@ -15,6 +17,7 @@ export type ErrorsAction =
   | { type: typeof FETCH_FAILURE; error: any }
   | { type: typeof SET_ACTIVE_ERROR; errorKey: string }
   | { type: typeof SET_CURRENT_EXCEPTION_INDEX; index: number }
+  | { type: typeof SET_ERRORS_SORT_FILTER; filter: SortFilters }
 
 export const fetchErrors = (service: string) => {
   return(
@@ -51,11 +54,21 @@ export function fetchedErrorsFailed(error: any): ErrorsAction {
   return { type: FETCH_FAILURE, error }
 }
 
+export const setActiveErrorSortFilter = (filter: SortFilters) => {
+  return { type: SET_ERRORS_SORT_FILTER, filter }
+}
+
+const ErrorsSortActions = {
+  "latest_occurrence": errorSortByLatestOccurrence,
+  "event_count": errorSortByEventCount,
+}
+
 const initialState: ErrorsState = {
   errors: RemoteData.idle(),
   activeError: undefined,
   updatedAt: undefined,
-  latestExceptionIndex: 0
+  latestExceptionIndex: 0,
+  activeSortFilter: 'latest_occurrence'
 }
 
 function errorsReducer(state = initialState, action: ErrorsAction) {
@@ -68,7 +81,7 @@ function errorsReducer(state = initialState, action: ErrorsAction) {
         activeService: action.service
       }
     case FETCH_SUCCESS:
-      const sortedErrors = action.errors.sort((a: AggregatedError, b: AggregatedError) => b.latest_errors[0].timestamp - a.latest_errors[0].timestamp)
+      const sortedErrors = ErrorsSortActions[state.activeSortFilter](action.errors)
       return {
         ...state,
         errors: RemoteData.succeed(sortedErrors),
@@ -96,6 +109,21 @@ function errorsReducer(state = initialState, action: ErrorsAction) {
         ...state,
         latestExceptionIndex: action.index
       }
+    case SET_ERRORS_SORT_FILTER:  
+      switch (state.errors.status) {
+        case RemoteData.SUCCESS: {
+          const sortedErrors = ErrorsSortActions[action.filter](state.errors.data)
+
+          return {
+            ...state,
+            activeSortFilter: action.filter,
+            errors: RemoteData.succeed(sortedErrors)
+          }
+        }
+        default: {
+          return state
+        }
+    }
     default:
       return state
   }
