@@ -10,17 +10,16 @@ import { RouteComponentProps, withRouter } from "react-router";
 
 interface DispatchProps {
   setActiveError: (notifcation: string) => void
-  setActiveErrorSortFilter: (filter: SortFilters) => void,
+  setActiveErrorSortFilter: (filter: SortFilters) => void
 }
 
 interface ConnectedProps {
   activeError: AggregatedError
+  activeSortFilter: SortFilters
 }
 
 interface DefaultsProps {
-  errors: AggregatedError[],
-  activeSortFilter: SortFilters,
-  setActiveErrorSortFilter: (filter: SortFilters) => void,
+  errors: AggregatedError[]
   handleErrorSelect: (errorKey: string) => void
 }
 
