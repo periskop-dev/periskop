@@ -1,12 +1,12 @@
 import "SideBar.scss"
-import * as React from "react";
-import { ListGroup, Badge, DropdownButton, ButtonGroup, Dropdown } from "react-bootstrap";
+import * as React from "react"
+import { ListGroup, Badge, DropdownButton, ButtonGroup, Dropdown } from "react-bootstrap"
 
 import { bindActionCreators, Dispatch, AnyAction } from "redux"
 import { connect } from "react-redux"
 import { StoreState, AggregatedError, SortFilters } from "data/types"
 import { setActiveError, setActiveErrorSortFilter } from "data/errors"
-import { RouteComponentProps, withRouter } from "react-router";
+import { RouteComponentProps, withRouter } from "react-router"
 
 interface DispatchProps {
   setActiveError: (notifcation: string) => void
@@ -18,12 +18,12 @@ interface ConnectedProps {
   activeSortFilter: SortFilters
 }
 
-interface DefaultsProps {
+interface DefaultProps extends RouteComponentProps<{ service: string }> {
   errors: AggregatedError[]
   handleErrorSelect: (errorKey: string) => void
 }
 
-type Props = ConnectedProps & DispatchProps & DefaultsProps & RouteComponentProps<{ service: string }>
+type Props = ConnectedProps & DispatchProps & DefaultProps
 
 export const SORT_FILTERS = {
   "latest_occurrence": "Latest Occurence",
@@ -40,8 +40,7 @@ const sidebarItemClass = (error: AggregatedError): string => {
   }
 }
 
-const SideBar = (props: Props) => {
-
+const SideBar: React.FC<Props> = (props) => {
   const renderNavItems = () => {
     if (props.errors.length === 0) {
       return <div>no errors returned from api</div>
@@ -107,4 +106,4 @@ const mapStateToProps = (state: StoreState) => {
   }
 }
 
-export default withRouter(connect<ConnectedProps, {}, RouteComponentProps<{service: string}>>(mapStateToProps, matchDispatchToProps)(SideBar))
+export default withRouter<DefaultProps, typeof SideBar>(connect(mapStateToProps, matchDispatchToProps)(SideBar))
