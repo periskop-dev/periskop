@@ -6,7 +6,6 @@ import { bindActionCreators, Dispatch, AnyAction } from "redux"
 import { connect } from "react-redux"
 import { StoreState, AggregatedError, SortFilters } from "data/types"
 import { setActiveError, setActiveErrorSortFilter } from "data/errors"
-import { RouteComponentProps, withRouter } from "react-router"
 
 interface DispatchProps {
   setActiveError: (notifcation: string) => void
@@ -18,7 +17,7 @@ interface ConnectedProps {
   activeSortFilter: SortFilters
 }
 
-interface DefaultProps extends RouteComponentProps<{ service: string }> {
+interface DefaultProps {
   errors: AggregatedError[]
   handleErrorSelect: (errorKey: string) => void
 }
@@ -41,6 +40,7 @@ const sidebarItemClass = (error: AggregatedError): string => {
 }
 
 const SideBar: React.FC<Props> = (props) => {
+
   const renderNavItems = () => {
     if (props.errors.length === 0) {
       return <div>no errors returned from api</div>
@@ -62,7 +62,7 @@ const SideBar: React.FC<Props> = (props) => {
 
   const renderActions = () =>  {
     return (
-      <div className='grid-component-actions'>
+      <div className="grid-component-actions">
         <DropdownButton
           id="sort-btn"
           as={ButtonGroup}
@@ -106,4 +106,4 @@ const mapStateToProps = (state: StoreState) => {
   }
 }
 
-export default withRouter<DefaultProps, typeof SideBar>(connect(mapStateToProps, matchDispatchToProps)(SideBar))
+export default connect(mapStateToProps, matchDispatchToProps)(SideBar)

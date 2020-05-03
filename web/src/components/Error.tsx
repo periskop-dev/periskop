@@ -6,8 +6,6 @@ import { ButtonGroup } from "react-bootstrap"
 import { setCurrentExceptionIndex } from "data/errors"
 import { bindActionCreators, Dispatch, AnyAction } from "redux"
 import { connect } from "react-redux"
-import { RouteComponentProps } from "react-router"
-
 
 interface ConnectedProps {
   activeError: AggregatedError,
@@ -15,13 +13,14 @@ interface ConnectedProps {
 }
 
 interface DispatchProps {
-  setCurrentExceptionIndex: (number) => void
+  setCurrentExceptionIndex: (num: number) => void
 }
 
 type Props = ConnectedProps & DispatchProps
 
 
-const ErrorComponent = (props: Props) => {
+const ErrorComponent: React.FC<Props> = (props) => {
+
   const calculateNewIndex = (index: number, inc: number, size: number) => {
     return (index + inc % size + size) % size
   }
@@ -222,7 +221,7 @@ const mapStateToProps = (state: StoreState) => {
 }
 
 const matchDispatchToProps = (dispatch: Dispatch<AnyAction>): DispatchProps => {
-  return bindActionCreators({ setCurrentExceptionIndex }, dispatch);
+  return bindActionCreators({ setCurrentExceptionIndex }, dispatch)
 }
 
-export default connect<ConnectedProps, {}, RouteComponentProps<{service: string}>>(mapStateToProps, matchDispatchToProps)(ErrorComponent)
+export default connect(mapStateToProps, matchDispatchToProps)(ErrorComponent)
