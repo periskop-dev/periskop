@@ -6,8 +6,10 @@ import (
 	"log"
 
 	gokit_log "github.com/go-kit/kit/log"
-	prometheus_discovery "github.com/modularise/prometheus-discovery/discovery"
-	prometheus_discovery_config "github.com/modularise/prometheus-discovery/discovery/config"
+	prometheus_discovery "github.com/prometheus/prometheus/discovery"
+	prometheus_discovery_config "github.com/prometheus/prometheus/discovery/config"
+	"github.com/prometheus/prometheus/pkg/labels"
+	"github.com/prometheus/prometheus/pkg/relabel"
 	"github.com/soundcloud/periskop/config"
 )
 
@@ -22,7 +24,8 @@ func EmptyResolvedAddresses() ResolvedAddresses {
 }
 
 type Resolver struct {
-	sdConfig map[string]prometheus_discovery_config.ServiceDiscoveryConfig
+	sdConfig       map[string]prometheus_discovery_config.ServiceDiscoveryConfig
+	relabelConfigs []*relabel.Config
 }
 
 func NewResolver(service config.Service) Resolver {
@@ -31,7 +34,8 @@ func NewResolver(service config.Service) Resolver {
 	}
 
 	return Resolver{
-		sdConfig: sdConfig,
+		sdConfig:       sdConfig,
+		relabelConfigs: service.RelabelConfigs,
 	}
 }
 
@@ -55,13 +59,36 @@ func (r Resolver) Resolve() <-chan ResolvedAddresses {
 
 	go func() {
 		for {
-			var addresses []string
+			var (
+				addresses []string
+				uniq      = make(map[string]struct{})
+			)
 			groups := <-manager.SyncCh()
+
 			for _, groupArr := range groups {
 				for i := 0; i < len(groupArr); i++ {
 					group := groupArr[i]
 					for _, target := range group.Targets {
-						addresses = append(addresses, string(target["__address__"]))
+						discoveredLabels := group.Labels.Merge(target)
+						var labelMap = make(map[string]string)
+						for k, v := range discoveredLabels.Clone() {
+							labelMap[string(k)] = string(v)
+						}
+
+						processedLabels := relabel.Process(labels.FromMap(labelMap), r.relabelConfigs...)
+
+						if processedLabels == nil {
+							continue
+						}
+
+						// Deduplicate group targets with same address
+						labels := processedLabels.Map()
+						if _, prs := uniq[labels["__address__"]]; prs {
+							continue
+						}
+						uniq[labels["__address__"]] = struct{}{}
+
+						addresses = append(addresses, labels["__address__"])
 					}
 				}
 			}
