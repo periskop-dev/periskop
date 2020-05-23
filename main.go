@@ -29,9 +29,9 @@ func main() {
 
 	flag.Parse()
 
-	server_url, env_server := os.LookupEnv("SERVER_URL")
-	if !env_server || server_url == "" {
-		server_url = "localhost"
+	serverURL, envServer := os.LookupEnv("SERVER_URL")
+	if !envServer || serverURL == "" {
+		serverURL = "localhost"
 	}
 
 	basePath, err := filepath.Abs(filepath.Dir(os.Args[0]))
@@ -71,7 +71,7 @@ func main() {
 	errorExporter := periskop.NewErrorExporter(&metrics.ErrorCollector)
 	periskopHandler := periskop.NewHandler(errorExporter)
 
-	http.Handle("/services/", api.NewHandler(&repo, server_url))
+	http.Handle("/services/", api.NewHandler(&repo, serverURL))
 	http.Handle("/metrics", promhttp.Handler())
 	http.Handle("/errors", periskopHandler)
 
