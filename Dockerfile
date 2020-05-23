@@ -23,6 +23,8 @@ RUN npm run build:dist --prefix web
 ## Build final container
 FROM gcr.io/distroless/base
 
+ENV SERVER_URL localhost
+ENV SERVER_PORT 8080
 ENV PORT 8080
 ENV CONFIG_FILE /etc/periskop/periskop.yaml
 
