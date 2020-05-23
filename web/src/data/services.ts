@@ -2,6 +2,7 @@ import { Dispatch } from "redux";
 import * as RemoteData from "data/remote-data";
 import { registerReducer } from "data/store"
 import { ServicesState } from "data/types"
+const METADATA = require('../../config/metadata.js');
 
 export const FETCH = "periskop/services/FETCH"
 export const FETCH_SUCCESS = "periskop/services/FETCH_SUCCESS"
@@ -78,8 +79,9 @@ registerReducer("servicesReducer", servicesReducer)
 
 const parseHostName = () => {
   let windowUrl = new URL(window.location.origin)
-  if (windowUrl.hostname === "localhost") {
-    windowUrl.port = "7777"
+  if (windowUrl.hostname === METADATA.backend_host ) {
+    windowUrl.port = METADATA.backend_port
   }
+
   return windowUrl
 }

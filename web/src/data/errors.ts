@@ -3,6 +3,7 @@ import * as RemoteData from "data/remote-data";
 import { registerReducer } from "data/store"
 import { AggregatedError, ErrorsState, SortFilters } from "data/types"
 import { errorSortByLatestOccurrence, errorSortByEventCount } from "util/errors"
+const METADATA = require('../../config/metadata.js');
 
 export const FETCH = "periskop/errors/FETCH"
 export const FETCH_SUCCESS = "periskop/errors/FETCH_SUCCESS"
@@ -133,8 +134,9 @@ registerReducer("errorsReducer", errorsReducer)
 
 const parseHostName = () => {
   let windowUrl = new URL(window.location.origin)
-  if (windowUrl.hostname === "localhost") {
-    windowUrl.port = "7777"
+  if (windowUrl.hostname === METADATA.backend_host ) {
+    windowUrl.port = METADATA.backend_port
   }
+
   return windowUrl
 }
