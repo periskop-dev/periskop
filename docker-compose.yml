@@ -1,0 +1,59 @@
+version: "3.8"
+services:
+
+  back-end:
+    networks:
+      - backend
+    ports:
+      - "8080:8080"
+      - "7777:7777"
+    volumes: 
+      - .:/periskop-dev
+    environment:
+      - SERVER_URL=${SERVER_URL}
+      - PORT=8080
+      - CONFIG_FILE=./config.dev.yaml
+    build: 
+      context: ./
+      dockerfile: go-dev.Dockerfile
+    command: 
+    - /bin/bash
+    - -c
+    - |
+      go build -o "/periskop-be/app" .
+      "/periskop-be/app"
+  front-end:
+    networks:
+      - backend
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./web:/periskop-dev
+    environment:
+      - SERVER_URL=${SERVER_URL}
+      - SERVER_PORT=8080
+    build: 
+      dockerfile: node-dev.Dockerfile
+      context: ./web
+    working_dir: /periskop-dev
+    command:
+    - /bin/bash
+    - -c
+    - |
+      cp -r . /periskop-modules/.
+      cd /periskop-modules
+      npm start
+    depends_on:
+      - back-end
+  
+  mock-target:
+    networks: 
+      - backend
+    ports: 
+      - "7778:7778"
+    build:
+      dockerfile: Dockerfile
+      context: ./mocktarget
+
+networks:
+  backend:

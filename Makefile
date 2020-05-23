@@ -2,6 +2,7 @@
 
 WEB_FOLDER := web
 PORT := 7777
+DOCKER_IP := $(shell docker-machine ip default)
 
 clean:
 	rm -rf $(WEB_FOLDER)/dist $(WEB_FOLDER)/node_modules
@@ -16,10 +17,10 @@ build-web:
 	npm run build:dist --prefix $(WEB_FOLDER)
 
 run-api:
-	GO111MODULE=on go build -o periskop && ./periskop -port=$(PORT) -config ./config.dev.yaml
+	GO111MODULE=on go build -o periskop && SERVER_URL=localhost ./periskop -port=$(PORT) -config ./config.dev.yaml
 
 run-mock-target:
-	GO111MODULE=on go build -o mock-target mocktarget/mocktarget.go && ./mock-target
+	cd mocktarget && GO111MODULE=on go build -o mock-target mocktarget.go && ./mock-target
 
 run-web:
 	npm start --prefix $(WEB_FOLDER)
@@ -34,3 +35,19 @@ test-api:
 
 lint-api:
 	golangci-lint run
+
+###########################################################################################
+## DOCKER COMPOSE
+###########################################################################################
+
+down:
+	docker-compose down
+
+build-up:
+	SERVER_URL=$(DOCKER_IP) docker-compose up --build -d	
+
+up: clean
+	SERVER_URL=$(DOCKER_IP) docker-compose up -d
+
+logs:
+	docker-compose logs
