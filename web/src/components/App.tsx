@@ -34,7 +34,7 @@ class App extends React.Component<Props> {
     this.handlerErrorSelect = this.handlerErrorSelect.bind(this)
   }
 
-  componentWillMount() {
+  componentDidMount() {
     if (RemoteData.isSuccess(this.props.services)) {
       this.props.fetchErrors(this.props.match.params.service)
     }
