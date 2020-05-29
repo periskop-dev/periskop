@@ -150,6 +150,15 @@ const ErrorComponent: React.FC<Props> = (props) => {
     );
   };
 
+  const renderRequestBody = (request_body: string) => {
+    return(
+      <ListGroup.Item>
+        <h4 className="list-group-item-heading"> Body</h4>
+        {request_body}
+      </ListGroup.Item>
+    );
+  };
+
   const renderHttpContext = (context: HttpContext) => {
     if (context == null) {
       return ""
@@ -168,6 +177,7 @@ const ErrorComponent: React.FC<Props> = (props) => {
             {context.request_method}
           </ListGroup.Item>
           {context.request_headers ? renderContextHeaders(context.request_headers) : null}
+          {context.request_body ? renderRequestBody(context.request_body): null}
         </ListGroup>
       </ListGroup.Item>
     )

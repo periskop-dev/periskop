@@ -63,7 +63,35 @@
                         "request_headers": {
                             "accept": "application/json",
                             "host": "badrequest.org"
-                        }
+                        },
+                        "request_body": "{\"params\":[{\"param1\":\"true\"},{\"param2\":5}]}"
+                    }
+                }
+            ]
+        },
+        {
+            "aggregation_key": "java.lang.Exception@496",
+            "total_count": 440,
+            "severity": "warning",
+            "latest_errors": [
+                {
+                    "error": {
+                        "class": "java.lang.Exception",
+                        "message": "Something bad",
+                        "stacktrace": [],
+                        "cause": null
+                    },
+                    "uuid": "e81e56ff-7f65-4279-1234-dd6075855555",
+                    "timestamp": "2019-09-11T11:46:25.333Z",
+                    "severity": "error",
+                    "http_context": {
+                        "request_method": "GET",
+                        "request_url": "http://badrequest.org/another-endpoint",
+                        "request_headers": {
+                            "accept": "application/json",
+                            "host": "badrequest.org"
+                        },
+                        "request_body": "{\"params\"what:happened[\"}hereparam1\":\"true\"},{\"param2\":5}]}"
                     }
                 }
             ]

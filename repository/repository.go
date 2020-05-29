@@ -33,6 +33,7 @@ type HTTPContext struct {
 	RequestMethod  string            `json:"request_method"`
 	RequestURL     string            `json:"request_url"`
 	RequestHeaders map[string]string `json:"request_headers"`
+	RequestBody    string            `json:"request_body"`
 }
 
 type ErrorsRepository interface {
