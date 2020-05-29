@@ -6,7 +6,7 @@ import (
 	"time"
 
 	prometheus_discovery_config "github.com/prometheus/prometheus/discovery/config"
-	"github.com/prometheus/prometheus/pkg/relabel"
+	prometheus_relabel "github.com/prometheus/prometheus/pkg/relabel"
 
 	yaml "gopkg.in/yaml.v2"
 )
@@ -19,7 +19,7 @@ type Service struct {
 	Name             string                                             `yaml:"name"`
 	ServiceDiscovery prometheus_discovery_config.ServiceDiscoveryConfig `yaml:",inline"`
 	Scraper          Scraper                                            `yaml:"scraper"`
-	RelabelConfigs   []*relabel.Config                                  `yaml:"relabel_configs,omitempty"`
+	RelabelConfigs   []*prometheus_relabel.Config                       `yaml:"relabel_configs,omitempty"`
 }
 
 type Scraper struct {
