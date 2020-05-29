@@ -170,5 +170,6 @@ func toRepositoryHTTPContext(httpContext *httpContext) *repository.HTTPContext {
 		RequestHeaders: httpContext.RequestHeaders,
 		RequestMethod:  httpContext.RequestMethod,
 		RequestURL:     httpContext.RequestURL,
+		RequestBody:    httpContext.RequestBody,
 	}
 }

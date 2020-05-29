@@ -8,7 +8,8 @@ export type Headers = {
 export interface HttpContext {
   "request_method"?: string,
   "request_headers"?: Headers,
-  "request_url"?: string
+  "request_url"?: string,
+  "request_body"?: string
 }
 
 export interface ErrorInstance {
