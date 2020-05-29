@@ -12,7 +12,7 @@ import * as RemoteData from "data/remote-data"
 
 import * as moment from "moment"
 
-import { Navbar, NavItem, Nav, NavDropdown, Button } from "react-bootstrap"
+import { Navbar, Nav, NavDropdown, Button } from "react-bootstrap"
 
 interface ConnectedProps {
   services: RemoteData.RemoteData<any, string[]>,
@@ -83,7 +83,7 @@ class NavbarComponent extends React.Component<Props, {}> {
           fixed="top"
         >
         <Navbar.Brand href="/">
-        <img src={Logo} width='130' height="20"></img>
+        <img src={Logo} width="130" height="20"></img>
         </Navbar.Brand>
         <Navbar.Toggle/>
         <Navbar.Collapse>
@@ -114,4 +114,4 @@ function mapStateToProps(state: StoreState): ConnectedProps {
   }
 }
 
-export default withRouter(connect<ConnectedProps, DispatchProps, {}>(mapStateToProps, matchDispatchToProps)(NavbarComponent))
+export default withRouter(connect(mapStateToProps, matchDispatchToProps)(NavbarComponent))

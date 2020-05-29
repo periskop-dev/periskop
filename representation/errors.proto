@@ -31,4 +31,5 @@ message HttpContext {
     string requestMethod = 1;
     string requestUrl = 2;
     map<string, string> requestHeaders = 3;
+    string requestBody = 4; // Optional
 }

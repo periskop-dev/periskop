@@ -6,8 +6,6 @@ import { ButtonGroup } from "react-bootstrap"
 import { setCurrentExceptionIndex } from "data/errors"
 import { bindActionCreators, Dispatch, AnyAction } from "redux"
 import { connect } from "react-redux"
-import { RouteComponentProps } from "react-router"
-
 
 interface ConnectedProps {
   activeError: AggregatedError,
@@ -15,13 +13,14 @@ interface ConnectedProps {
 }
 
 interface DispatchProps {
-  setCurrentExceptionIndex: (number) => void
+  setCurrentExceptionIndex: (num: number) => void
 }
 
 type Props = ConnectedProps & DispatchProps
 
 
-const ErrorComponent = (props: Props) => {
+const ErrorComponent: React.FC<Props> = (props) => {
+
   const calculateNewIndex = (index: number, inc: number, size: number) => {
     return (index + inc % size + size) % size
   }
@@ -151,6 +150,15 @@ const ErrorComponent = (props: Props) => {
     );
   };
 
+  const renderRequestBody = (request_body: string) => {
+    return(
+      <ListGroup.Item>
+        <h4 className="list-group-item-heading"> Body</h4>
+        {request_body}
+      </ListGroup.Item>
+    );
+  };
+
   const renderHttpContext = (context: HttpContext) => {
     if (context == null) {
       return ""
@@ -169,6 +177,7 @@ const ErrorComponent = (props: Props) => {
             {context.request_method}
           </ListGroup.Item>
           {context.request_headers ? renderContextHeaders(context.request_headers) : null}
+          {context.request_body ? renderRequestBody(context.request_body): null}
         </ListGroup>
       </ListGroup.Item>
     )
@@ -222,7 +231,7 @@ const mapStateToProps = (state: StoreState) => {
 }
 
 const matchDispatchToProps = (dispatch: Dispatch<AnyAction>): DispatchProps => {
-  return bindActionCreators({ setCurrentExceptionIndex }, dispatch);
+  return bindActionCreators({ setCurrentExceptionIndex }, dispatch)
 }
 
-export default connect<ConnectedProps, {}, RouteComponentProps<{service: string}>>(mapStateToProps, matchDispatchToProps)(ErrorComponent)
+export default connect(mapStateToProps, matchDispatchToProps)(ErrorComponent)

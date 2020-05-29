@@ -47,6 +47,8 @@ docker run -v path/to/config.yaml:/etc/periskop/periskop.yaml -p 8080:8080 peris
 
   - [periskop-scala](https://github.com/soundcloud/periskop-scala)
   - [periskop-go](https://github.com/soundcloud/periskop-go)
+  - [periskop-python](https://github.com/soundcloud/periskop-python)
+  
 
 ## Alert reported exceptions
 

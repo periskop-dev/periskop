@@ -83,7 +83,7 @@ class App extends React.Component<Props> {
     switch (this.props.errors.status) {
       case RemoteData.SUCCESS:
       if ((this.props.errors.data.length !== 0 && this.props.activeError !== undefined)) {
-        return <ErrorComponent activeError={this.props.activeError} />
+        return <ErrorComponent />
       }
     }
   }
