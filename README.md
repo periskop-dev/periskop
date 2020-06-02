@@ -20,8 +20,6 @@ Periskop supports all service discovery mechanisms supported by Prometheus. The 
 mirrors the one from Prometheus. See [Prometheus's official documentation](https://prometheus.io/docs/prometheus/latest/configuration/configuration/)
 for reference.
 
-At the moment, only DNS has been fully tested, we are working on properly testing the remaining methods.
-
 A full example of service configuration for Periskop can be found in the [sample configuration](config.dev.yaml).
 
 ## Format
