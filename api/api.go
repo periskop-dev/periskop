@@ -13,7 +13,7 @@ import (
 
 func NewHandler(r *repository.ErrorsRepository, serverURL string) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
-		// Allow CORS requests for local development since API and frontend run on different ports
+		// Allow CORS requests for local development since API and web run on different ports
 		origin := req.Header.Get("Origin")
 		if strings.HasPrefix(origin, fmt.Sprintf("http://%s:", serverURL)) {
 			w.Header().Set("Access-Control-Allow-Origin", origin)

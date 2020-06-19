@@ -49,20 +49,20 @@ In the `Makefile` there's a section for `DOCKER COMPOSE`:
 
 - `make down`: Will call `docker-compose down` which will stop all running containers orchestrated with our `docker-compose` configuration
 - `make build-up`: Forces the building of the different images and then boots the 3 containers
-    + back-end
-    + front-end
+    + api
+    + web
     + mockup-target
-- `make up`: Boots up the 3 containers without a force build. Changes to the front-end fails will livereload in the browser
+- `make up`: Boots up the 3 containers without a force build. Changes to the web fails will livereload in the browser
 - `make logs`: Shows the logs of the 3 containers
 
 If you would like to follow the logs of any container you can do so as follows:
 
 ```bash
 # Front end container - nodejs
-docker-compose logs --follow front-end
+docker-compose logs --follow web
 
 # Back end container - golang
-docker-compose logs --follow back-end
+docker-compose logs --follow api
 
 # The mockup target. Doesn't do much other that show 1 line of code where it is serving the errors - golang
 docker-compose logs --follow mock-target
@@ -70,8 +70,8 @@ docker-compose logs --follow mock-target
 
 All the commands that boot up containers override 2 environment variables:
 
-- `SERVER_URL`: This is the url of the back-end. The `Makefile` will default the `DOCKER_IP` variable to `localhost` and assign it to this variable in case the containers are running inside `Virtualbox` or some other setup that assigns a differnt ip than the host. If your configuration runs `docker` containers with different a different `URL` you can specify by running `make up DOCKER_IP=<your_docker_ip>`
-- `SERVER_PORT`: The port where the back-end will be listening to. It defaults to `8080`.
+- `SERVER_URL`: This is the url of the api. The `Makefile` will default the `DOCKER_IP` variable to `localhost` and assign it to this variable in case the containers are running inside `Virtualbox` or some other setup that assigns a differnt ip than the host. If your configuration runs `docker` containers with different a different `URL` you can specify by running `make up DOCKER_IP=<your_docker_ip>`
+- `SERVER_PORT`: The port where the api will be listening to. It defaults to `8080`.
 
 ## Testing
 

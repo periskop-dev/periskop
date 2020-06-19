@@ -1,9 +1,9 @@
 version: "3.8"
 services:
 
-  back-end:
+  api:
     networks:
-      - backend
+      - api
     ports:
       - "8080:8080"
       - "7777:7777"
@@ -22,9 +22,9 @@ services:
     - |
       go build -o "/periskop-be/app" .
       "/periskop-be/app"
-  front-end:
+  web:
     networks:
-      - backend
+      - api
     ports:
       - "3000:3000"
     volumes:
@@ -44,11 +44,11 @@ services:
       cd /periskop-modules
       npm start
     depends_on:
-      - back-end
+      - api
   
   mock-target:
     networks: 
-      - backend
+      - api
     ports: 
       - "7778:7778"
     build:
@@ -56,4 +56,4 @@ services:
       context: ./mocktarget
 
 networks:
-  backend:
+  api:

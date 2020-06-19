@@ -79,8 +79,8 @@ registerReducer("servicesReducer", servicesReducer)
 
 const parseHostName = () => {
   let windowUrl = new URL(window.location.origin)
-  if (windowUrl.hostname === METADATA.backend_host ) {
-    windowUrl.port = METADATA.backend_port
+  if (windowUrl.hostname === METADATA.api_host ) {
+    windowUrl.port = METADATA.api_port
   }
 
   return windowUrl
