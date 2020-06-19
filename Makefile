@@ -2,7 +2,7 @@
 
 WEB_FOLDER := web
 PORT := 7777
-DOCKER_IP := $(shell docker-machine ip default)
+DOCKER_IP ?= localhost
 
 clean:
 	rm -rf $(WEB_FOLDER)/dist $(WEB_FOLDER)/node_modules
