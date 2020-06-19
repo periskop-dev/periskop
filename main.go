@@ -62,12 +62,6 @@ func main() {
 
 	http.HandleFunc("/-/health", healthHandler)
 
-	webFolder := filepath.Join(basePath, "web/dist")
-	log.Printf("Using webFolder %s", webFolder)
-
-	fs := http.FileServer(http.Dir(webFolder))
-	http.Handle("/", fs)
-
 	errorExporter := periskop.NewErrorExporter(&metrics.ErrorCollector)
 	periskopHandler := periskop.NewHandler(errorExporter)
 
