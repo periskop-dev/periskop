@@ -70,7 +70,7 @@ docker-compose logs --follow mock-target
 
 All the commands that boot up containers override 2 environment variables:
 
-- `SERVER_URL`: This is the url of the back-end. The `Makefile` will grab the `docker-machine ip default` ip and assign it to this variable in case the containers are running inside `Virtualbox` or some other setup that assigns a differnt ip than the host.
+- `SERVER_URL`: This is the url of the back-end. The `Makefile` will default the `DOCKER_IP` variable to `localhost` and assign it to this variable in case the containers are running inside `Virtualbox` or some other setup that assigns a differnt ip than the host. If your configuration runs `docker` containers with different a different `URL` you can specify by running `make up DOCKER_IP=<your_docker_ip>`
 - `SERVER_PORT`: The port where the back-end will be listening to. It defaults to `8080`.
 
 ## Testing
