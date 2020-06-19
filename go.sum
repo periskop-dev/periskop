@@ -725,6 +725,8 @@ github.com/soheilhy/cmux v0.1.4/go.mod h1:IM3LyeVVIOuxMH7sFAkER9+bJ4dT7Ms6E4xg4k
 github.com/sony/gobreaker v0.4.1/go.mod h1:ZKptC7FHNvhBz7dN2LGjPVBz2sZJmc0/PkyDJOjmxWY=
 github.com/soundcloud/periskop-go v0.0.0-20200419230737-a50d012c0265 h1:3cpIeFDEJIPt9deuJLelQwucTUx4c/HgXlNzCeDJYZo=
 github.com/soundcloud/periskop-go v0.0.0-20200419230737-a50d012c0265/go.mod h1:J97ttdY/AWWa4ien4zICHKjSZ2B1yimnPpUI+0lQPeA=
+github.com/soundcloud/periskop-go v0.0.0-20200619115525-5a967764f9b8 h1:iRTZza7rqFX5QB6SBSwIwbeUrk3hbVQfoxeS5I6N+jQ=
+github.com/soundcloud/periskop-go v0.0.0-20200619115525-5a967764f9b8/go.mod h1:J97ttdY/AWWa4ien4zICHKjSZ2B1yimnPpUI+0lQPeA=
 github.com/spaolacci/murmur3 v0.0.0-20180118202830-f09979ecbc72 h1:qLC7fQah7D6K1B0ujays3HV9gkFtllcxhzImRR7ArPQ=
 github.com/spaolacci/murmur3 v0.0.0-20180118202830-f09979ecbc72/go.mod h1:JwIasOWyU6f++ZhiEuf87xNszmSA2myDM2Kzu9HwQUA=
 github.com/spaolacci/murmur3 v1.1.0/go.mod h1:JwIasOWyU6f++ZhiEuf87xNszmSA2myDM2Kzu9HwQUA=
