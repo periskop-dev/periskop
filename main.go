@@ -8,6 +8,7 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/gorilla/mux"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/soundcloud/periskop-go"
 
@@ -65,10 +66,14 @@ func main() {
 
 	errorExporter := periskop.NewErrorExporter(&metrics.ErrorCollector)
 	periskopHandler := periskop.NewHandler(errorExporter)
+	r := mux.NewRouter()
 
-	http.Handle("/services/", api.NewHandler(&repo))
+	r.Handle("/services/", api.NewServicesListHandler(&repo)).Methods(http.MethodGet)
+	r.Handle("/services/{service_name}/errors", api.NewErrorsListHandler(&repo)).Methods(http.MethodGet)
+
 	http.Handle("/metrics", promhttp.Handler())
 	http.Handle("/errors", periskopHandler)
+	http.Handle("/", r)
 
 	address := fmt.Sprintf(":%s", *port)
 	log.Printf("Serving on address %s", address)
