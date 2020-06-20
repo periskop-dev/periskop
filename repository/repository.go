@@ -85,3 +85,16 @@ func (r *inMemoryRepository) GetErrors(serviceName string, numberOfErrors int) (
 	metrics.ServiceErrors.WithLabelValues("service_not_found").Inc()
 	return nil, fmt.Errorf("service %s not found", serviceName)
 }
+
+func (r *inMemoryRepository) DeleteError(serviceName string, key string) {
+	if value, ok := r.AggregatedError.Load(serviceName); ok {
+		value, _ := value.([]ErrorAggregate)
+		newValues := []ErrorAggregate{}
+		for _, errorObj := range value {
+			if errorObj.AggregationKey != key {
+				newValues = append(newValues, errorObj)
+			}
+		}
+		r.StoreErrors(serviceName, newValues)
+	}
+}
