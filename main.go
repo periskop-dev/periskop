@@ -56,8 +56,6 @@ func main() {
 		go s.Scrape()
 	}
 
-	http.HandleFunc("/-/health", healthHandler)
-
 	webFolder := filepath.Join(basePath, "web/dist")
 	log.Printf("Using webFolder %s", webFolder)
 
@@ -68,12 +66,19 @@ func main() {
 	periskopHandler := periskop.NewHandler(errorExporter)
 	r := mux.NewRouter()
 
-	r.Handle("/services/", api.NewServicesListHandler(&repo)).Methods(http.MethodGet)
-	r.Handle("/services/{service_name}/errors", api.NewErrorsListHandler(&repo)).Methods(http.MethodGet)
+	// API routing
+	r.Handle("/services/",
+		api.NewServicesListHandler(&repo)).Methods(http.MethodGet)
+	r.Handle("/services/{service_name}/errors",
+		api.NewErrorsListHandler(&repo)).Methods(http.MethodGet)
+	r.Handle("/services/{service_name}/errors/{error_key}/",
+		api.NewErrorDeleteHandler(&repo)).Methods(http.MethodDelete)
+	http.Handle("/", r)
 
+	// Telemetry endpoints
 	http.Handle("/metrics", promhttp.Handler())
 	http.Handle("/errors", periskopHandler)
-	http.Handle("/", r)
+	http.HandleFunc("/-/health", healthHandler)
 
 	address := fmt.Sprintf(":%s", *port)
 	log.Printf("Serving on address %s", address)

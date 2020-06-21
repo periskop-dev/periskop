@@ -38,6 +38,21 @@ func NewErrorsListHandler(r *repository.ErrorsRepository) http.Handler {
 	})
 }
 
+func NewErrorDeleteHandler(r *repository.ErrorsRepository) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+		allowCORS(w, req)
+		vars := mux.Vars(req)
+
+		if service, found := vars["service_name"]; found {
+			errKey := vars["error_key"]
+			(*r).DeleteError(service, errKey)
+			w.WriteHeader(http.StatusNoContent)
+		} else {
+			http.NotFound(w, req)
+		}
+	})
+}
+
 func allowCORS(w http.ResponseWriter, req *http.Request) {
 	// Allow CORS requests for local development since API and frontend run on different ports
 	origin := req.Header.Get("Origin")

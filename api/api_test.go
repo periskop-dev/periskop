@@ -53,7 +53,7 @@ func TestServicesWithNonEmptyRepoReturnsServiceNames(t *testing.T) {
 func serveMockServiceList(rr *httptest.ResponseRecorder, r repository.ErrorsRepository) {
 	handler := NewServicesListHandler(&r)
 	router := mux.NewRouter()
-	router.Handle("/services/", handler)
+	router.Handle("/services/", handler).Methods(http.MethodGet)
 	req, _ := http.NewRequest("GET", "/services/", nil)
 	router.ServeHTTP(rr, req)
 }
@@ -111,7 +111,40 @@ func TestErrorsForKnownServiceReturnsErrors(t *testing.T) {
 func serveMockErrorList(rr *httptest.ResponseRecorder, r repository.ErrorsRepository, serviceName string) {
 	handler := NewErrorsListHandler(&r)
 	router := mux.NewRouter()
-	router.Handle("/services/{service_name}/errors/", handler)
+	router.Handle("/services/{service_name}/errors/", handler).Methods(http.MethodGet)
 	req, _ := http.NewRequest("GET", fmt.Sprintf("/services/%s/errors/", serviceName), nil)
+	router.ServeHTTP(rr, req)
+}
+
+func TestDeleteErrorForUnknownServiceReturnsNotFound(t *testing.T) {
+	r := repository.NewInMemory()
+	rr := httptest.NewRecorder()
+	serveMockErrorDelete(rr, r, "api-test", "test")
+
+	if status := rr.Code; status != http.StatusNotFound {
+		t.Errorf("handler returned wrong status code: got %v want %v",
+			status, http.StatusNotFound)
+	}
+}
+
+func TestDeleteErrorsReturnsSuccess(t *testing.T) {
+	r := repository.NewInMemory()
+	r.StoreErrors("api-test", []repository.ErrorAggregate{})
+
+	rr := httptest.NewRecorder()
+	serveMockErrorDelete(rr, r, "api-test", "test")
+
+	if status := rr.Code; status != http.StatusNoContent {
+		t.Errorf("handler returned wrong status code: got %v want %v",
+			status, http.StatusOK)
+	}
+}
+
+func serveMockErrorDelete(rr *httptest.ResponseRecorder, r repository.ErrorsRepository,
+	serviceName string, errKey string) {
+	handler := NewErrorDeleteHandler(&r)
+	router := mux.NewRouter()
+	router.Handle("/services/{service_name}/errors/{error_key}/", handler).Methods(http.MethodDelete)
+	req, _ := http.NewRequest("DELETE", fmt.Sprintf("/services/%s/errors/%s/", serviceName, errKey), nil)
 	router.ServeHTTP(rr, req)
 }

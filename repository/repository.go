@@ -40,6 +40,7 @@ type ErrorsRepository interface {
 	StoreErrors(serviceName string, errors []ErrorAggregate)
 	GetServices() []string
 	GetErrors(serviceName string, numberOfErrors int) ([]ErrorAggregate, error)
+	DeleteError(serviceName string, key string)
 }
 
 func NewInMemory() ErrorsRepository {
