@@ -58,24 +58,23 @@ func main() {
 
 	webFolder := filepath.Join(basePath, "web/dist")
 	log.Printf("Using webFolder %s", webFolder)
-
 	fs := http.FileServer(http.Dir(webFolder))
-	http.Handle("/", fs)
-
-	errorExporter := periskop.NewErrorExporter(&metrics.ErrorCollector)
-	periskopHandler := periskop.NewHandler(errorExporter)
-	r := mux.NewRouter()
 
 	// API routing
+	r := mux.NewRouter()
 	r.Handle("/services/",
 		api.NewServicesListHandler(&repo)).Methods(http.MethodGet)
-	r.Handle("/services/{service_name}/errors",
+	r.Handle("/services/{service_name}/errors/",
 		api.NewErrorsListHandler(&repo)).Methods(http.MethodGet)
 	r.Handle("/services/{service_name}/errors/{error_key}/",
 		api.NewErrorDeleteHandler(&repo)).Methods(http.MethodDelete)
+	r.Handle("/", fs)
 	http.Handle("/", r)
 
 	// Telemetry endpoints
+	errorExporter := periskop.NewErrorExporter(&metrics.ErrorCollector)
+	periskopHandler := periskop.NewHandler(errorExporter)
+
 	http.Handle("/metrics", promhttp.Handler())
 	http.Handle("/errors", periskopHandler)
 	http.HandleFunc("/-/health", healthHandler)
