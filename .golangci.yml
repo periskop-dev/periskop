@@ -5,6 +5,7 @@ linters:
     - wsl
     - gochecknoinits
     - godox
+    - interfacer
 run:
   skip-dirs:
     - web
