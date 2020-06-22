@@ -66,7 +66,7 @@ func defaultErrorsFetcher() ErrorsFetcher {
 			metrics.ErrorCollector.ReportWithHTTPContext(err, &periskop.HTTPContext{
 				RequestMethod: "GET",
 				RequestURL:    target,
-			})
+			}, "scrapped-url-error")
 			return nil, err
 		}
 
