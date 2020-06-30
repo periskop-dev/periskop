@@ -1,9 +1,9 @@
 import "SideBar.scss"
 import * as React from "react"
 import { ListGroup, Badge, DropdownButton, ButtonGroup, Dropdown } from "react-bootstrap"
+import { connect } from "react-redux"
 
 import { bindActionCreators, Dispatch, AnyAction } from "redux"
-import { connect } from "react-redux"
 import { StoreState, AggregatedError, SortFilters } from "data/types"
 import { setActiveError, setActiveErrorSortFilter } from "data/errors"
 
@@ -20,6 +20,7 @@ interface ConnectedProps {
 interface DefaultProps {
   errors: AggregatedError[]
   handleErrorSelect: (errorKey: string) => void
+  onSearchByAggredgatedKey: (errorKey: string) => void
 }
 
 type Props = ConnectedProps & DispatchProps & DefaultProps
@@ -28,6 +29,7 @@ export const SORT_FILTERS = {
   "latest_occurrence": "Latest Occurence",
   "event_count": "Event Count",
 }
+
 
 const sidebarItemClass = (error: AggregatedError): string => {
   if (error.severity === "info") {
@@ -41,7 +43,16 @@ const sidebarItemClass = (error: AggregatedError): string => {
 
 const SideBar: React.FC<Props> = (props) => {
 
-  const renderNavItems = () => {
+  const onSearchByKeyChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const { value } = event.target
+    props.onSearchByAggredgatedKey(value)
+  }
+
+  const renderErrors = () => {
+    if (!Array.isArray(props.errors)) {
+      return <div>loading...</div>
+    }
+
     if (props.errors.length === 0) {
       return <div>no errors returned from api</div>
     }
@@ -60,7 +71,7 @@ const SideBar: React.FC<Props> = (props) => {
     })
   }
 
-  const renderActions = () =>  {
+  const renderActions = () => {
     return (
       <div className="grid-component-actions">
         <DropdownButton
@@ -80,8 +91,13 @@ const SideBar: React.FC<Props> = (props) => {
             </Dropdown.Item>
           ))}
         </DropdownButton>
+
+        <input
+          onChange={onSearchByKeyChange}
+          placeholder="Search for an error"
+        />
       </div>
-      )
+    )
   }
 
   return (
@@ -89,7 +105,7 @@ const SideBar: React.FC<Props> = (props) => {
       {renderActions()}
 
       <ListGroup>
-        {renderNavItems()}
+        {renderErrors()}
       </ListGroup>
     </div>
   )

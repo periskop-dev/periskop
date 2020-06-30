@@ -20,7 +20,7 @@ export type ErrorsAction =
   | { type: typeof SET_ERRORS_SORT_FILTER; filter: SortFilters }
 
 export const fetchErrors = (service: string) => {
-  return(
+  return (
     dispatch: Dispatch<ErrorsAction>
   ) => {
     dispatch(fetchingErrors(service))
@@ -47,7 +47,7 @@ export function fetchingErrors(service: string): ErrorsAction {
 }
 
 export function fetchedErrorsSuccessfully(errors: AggregatedError[], service: string): ErrorsAction {
-  return { type: FETCH_SUCCESS, errors}
+  return { type: FETCH_SUCCESS, errors }
 }
 
 export function fetchedErrorsFailed(error: any): ErrorsAction {
@@ -68,7 +68,7 @@ const initialState: ErrorsState = {
   activeError: undefined,
   updatedAt: undefined,
   latestExceptionIndex: 0,
-  activeSortFilter: 'latest_occurrence'
+  activeSortFilter: "latest_occurrence",
 }
 
 function errorsReducer(state = initialState, action: ErrorsAction) {
@@ -92,24 +92,24 @@ function errorsReducer(state = initialState, action: ErrorsAction) {
       return {
         errors: RemoteData.fail(action.error)
       }
-      case SET_ACTIVE_ERROR:
-        switch (state.errors.status) {
-          case RemoteData.SUCCESS:
-            return {
-              ...state,
-              activeError: state.errors.data.find(e => e.aggregation_key === action.errorKey),
-              latestExceptionIndex: 0
-            }
-          default: {
-            return state
+    case SET_ACTIVE_ERROR:
+      switch (state.errors.status) {
+        case RemoteData.SUCCESS:
+          return {
+            ...state,
+            activeError: state.errors.data.find(e => e.aggregation_key === action.errorKey),
+            latestExceptionIndex: 0
           }
+        default: {
+          return state
         }
+      }
     case SET_CURRENT_EXCEPTION_INDEX:
       return {
         ...state,
         latestExceptionIndex: action.index
       }
-    case SET_ERRORS_SORT_FILTER:  
+    case SET_ERRORS_SORT_FILTER:
       switch (state.errors.status) {
         case RemoteData.SUCCESS: {
           const sortedErrors = ErrorsSortActions[action.filter](state.errors.data)
@@ -123,7 +123,7 @@ function errorsReducer(state = initialState, action: ErrorsAction) {
         default: {
           return state
         }
-    }
+      }
     default:
       return state
   }
