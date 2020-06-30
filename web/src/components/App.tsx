@@ -111,6 +111,7 @@ class App extends React.Component<Props, State> {
               errors={this.state.errors}
               handleErrorSelect={this.handlerErrorSelect}
               onSearchByAggredgatedKey={this.handleFilterByAggregatedkey}
+              searchKey={this.state.searchKey}
             />
           )
         }

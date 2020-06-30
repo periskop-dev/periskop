@@ -19,6 +19,7 @@ interface ConnectedProps {
 
 interface DefaultProps {
   errors: AggregatedError[]
+  searchKey: string
   handleErrorSelect: (errorKey: string) => void
   onSearchByAggredgatedKey: (errorKey: string) => void
 }
@@ -95,6 +96,7 @@ const SideBar: React.FC<Props> = (props) => {
         <input
           onChange={onSearchByKeyChange}
           placeholder="Search for an error"
+          value={props.searchKey}
         />
       </div>
     )
