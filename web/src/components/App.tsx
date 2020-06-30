@@ -44,35 +44,38 @@ class App extends React.Component<Props, State> {
     this.handlerErrorSelect = this.handlerErrorSelect.bind(this)
   }
 
-  componentWillMount() {
+  componentDidMount() {
     if (RemoteData.isSuccess(this.props.services)) {
       this.props.fetchErrors(this.props.match.params.service)
     }
   }
 
   componentDidUpdate(prevProps: Props) {
-    if (RemoteData.isSuccess(this.props.services)) {
+    const { activeService, services, errors, match, fetchErrors, setActiveError } = this.props
+    const { searchKey } = this.state
+
+    if (RemoteData.isSuccess(services)) {
       if (
-        this.props.services.data.includes(this.props.match.params.service) &&
-        (this.props.activeService !== this.props.match.params.service) &&
-        !RemoteData.isLoading(this.props.errors)) {
-        this.props.fetchErrors(this.props.match.params.service)
+        services.data.includes(match.params.service) &&
+        (activeService !== match.params.service) &&
+        !RemoteData.isLoading(errors)) {
+        fetchErrors(match.params.service)
       }
     }
 
-    if (RemoteData.isSuccess(this.props.errors)) {
-      let decodedErrorKey = decodeURIComponent(this.props.match.params.errorKey)
-      let activeError = this.props.errors.data.find(e => e.aggregation_key === decodedErrorKey)
+    if (RemoteData.isSuccess(errors)) {
+      let decodedErrorKey = decodeURIComponent(match.params.errorKey)
+      let activeError = errors.data.find(e => e.aggregation_key === decodedErrorKey)
       if (
         activeError !== undefined &&
-        (this.props.activeError !== decodedErrorKey) &&
-        !RemoteData.isLoading(this.props.errors)) {
-        this.props.setActiveError(activeError.aggregation_key)
+        (activeError !== decodedErrorKey) &&
+        !RemoteData.isLoading(errors)) {
+        setActiveError(activeError.aggregation_key)
       }
 
-      const hasNewErrors = this.props.errors !== prevProps.errors && this.props.errors
+      const hasNewErrors = errors !== prevProps.errors && errors
       if (hasNewErrors) {
-        this.handleFilterByAggregatedkey(this.state.searchKey)
+        this.handleFilterByAggregatedkey(searchKey)
       }
     }
   }
