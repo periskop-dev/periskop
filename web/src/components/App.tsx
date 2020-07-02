@@ -25,39 +25,57 @@ interface DispatchProps {
   setActiveError: (errorKey: string) => void
 }
 
-type Props = ConnectedProps & DispatchProps & RouteComponentProps<{service: string, errorKey: string}>
+type Props = ConnectedProps & DispatchProps & RouteComponentProps<{ service: string, errorKey: string }>
 
-class App extends React.Component<Props> {
+export interface State {
+  errors: AggregatedError[]
+  searchKey: string,
+}
+
+
+class App extends React.Component<Props, State> {
+  state = {
+    errors: [],
+    searchKey: "",
+  }
 
   constructor(props, context) {
     super(props, context)
     this.handlerErrorSelect = this.handlerErrorSelect.bind(this)
   }
 
-  componentWillMount() {
+  componentDidMount() {
     if (RemoteData.isSuccess(this.props.services)) {
       this.props.fetchErrors(this.props.match.params.service)
     }
   }
 
-  componentDidUpdate() {
-    if (RemoteData.isSuccess(this.props.services)) {
+  componentDidUpdate(prevProps: Props) {
+    const { activeService, services, errors, match, fetchErrors, setActiveError } = this.props
+    const { searchKey } = this.state
+
+    if (RemoteData.isSuccess(services)) {
       if (
-        this.props.services.data.includes(this.props.match.params.service) &&
-        (this.props.activeService !== this.props.match.params.service) &&
-        !RemoteData.isLoading(this.props.errors)) {
-          this.props.fetchErrors(this.props.match.params.service)
+        services.data.includes(match.params.service) &&
+        (activeService !== match.params.service) &&
+        !RemoteData.isLoading(errors)) {
+        fetchErrors(match.params.service)
       }
     }
 
-    if (RemoteData.isSuccess(this.props.errors)) {
-      let decodedErrorKey = decodeURIComponent(this.props.match.params.errorKey)
-      let activeError = this.props.errors.data.find(e => e.aggregation_key === decodedErrorKey)
+    if (RemoteData.isSuccess(errors)) {
+      let decodedErrorKey = decodeURIComponent(match.params.errorKey)
+      let activeError = errors.data.find(e => e.aggregation_key === decodedErrorKey)
       if (
         activeError !== undefined &&
-        (this.props.activeError !== decodedErrorKey) &&
-        !RemoteData.isLoading(this.props.errors)) {
-          this.props.setActiveError(activeError.aggregation_key)
+        (activeError !== decodedErrorKey) &&
+        !RemoteData.isLoading(errors)) {
+        setActiveError(activeError.aggregation_key)
+      }
+
+      const hasNewErrors = errors !== prevProps.errors && errors
+      if (hasNewErrors) {
+        this.handleFilterByAggregatedkey(searchKey)
       }
     }
   }
@@ -66,13 +84,36 @@ class App extends React.Component<Props> {
     this.props.history.push(`/${this.props.match.params.service}/errors/${encodeURIComponent(errorKey)}`)
   }
 
+  handleFilterByAggregatedkey = (key: string) => {
+    const { errors } = this.props
+
+    switch (errors.status) {
+      case RemoteData.SUCCESS:
+
+        return this.setState({
+          errors: errors.data.filter((error) => error.aggregation_key.includes(key.toLowerCase())),
+          searchKey: key,
+        })
+
+      case RemoteData.LOADING:
+        return <div>fetching errors...</div>
+    }
+  }
+
   renderSideBar() {
     switch (this.props.errors.status) {
       case RemoteData.SUCCESS:
         if (this.props.errors.data.length === 0) {
           return <div>no errors returned by api</div>
         } else {
-          return <SideBar errors={this.props.errors.data} handleErrorSelect={this.handlerErrorSelect}/>
+          return (
+            <SideBar
+              errors={this.state.errors}
+              handleErrorSelect={this.handlerErrorSelect}
+              onSearchByAggredgatedKey={this.handleFilterByAggregatedkey}
+              searchKey={this.state.searchKey}
+            />
+          )
         }
       case RemoteData.LOADING:
         return <div>fetching errors...</div>
@@ -82,26 +123,26 @@ class App extends React.Component<Props> {
   renderError() {
     switch (this.props.errors.status) {
       case RemoteData.SUCCESS:
-      if ((this.props.errors.data.length !== 0 && this.props.activeError !== undefined)) {
-        return <ErrorComponent />
-      }
+        if ((this.props.errors.data.length !== 0 && this.props.activeError !== undefined)) {
+          return <ErrorComponent />
+        }
     }
   }
 
   render() {
     return (
       <div className="app-component">
-          <Container fluid className="app-component-grid">
-            <Row className="app-component-row">
-              <Col xs={3} id="left-column">
-                {this.renderSideBar()}
-              </Col>
-              <Col xs={9} id="right-column">
-                {this.renderError()}
-              </Col>
-            </Row>
-          </Container>
-        </div>
+        <Container fluid className="app-component-grid">
+          <Row className="app-component-row">
+            <Col xs={3} id="left-column">
+              {this.renderSideBar()}
+            </Col>
+            <Col xs={9} id="right-column">
+              {this.renderError()}
+            </Col>
+          </Row>
+        </Container>
+      </div>
     )
   }
 }
@@ -119,4 +160,4 @@ const matchDispatchToProps = (dispatch: Dispatch<AnyAction>): DispatchProps => {
   return bindActionCreators({ fetchErrors, setActiveError }, dispatch);
 }
 
-export default withRouter(connect<ConnectedProps, {}, RouteComponentProps<{service: string}>>(mapStateToProps, matchDispatchToProps)(App))
+export default withRouter(connect<ConnectedProps, {}, RouteComponentProps<{ service: string }>>(mapStateToProps, matchDispatchToProps)(App))
