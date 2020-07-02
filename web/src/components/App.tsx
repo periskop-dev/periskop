@@ -12,6 +12,7 @@ import { StoreState, AggregatedError } from "data/types"
 import { fetchErrors, setActiveError } from "data/errors"
 
 import { Row, Col, Container } from "react-bootstrap"
+import { filterErrorsBySubstringMatch } from "util/errors"
 
 interface ConnectedProps {
   errors: RemoteData.RemoteData<any, AggregatedError[]>,
@@ -29,14 +30,14 @@ type Props = ConnectedProps & DispatchProps & RouteComponentProps<{ service: str
 
 export interface State {
   errors: AggregatedError[]
-  searchKey: string,
+  searchTerm: string,
 }
 
 
 class App extends React.Component<Props, State> {
   state = {
     errors: [],
-    searchKey: "",
+    searchTerm: "",
   }
 
   constructor(props, context) {
@@ -52,7 +53,7 @@ class App extends React.Component<Props, State> {
 
   componentDidUpdate(prevProps: Props) {
     const { activeService, services, errors, match, fetchErrors, setActiveError } = this.props
-    const { searchKey } = this.state
+    const { searchTerm } = this.state
 
     if (RemoteData.isSuccess(services)) {
       if (
@@ -75,7 +76,7 @@ class App extends React.Component<Props, State> {
 
       const hasNewErrors = errors !== prevProps.errors && errors
       if (hasNewErrors) {
-        this.handleFilterByAggregatedkey(searchKey)
+        this.handleFilterByAggregatedKey(searchTerm)
       }
     }
   }
@@ -84,15 +85,14 @@ class App extends React.Component<Props, State> {
     this.props.history.push(`/${this.props.match.params.service}/errors/${encodeURIComponent(errorKey)}`)
   }
 
-  handleFilterByAggregatedkey = (key: string) => {
+  handleFilterByAggregatedKey = (searchTerm: string) => {
     const { errors } = this.props
 
     switch (errors.status) {
       case RemoteData.SUCCESS:
-
         return this.setState({
-          errors: errors.data.filter((error) => error.aggregation_key.includes(key.toLowerCase())),
-          searchKey: key,
+          errors: filterErrorsBySubstringMatch(errors.data, searchTerm),
+          searchTerm,
         })
 
       case RemoteData.LOADING:
@@ -110,8 +110,8 @@ class App extends React.Component<Props, State> {
             <SideBar
               errors={this.state.errors}
               handleErrorSelect={this.handlerErrorSelect}
-              onSearchByAggredgatedKey={this.handleFilterByAggregatedkey}
-              searchKey={this.state.searchKey}
+              onSearchByAggredgatedKey={this.handleFilterByAggregatedKey}
+              searchKey={this.state.searchTerm}
             />
           )
         }

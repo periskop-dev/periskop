@@ -7,3 +7,7 @@ export const errorSortByLatestOccurrence = (errors: AggregatedError[]) => {
 export const errorSortByEventCount = (errors: AggregatedError[]) => {
   return [...errors].sort((a, b) => a.total_count >= b.total_count ? -1 : 1)
 }
+
+export const filterErrorsBySubstringMatch = (errors: AggregatedError[], searchTerm: string) => {
+  return errors.filter((error) => error.aggregation_key.toLowerCase().includes(searchTerm.toLowerCase()))
+}
