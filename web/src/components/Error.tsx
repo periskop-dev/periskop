@@ -13,7 +13,8 @@ interface ConnectedProps {
 }
 
 interface DispatchProps {
-  setCurrentExceptionIndex: (num: number) => void
+  setCurrentExceptionIndex: (num: number) => void,
+  deleteError: (service: string, errorKey: string) => void
 }
 
 type Props = ConnectedProps & DispatchProps
@@ -183,9 +184,16 @@ const ErrorComponent: React.FC<Props> = (props) => {
     )
   }
 
+  const deleteError = () => {
+    props.deleteError("mock-target", props.activeError.aggregation_key)
+  }
+    
   const renderAggregatedError = () => {
     return (
       <div className={"grid-component"}>
+        <ButtonGroup className="float-right">
+          <Button variant="outline-danger" size="sm" onClick={() => deleteError()}>Delete</Button>
+        </ButtonGroup>
         <h3 className="list-group-item-heading"> Summary</h3>
         <ListGroup>
           <ListGroup.Item>
@@ -210,7 +218,7 @@ const ErrorComponent: React.FC<Props> = (props) => {
           <Button variant="outline-dark" size="sm" onClick={() => showPreviousException()}>Previous</Button>
           <Button variant="outline-dark" size="sm" onClick={() => showNextException()} >Next</Button>
         </ButtonGroup>
-        <h3 className="list-group-item-heading"> Latest Occurences <Badge variant="light">{props.latestExceptionIndex+1 + "/" + props.activeError.latest_errors.length}</Badge></h3>
+        <h3 className="list-group-item-heading"> Latest Occurrences <Badge variant="light">{props.latestExceptionIndex+1 + "/" + props.activeError.latest_errors.length}</Badge></h3>
         {renderError(props.activeError.latest_errors[props.latestExceptionIndex]) }
       </div>
     )
