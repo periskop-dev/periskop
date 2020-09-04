@@ -11,7 +11,10 @@ func TestDeleteError(t *testing.T) {
 		{AggregationKey: "test-error-0"},
 		{AggregationKey: "test-error-1"},
 	})
-	er.DeleteError(serviceName, "test-error-0")
+	err := er.DeleteError(serviceName, "test-error-0")
+	if err != nil {
+		t.Errorf("deleting the error")
+	}
 	if value, ok := er.AggregatedError.Load(serviceName); ok {
 		value, _ := value.([]ErrorAggregate)
 		if len(value) != 1 {
