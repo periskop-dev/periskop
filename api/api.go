@@ -13,7 +13,6 @@ import (
 
 func NewServicesListHandler(r *repository.ErrorsRepository) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
-		allowCORS(w, req)
 		err := servicesList(w, r)
 		if err != nil {
 			metrics.ErrorCollector.ReportWithHTTPRequest(err, req)
@@ -23,7 +22,6 @@ func NewServicesListHandler(r *repository.ErrorsRepository) http.Handler {
 
 func NewErrorsListHandler(r *repository.ErrorsRepository) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
-		allowCORS(w, req)
 		vars := mux.Vars(req)
 		numberOfOccurrencesPerError := 10
 
@@ -40,7 +38,6 @@ func NewErrorsListHandler(r *repository.ErrorsRepository) http.Handler {
 
 func NewErrorDeleteHandler(r *repository.ErrorsRepository) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
-		allowCORS(w, req)
 		vars := mux.Vars(req)
 
 		if service, found := vars["service_name"]; found {
@@ -56,11 +53,16 @@ func NewErrorDeleteHandler(r *repository.ErrorsRepository) http.Handler {
 	})
 }
 
-func allowCORS(w http.ResponseWriter, req *http.Request) {
-	// Allow CORS requests for local development since API and frontend run on different ports
-	origin := req.Header.Get("Origin")
-	if strings.HasPrefix(origin, "http://localhost:") {
-		w.Header().Set("Access-Control-Allow-Origin", origin)
+// CORSLocalhostMiddleware allows CORS requests for local development since API and frontend run on different ports
+func CORSLocalhostMiddleware(r *mux.Router) mux.MiddlewareFunc {
+	return func(next http.Handler) http.Handler {
+		return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+			origin := req.Header.Get("Origin")
+			if strings.HasPrefix(origin, "http://localhost:") {
+				w.Header().Set("Access-Control-Allow-Origin", origin)
+			}
+			next.ServeHTTP(w, req)
+		})
 	}
 }
 

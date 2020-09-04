@@ -69,6 +69,7 @@ func main() {
 	r.Handle("/services/{service_name}/errors/{error_key}/",
 		api.NewErrorDeleteHandler(&repo)).Methods(http.MethodDelete)
 	r.Handle("/", fs)
+	r.Use(api.CORSLocalhostMiddleware(r))
 	http.Handle("/", r)
 
 	// Telemetry endpoints
