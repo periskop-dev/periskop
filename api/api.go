@@ -45,7 +45,10 @@ func NewErrorDeleteHandler(r *repository.ErrorsRepository) http.Handler {
 
 		if service, found := vars["service_name"]; found {
 			errKey := vars["error_key"]
-			(*r).DeleteError(service, errKey)
+			err := (*r).DeleteError(service, errKey)
+			if err != nil {
+				http.NotFound(w, req)
+			}
 			w.WriteHeader(http.StatusNoContent)
 		} else {
 			http.NotFound(w, req)
