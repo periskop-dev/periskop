@@ -13,6 +13,11 @@
 .grid-component {
     &-actions {
         display: flex;
-        padding-bottom: 15px;
+        flex-flow: column;
+        padding-bottom: 15px;       
+        
+        & > *:first-child {
+            margin-bottom: 5px;
+        }
     }
 }
