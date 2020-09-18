@@ -14,17 +14,17 @@ import (
 
 type errorAggregateMap map[string]errorAggregate
 
-func (errorAggregateMap errorAggregateMap) combine(aggregatedErrors []errorAggregate) {
-	for _, item := range aggregatedErrors {
-		if existing, exists := errorAggregateMap[item.AggregationKey]; exists {
-			errorAggregateMap[item.AggregationKey] = errorAggregate{
+func (ea errorAggregateMap) combine(rp responsePayload) {
+	for _, item := range rp.ErrorAggregate {
+		if existing, exists := ea[item.AggregationKey]; exists {
+			ea[item.AggregationKey] = errorAggregate{
 				TotalCount:     existing.TotalCount + item.TotalCount,
 				AggregationKey: existing.AggregationKey,
 				Severity:       item.Severity,
 				LatestErrors:   combine(existing.LatestErrors, item.LatestErrors),
 			}
 		} else {
-			errorAggregateMap[item.AggregationKey] = item
+			ea[item.AggregationKey] = item
 		}
 	}
 }
