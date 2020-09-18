@@ -84,9 +84,9 @@ func (scraper Scraper) Scrape() {
 	}
 }
 
-func scrapeInstances(addresses []string, endpoint string, processor Processor) <-chan []errorAggregate {
+func scrapeInstances(addresses []string, endpoint string, processor Processor) <-chan responsePayload {
 	var wg sync.WaitGroup
-	out := make(chan []errorAggregate, len(addresses))
+	out := make(chan responsePayload, len(addresses))
 
 	wg.Add(len(addresses))
 	for _, address := range addresses {
