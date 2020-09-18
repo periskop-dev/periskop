@@ -13,18 +13,24 @@ import (
 )
 
 type errorAggregateMap map[string]errorAggregate
+type instanceErrorAggregateMap map[string]map[string]int
 
-func (ea errorAggregateMap) combine(rp responsePayload) {
+func (ea errorAggregateMap) combine(rp responsePayload, es instanceErrorAggregateMap) {
 	for _, item := range rp.ErrorAggregate {
 		if existing, exists := ea[item.AggregationKey]; exists {
+			prevCount := es[rp.Instance][item.AggregationKey]
+
 			ea[item.AggregationKey] = errorAggregate{
-				TotalCount:     existing.TotalCount + item.TotalCount,
+				TotalCount:     existing.TotalCount + (item.TotalCount - prevCount),
 				AggregationKey: existing.AggregationKey,
 				Severity:       item.Severity,
 				LatestErrors:   combine(existing.LatestErrors, item.LatestErrors),
 			}
+			es[rp.Instance][item.AggregationKey] = item.TotalCount
 		} else {
 			ea[item.AggregationKey] = item
+			es[rp.Instance] = make(map[string]int)
+			es[rp.Instance][item.AggregationKey] = 0
 		}
 	}
 }
@@ -58,7 +64,8 @@ func (scraper Scraper) Scrape() {
 	resolutions := scraper.Resolver.Resolve()
 	var resolvedAddresses = servicediscovery.EmptyResolvedAddresses()
 	timer := time.NewTimer(scraper.ServiceConfig.Scraper.RefreshInterval)
-
+	var errorsSnapshot = make(instanceErrorAggregateMap)
+	var currentAggregatedErrorsMap = make(errorAggregateMap)
 	for {
 		select {
 		case newResult := <-resolutions:
@@ -68,10 +75,9 @@ func (scraper Scraper) Scrape() {
 
 		case <-timer.C:
 			timer.Stop()
-			var currentAggregatedErrorsMap = make(errorAggregateMap)
 			for responsePayload := range scrapeInstances(resolvedAddresses.Addresses, serviceConfig.Scraper.Endpoint,
 				scraper.processor) {
-				currentAggregatedErrorsMap.combine(responsePayload)
+				currentAggregatedErrorsMap.combine(responsePayload, errorsSnapshot)
 			}
 			store(serviceConfig.Name, scraper.Repository, currentAggregatedErrorsMap)
 			numInstances := len(resolvedAddresses.Addresses)
