@@ -3,12 +3,13 @@ import { ListGroup, Table, Button, Badge } from "react-bootstrap"
 import * as moment from "moment"
 import { AggregatedError, Error, HttpContext, Headers, StoreState, ErrorInstance } from "data/types"
 import { ButtonGroup } from "react-bootstrap"
-import { setCurrentExceptionIndex } from "data/errors"
+import { setCurrentExceptionIndex, deleteError } from "data/errors"
 import { bindActionCreators, Dispatch, AnyAction } from "redux"
 import { connect } from "react-redux"
 
 interface ConnectedProps {
   activeError: AggregatedError,
+  activeService: string,
   latestExceptionIndex: number,
 }
 
@@ -185,7 +186,7 @@ const ErrorComponent: React.FC<Props> = (props) => {
   }
 
   const deleteError = () => {
-    props.deleteError("mock-target", props.activeError.aggregation_key)
+    props.deleteError(props.activeService, props.activeError.aggregation_key)
   }
     
   const renderAggregatedError = () => {
@@ -234,12 +235,13 @@ const ErrorComponent: React.FC<Props> = (props) => {
 const mapStateToProps = (state: StoreState) => {
   return {
     activeError: state.errorsReducer.activeError,
+    activeService: state.errorsReducer.activeService,
     latestExceptionIndex: state.errorsReducer.latestExceptionIndex,
   }
 }
 
 const matchDispatchToProps = (dispatch: Dispatch<AnyAction>): DispatchProps => {
-  return bindActionCreators({ setCurrentExceptionIndex }, dispatch)
+  return bindActionCreators({ setCurrentExceptionIndex, deleteError }, dispatch)
 }
 
 export default connect(mapStateToProps, matchDispatchToProps)(ErrorComponent)

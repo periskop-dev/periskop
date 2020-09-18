@@ -60,6 +60,7 @@ func CORSLocalhostMiddleware(r *mux.Router) mux.MiddlewareFunc {
 			origin := req.Header.Get("Origin")
 			if strings.HasPrefix(origin, "http://localhost:") {
 				w.Header().Set("Access-Control-Allow-Origin", origin)
+				w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE")
 			}
 			next.ServeHTTP(w, req)
 		})
