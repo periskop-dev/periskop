@@ -19,7 +19,6 @@ func (ea errorAggregateMap) combine(rp responsePayload, es instanceErrorAggregat
 	for _, item := range rp.ErrorAggregate {
 		if existing, exists := ea[item.AggregationKey]; exists {
 			prevCount := es[rp.Instance][item.AggregationKey]
-
 			ea[item.AggregationKey] = errorAggregate{
 				TotalCount:     existing.TotalCount + (item.TotalCount - prevCount),
 				AggregationKey: existing.AggregationKey,
@@ -29,8 +28,10 @@ func (ea errorAggregateMap) combine(rp responsePayload, es instanceErrorAggregat
 			es[rp.Instance][item.AggregationKey] = item.TotalCount
 		} else {
 			ea[item.AggregationKey] = item
-			es[rp.Instance] = make(map[string]int)
-			es[rp.Instance][item.AggregationKey] = 0
+			if _, exists := es[rp.Instance]; !exists {
+				es[rp.Instance] = make(map[string]int)
+			}
+			es[rp.Instance][item.AggregationKey] = item.TotalCount
 		}
 	}
 }
@@ -64,6 +65,7 @@ func (scraper Scraper) Scrape() {
 	resolutions := scraper.Resolver.Resolve()
 	var resolvedAddresses = servicediscovery.EmptyResolvedAddresses()
 	timer := time.NewTimer(scraper.ServiceConfig.Scraper.RefreshInterval)
+
 	var errorsSnapshot = make(instanceErrorAggregateMap)
 	var currentAggregatedErrorsMap = make(errorAggregateMap)
 	for {
