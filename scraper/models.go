@@ -4,7 +4,7 @@ import "time"
 
 type responsePayload struct {
 	ErrorAggregate []errorAggregate `json:"aggregated_errors"`
-	Instance       string           `json:"instance"`
+	Target         string           `json:"target"`
 }
 
 type errorAggregate struct {

@@ -78,7 +78,7 @@ func defaultErrorsFetcher() ErrorsFetcher {
 			})
 			return responsePayload{}, err
 		}
-		rp.Instance = target
+		rp.Target = target
 		return rp, nil
 	}
 }

@@ -18,20 +18,20 @@ type instanceErrorAggregateMap map[string]map[string]int
 func (ea errorAggregateMap) combine(rp responsePayload, es instanceErrorAggregateMap) {
 	for _, item := range rp.ErrorAggregate {
 		if existing, exists := ea[item.AggregationKey]; exists {
-			prevCount := es[rp.Instance][item.AggregationKey]
+			prevCount := es[rp.Target][item.AggregationKey]
 			ea[item.AggregationKey] = errorAggregate{
 				TotalCount:     existing.TotalCount + (item.TotalCount - prevCount),
 				AggregationKey: existing.AggregationKey,
 				Severity:       item.Severity,
 				LatestErrors:   combine(existing.LatestErrors, item.LatestErrors),
 			}
-			es[rp.Instance][item.AggregationKey] = item.TotalCount
+			es[rp.Target][item.AggregationKey] = item.TotalCount
 		} else {
 			ea[item.AggregationKey] = item
-			if _, exists := es[rp.Instance]; !exists {
-				es[rp.Instance] = make(map[string]int)
+			if _, exists := es[rp.Target]; !exists {
+				es[rp.Target] = make(map[string]int)
 			}
-			es[rp.Instance][item.AggregationKey] = item.TotalCount
+			es[rp.Target][item.AggregationKey] = item.TotalCount
 		}
 	}
 }
