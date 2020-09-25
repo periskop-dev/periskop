@@ -2,48 +2,69 @@ package api
 
 import (
 	"encoding/json"
-	"errors"
 	"fmt"
 	"net/http"
 	"strings"
 
+	"github.com/gorilla/mux"
 	"github.com/soundcloud/periskop/metrics"
 	"github.com/soundcloud/periskop/repository"
 )
 
-func NewHandler(r *repository.ErrorsRepository) http.Handler {
+func NewServicesListHandler(r *repository.ErrorsRepository) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
-		// Allow CORS requests for local development since API and frontend run on different ports
-		origin := req.Header.Get("Origin")
-		if strings.HasPrefix(origin, "http://localhost:") {
-			w.Header().Set("Access-Control-Allow-Origin", origin)
+		err := servicesList(w, r)
+		if err != nil {
+			metrics.ErrorCollector.ReportWithHTTPRequest(err, req)
 		}
+	})
+}
 
-		path := strings.TrimPrefix(req.URL.Path, "/services/")
+func NewErrorsListHandler(r *repository.ErrorsRepository) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+		vars := mux.Vars(req)
 		numberOfOccurrencesPerError := 10
 
-		if len(path) == 0 {
-			err := servicesList(w, r)
-			if err != nil {
-				metrics.ErrorCollector.ReportWithHTTPRequest(err, req)
-			}
-		} else if service, err := extractServiceName(path); err == nil {
-			err = errorsForService(w, r, service, numberOfOccurrencesPerError)
+		if service, found := vars["service_name"]; found {
+			err := errorsForService(w, r, service, numberOfOccurrencesPerError)
 			if err != nil {
 				metrics.ErrorCollector.ReportWithHTTPRequest(err, req)
 			}
 		} else {
-			metrics.ErrorCollector.ReportWithHTTPRequest(err, req)
 			http.NotFound(w, req)
 		}
 	})
 }
 
-func extractServiceName(url string) (string, error) {
-	if strings.HasSuffix(url, "/errors/") {
-		return strings.TrimSuffix(url, "/errors/"), nil
+func NewErrorResolveHandler(r *repository.ErrorsRepository) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+		vars := mux.Vars(req)
+
+		if service, found := vars["service_name"]; found {
+			errKey := vars["error_key"]
+			err := (*r).ResolveError(service, errKey)
+			if err != nil {
+				http.NotFound(w, req)
+			}
+			w.WriteHeader(http.StatusNoContent)
+		} else {
+			http.NotFound(w, req)
+		}
+	})
+}
+
+// CORSLocalhostMiddleware allows CORS requests for local development since API and frontend run on different ports
+func CORSLocalhostMiddleware(r *mux.Router) mux.MiddlewareFunc {
+	return func(next http.Handler) http.Handler {
+		return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+			origin := req.Header.Get("Origin")
+			if strings.HasPrefix(origin, "http://localhost:") {
+				w.Header().Set("Access-Control-Allow-Origin", origin)
+				w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE")
+			}
+			next.ServeHTTP(w, req)
+		})
 	}
-	return "", errors.New("invalid path")
 }
 
 func errorsForService(w http.ResponseWriter, r *repository.ErrorsRepository,
