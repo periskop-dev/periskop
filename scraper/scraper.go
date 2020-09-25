@@ -19,6 +19,7 @@ func (ea errorAggregateMap) combine(rp responsePayload, es instanceErrorAggregat
 	for _, item := range rp.ErrorAggregate {
 		if existing, exists := ea[item.AggregationKey]; exists {
 			prevCount := es[rp.Target][item.AggregationKey]
+			// TODO: review if num errors is less than before
 			ea[item.AggregationKey] = errorAggregate{
 				TotalCount:     existing.TotalCount + (item.TotalCount - prevCount),
 				AggregationKey: existing.AggregationKey,
