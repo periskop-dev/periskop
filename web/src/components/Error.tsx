@@ -3,7 +3,7 @@ import { ListGroup, Table, Button, Badge } from "react-bootstrap"
 import * as moment from "moment"
 import { AggregatedError, Error, HttpContext, Headers, StoreState, ErrorInstance } from "data/types"
 import { ButtonGroup } from "react-bootstrap"
-import { setCurrentExceptionIndex, deleteError } from "data/errors"
+import { setCurrentExceptionIndex, resolveError } from "data/errors"
 import { bindActionCreators, Dispatch, AnyAction } from "redux"
 import { connect } from "react-redux"
 
@@ -15,7 +15,7 @@ interface ConnectedProps {
 
 interface DispatchProps {
   setCurrentExceptionIndex: (num: number) => void,
-  deleteError: (service: string, errorKey: string) => void
+  resolveError: (service: string, errorKey: string) => void
 }
 
 type Props = ConnectedProps & DispatchProps
@@ -185,15 +185,15 @@ const ErrorComponent: React.FC<Props> = (props) => {
     )
   }
 
-  const deleteError = () => {
-    props.deleteError(props.activeService, props.activeError.aggregation_key)
+  const resolveError = () => {
+    props.resolveError(props.activeService, props.activeError.aggregation_key)
   }
     
   const renderAggregatedError = () => {
     return (
       <div className={"grid-component"}>
         <ButtonGroup className="float-right">
-          <Button variant="outline-danger" size="sm" onClick={() => deleteError()}>Delete</Button>
+          <Button variant="outline-danger" size="sm" onClick={() => resolveError()}>Resolve</Button>
         </ButtonGroup>
         <h3 className="list-group-item-heading"> Summary</h3>
         <ListGroup>
@@ -241,7 +241,7 @@ const mapStateToProps = (state: StoreState) => {
 }
 
 const matchDispatchToProps = (dispatch: Dispatch<AnyAction>): DispatchProps => {
-  return bindActionCreators({ setCurrentExceptionIndex, deleteError }, dispatch)
+  return bindActionCreators({ setCurrentExceptionIndex, resolveError }, dispatch)
 }
 
 export default connect(mapStateToProps, matchDispatchToProps)(ErrorComponent)

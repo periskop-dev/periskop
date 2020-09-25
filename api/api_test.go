@@ -116,10 +116,10 @@ func serveMockErrorList(rr *httptest.ResponseRecorder, r repository.ErrorsReposi
 	router.ServeHTTP(rr, req)
 }
 
-func TestDeleteErrorForUnknownServiceReturnsNotFound(t *testing.T) {
+func TestResolveErrorForUnknownServiceReturnsNotFound(t *testing.T) {
 	r := repository.NewInMemory()
 	rr := httptest.NewRecorder()
-	serveMockErrorDelete(rr, r, "api-test", "test")
+	serveMockErrorResolve(rr, r, "api-test", "test")
 
 	if status := rr.Code; status != http.StatusNotFound {
 		t.Errorf("handler returned wrong status code: got %v want %v",
@@ -127,12 +127,12 @@ func TestDeleteErrorForUnknownServiceReturnsNotFound(t *testing.T) {
 	}
 }
 
-func TestDeleteErrorsReturnsSuccess(t *testing.T) {
+func TestResolveErrorsReturnsSuccess(t *testing.T) {
 	r := repository.NewInMemory()
 	r.StoreErrors("api-test", []repository.ErrorAggregate{})
 
 	rr := httptest.NewRecorder()
-	serveMockErrorDelete(rr, r, "api-test", "test")
+	serveMockErrorResolve(rr, r, "api-test", "test")
 
 	if status := rr.Code; status != http.StatusNoContent {
 		t.Errorf("handler returned wrong status code: got %v want %v",
@@ -140,9 +140,9 @@ func TestDeleteErrorsReturnsSuccess(t *testing.T) {
 	}
 }
 
-func serveMockErrorDelete(rr *httptest.ResponseRecorder, r repository.ErrorsRepository,
+func serveMockErrorResolve(rr *httptest.ResponseRecorder, r repository.ErrorsRepository,
 	serviceName string, errKey string) {
-	handler := NewErrorDeleteHandler(&r)
+	handler := NewErrorResolveHandler(&r)
 	router := mux.NewRouter()
 	router.Handle("/services/{service_name}/errors/{error_key}/", handler).Methods(http.MethodDelete)
 	req, _ := http.NewRequest("DELETE", fmt.Sprintf("/services/%s/errors/%s/", serviceName, errKey), nil)

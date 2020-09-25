@@ -67,7 +67,7 @@ func main() {
 	r.Handle("/services/{service_name}/errors/",
 		api.NewErrorsListHandler(&repo)).Methods(http.MethodGet)
 	r.Handle("/services/{service_name}/errors/{error_key}/",
-		api.NewErrorDeleteHandler(&repo)).Methods(http.MethodDelete, http.MethodOptions)
+		api.NewErrorResolveHandler(&repo)).Methods(http.MethodDelete, http.MethodOptions)
 	r.Handle("/", fs)
 	r.Use(api.CORSLocalhostMiddleware(r))
 	http.Handle("/", r)

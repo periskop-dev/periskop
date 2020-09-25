@@ -40,7 +40,7 @@ type ErrorsRepository interface {
 	StoreErrors(serviceName string, errors []ErrorAggregate)
 	GetServices() []string
 	GetErrors(serviceName string, numberOfErrors int) ([]ErrorAggregate, error)
-	DeleteError(serviceName string, key string) error
+	ResolveError(serviceName string, key string) error
 }
 
 func NewInMemory() ErrorsRepository {
@@ -87,7 +87,7 @@ func (r *inMemoryRepository) GetErrors(serviceName string, numberOfErrors int) (
 	return nil, fmt.Errorf("service %s not found", serviceName)
 }
 
-func (r *inMemoryRepository) DeleteError(serviceName string, key string) error {
+func (r *inMemoryRepository) ResolveError(serviceName string, key string) error {
 	if value, ok := r.AggregatedError.Load(serviceName); ok {
 		value, _ := value.([]ErrorAggregate)
 		newValues := []ErrorAggregate{}

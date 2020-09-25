@@ -36,13 +36,13 @@ func NewErrorsListHandler(r *repository.ErrorsRepository) http.Handler {
 	})
 }
 
-func NewErrorDeleteHandler(r *repository.ErrorsRepository) http.Handler {
+func NewErrorResolveHandler(r *repository.ErrorsRepository) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
 		vars := mux.Vars(req)
 
 		if service, found := vars["service_name"]; found {
 			errKey := vars["error_key"]
-			err := (*r).DeleteError(service, errKey)
+			err := (*r).ResolveError(service, errKey)
 			if err != nil {
 				http.NotFound(w, req)
 			}

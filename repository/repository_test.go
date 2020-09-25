@@ -4,14 +4,14 @@ import (
 	"testing"
 )
 
-func TestDeleteError(t *testing.T) {
+func TestResolveErrorError(t *testing.T) {
 	serviceName := "test-service"
 	er := &inMemoryRepository{}
 	er.AggregatedError.Store(serviceName, []ErrorAggregate{
 		{AggregationKey: "test-error-0"},
 		{AggregationKey: "test-error-1"},
 	})
-	err := er.DeleteError(serviceName, "test-error-0")
+	err := er.ResolveError(serviceName, "test-error-0")
 	if err != nil {
 		t.Errorf("deleting the error")
 	}

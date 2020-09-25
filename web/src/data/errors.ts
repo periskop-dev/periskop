@@ -11,8 +11,8 @@ export const FETCH_FAILURE = "periskop/errors/FETCH_FAILURE"
 export const SET_ACTIVE_ERROR = "periskop/errors/SET_ACTIVE_ERROR"
 export const SET_CURRENT_EXCEPTION_INDEX = "periskop/errors/SET_CURRENT_EXCEPTION_INDEX"
 export const SET_ERRORS_SORT_FILTER = "periskop/errors/SET_ERRORS_SORT_FILTER"
-export const DELETE_ERROR = "periskop/errors/DELETE_ERROR"
-export const DELETE_ERROR_FAILURE = "periskop/errors/DELETE_ERROR_FAILURE"
+export const RESOLVE_ERROR = "periskop/errors/RESOLVE_ERROR"
+export const RESOLVE_ERROR_FAILURE = "periskop/errors/RESOLVE_ERROR_FAILURE"
 
 export type ErrorsAction =
   | { type: typeof FETCH; service: string }
@@ -21,8 +21,8 @@ export type ErrorsAction =
   | { type: typeof SET_ACTIVE_ERROR; errorKey: string }
   | { type: typeof SET_CURRENT_EXCEPTION_INDEX; index: number }
   | { type: typeof SET_ERRORS_SORT_FILTER; filter: SortFilters }
-  | { type: typeof DELETE_ERROR; service: string, errorKey: String }
-  | { type: typeof DELETE_ERROR_FAILURE; service: string, errorKey: String }
+  | { type: typeof RESOLVE_ERROR; service: string, errorKey: String }
+  | { type: typeof RESOLVE_ERROR_FAILURE; service: string, errorKey: String }
 
 export const fetchErrors = (service: string) => {
   return (
@@ -63,15 +63,15 @@ export const setActiveErrorSortFilter = (filter: SortFilters) => {
   return { type: SET_ERRORS_SORT_FILTER, filter }
 }
 
-export const deleteError = (service: string, errorKey: string) => {
+export const resolveError = (service: string, errorKey: string) => {
   return (dispatch: ThunkDispatch<{}, {}, ErrorsAction>) => {
-    dispatch({ type: DELETE_ERROR, service: service, errorKey: errorKey })
+    dispatch({ type: RESOLVE_ERROR, service: service, errorKey: errorKey })
 
     return fetch(`${parseHostName()}services/${service}/errors/${errorKey}/`, {
       method: 'DELETE'
     })
       .then((_) => dispatch(fetchErrors(service)))
-      .catch(err => dispatch({ type: DELETE_ERROR_FAILURE, service: service, errorKey: errorKey }))
+      .catch(err => dispatch({ type: RESOLVE_ERROR_FAILURE, service: service, errorKey: errorKey }))
   }
 }
 
