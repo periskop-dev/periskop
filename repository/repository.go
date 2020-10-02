@@ -41,17 +41,21 @@ type ErrorsRepository interface {
 	GetServices() []string
 	GetErrors(serviceName string, numberOfErrors int) ([]ErrorAggregate, error)
 	ResolveError(serviceName string, key string) error
+	SearchResolved(serviceName string, key string) bool
 }
 
 func NewInMemory() ErrorsRepository {
 	return &inMemoryRepository{
 		AggregatedError: sync.Map{},
+		ResolvedErrors:  sync.Map{},
 	}
 }
 
 type inMemoryRepository struct {
 	// map service name -> errors
 	AggregatedError sync.Map
+	// map service name -> resolved errors
+	ResolvedErrors sync.Map
 }
 
 func (r *inMemoryRepository) StoreErrors(serviceName string, errors []ErrorAggregate) {
@@ -87,6 +91,31 @@ func (r *inMemoryRepository) GetErrors(serviceName string, numberOfErrors int) (
 	return nil, fmt.Errorf("service %s not found", serviceName)
 }
 
+// addToResolved saves the error to resolved error list
+func (r *inMemoryRepository) addToResolved(serviceName string, key string) {
+	if resolved, ok := r.ResolvedErrors.Load(serviceName); ok {
+		resolved := resolved.([]string)
+		resolved = append(resolved, key)
+		r.ResolvedErrors.Store(serviceName, resolved)
+	} else {
+		r.ResolvedErrors.Store(serviceName, []string{key})
+	}
+}
+
+// SearchResolved searches if an error is inside the list of resolved errors
+func (r *inMemoryRepository) SearchResolved(serviceName string, key string) bool {
+	if resolved, ok := r.ResolvedErrors.Load(serviceName); ok {
+		resolved := resolved.([]string)
+		for _, errKey := range resolved {
+			if errKey == key {
+				return true
+			}
+		}
+	}
+	return false
+}
+
+// ResolveError removes the error from list of errors and adds to the list of resolved errors
 func (r *inMemoryRepository) ResolveError(serviceName string, key string) error {
 	if value, ok := r.AggregatedError.Load(serviceName); ok {
 		value, _ := value.([]ErrorAggregate)
@@ -97,6 +126,7 @@ func (r *inMemoryRepository) ResolveError(serviceName string, key string) error 
 			}
 		}
 		r.StoreErrors(serviceName, newValues)
+		r.addToResolved(serviceName, key)
 		return nil
 	}
 	return fmt.Errorf("service %s not found", serviceName)

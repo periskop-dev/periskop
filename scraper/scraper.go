@@ -119,15 +119,18 @@ func scrapeInstances(addresses []string, endpoint string, processor Processor) <
 func store(serviceName string, r *repository.ErrorsRepository, m errorAggregateMap) {
 	errors := make([]repository.ErrorAggregate, 0, len(m))
 	for _, value := range m {
-		severity := severityWithFallback(value.Severity)
-		errors = append(errors, repository.ErrorAggregate{
-			AggregationKey: value.AggregationKey,
-			Severity:       severity,
-			TotalCount:     value.TotalCount,
-			LatestErrors:   toRepositoryErrorsWithContent(value.LatestErrors),
-		})
-		metrics.ErrorOccurrences.WithLabelValues(serviceName, severity,
-			value.AggregationKey).Set(float64(value.TotalCount))
+		if !(*r).SearchResolved(serviceName, value.AggregationKey) {
+			severity := severityWithFallback(value.Severity)
+			errors = append(errors, repository.ErrorAggregate{
+				AggregationKey: value.AggregationKey,
+				Severity:       severity,
+				TotalCount:     value.TotalCount,
+				LatestErrors:   toRepositoryErrorsWithContent(value.LatestErrors),
+			})
+			metrics.ErrorOccurrences.WithLabelValues(serviceName, severity,
+				value.AggregationKey).Set(float64(value.TotalCount))
+		}
+
 	}
 	(*r).StoreErrors(serviceName, errors)
 }
