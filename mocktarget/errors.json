@@ -98,7 +98,7 @@
         },
         {
             "aggregation_key": "java.lang.Exception@789",
-            "total_count": 14,
+            "total_count": 16,
             "severity": "warning",
             "latest_errors": [
                 {

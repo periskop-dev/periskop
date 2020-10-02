@@ -15,7 +15,8 @@ import (
 type errorAggregateMap map[string]errorAggregate
 type instanceErrorAggregateMap map[string]map[string]int
 
-func (ea errorAggregateMap) combine(rp responsePayload, es instanceErrorAggregateMap) {
+func (ea errorAggregateMap) combine(serviceName string, r *repository.ErrorsRepository,
+	rp responsePayload, es instanceErrorAggregateMap) {
 	for _, item := range rp.ErrorAggregate {
 		if existing, exists := ea[item.AggregationKey]; exists {
 			prevCount := es[rp.Target][item.AggregationKey]
@@ -34,6 +35,9 @@ func (ea errorAggregateMap) combine(rp responsePayload, es instanceErrorAggregat
 			}
 			es[rp.Target][item.AggregationKey] = item.TotalCount
 		}
+		// If an error that was previously mark as resolved is scrapped again
+		// it's going to be added again to list of errors
+		(*r).RemoveResolved(serviceName, item.AggregationKey)
 	}
 }
 
@@ -80,7 +84,8 @@ func (scraper Scraper) Scrape() {
 			timer.Stop()
 			for responsePayload := range scrapeInstances(resolvedAddresses.Addresses, serviceConfig.Scraper.Endpoint,
 				scraper.processor) {
-				currentAggregatedErrorsMap.combine(responsePayload, errorsSnapshot)
+				currentAggregatedErrorsMap.combine(serviceConfig.Name, scraper.Repository,
+					responsePayload, errorsSnapshot)
 			}
 			store(serviceConfig.Name, scraper.Repository, currentAggregatedErrorsMap)
 			numInstances := len(resolvedAddresses.Addresses)

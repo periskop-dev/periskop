@@ -42,6 +42,7 @@ type ErrorsRepository interface {
 	GetErrors(serviceName string, numberOfErrors int) ([]ErrorAggregate, error)
 	ResolveError(serviceName string, key string) error
 	SearchResolved(serviceName string, key string) bool
+	RemoveResolved(serviceName string, key string)
 }
 
 func NewInMemory() ErrorsRepository {
@@ -52,9 +53,9 @@ func NewInMemory() ErrorsRepository {
 }
 
 type inMemoryRepository struct {
-	// map service name -> errors
+	// map service name -> list of errors
 	AggregatedError sync.Map
-	// map service name -> resolved errors
+	// map service name -> set of resolved errors
 	ResolvedErrors sync.Map
 }
 
@@ -91,31 +92,36 @@ func (r *inMemoryRepository) GetErrors(serviceName string, numberOfErrors int) (
 	return nil, fmt.Errorf("service %s not found", serviceName)
 }
 
-// addToResolved saves the error to resolved error list
+// addToResolved saves the error to resolved error set
 func (r *inMemoryRepository) addToResolved(serviceName string, key string) {
-	if resolved, ok := r.ResolvedErrors.Load(serviceName); ok {
-		resolved := resolved.([]string)
-		resolved = append(resolved, key)
-		r.ResolvedErrors.Store(serviceName, resolved)
+	if resolvedSet, ok := r.ResolvedErrors.Load(serviceName); ok {
+		resolvedSet := resolvedSet.(map[string]bool)
+		resolvedSet[key] = true
+		r.ResolvedErrors.Store(serviceName, resolvedSet)
 	} else {
-		r.ResolvedErrors.Store(serviceName, []string{key})
+		r.ResolvedErrors.Store(serviceName, map[string]bool{key: true})
 	}
 }
 
-// SearchResolved searches if an error is inside the list of resolved errors
+// RemoveResolved removes a resolved error from resolved error set
+func (r *inMemoryRepository) RemoveResolved(serviceName string, key string) {
+	if resolvedSet, ok := r.ResolvedErrors.Load(serviceName); ok {
+		resolvedSet := resolvedSet.(map[string]bool)
+		delete(resolvedSet, key)
+		r.ResolvedErrors.Store(serviceName, resolvedSet)
+	}
+}
+
+// SearchResolved searches if an error is inside the set of resolved errors
 func (r *inMemoryRepository) SearchResolved(serviceName string, key string) bool {
-	if resolved, ok := r.ResolvedErrors.Load(serviceName); ok {
-		resolved := resolved.([]string)
-		for _, errKey := range resolved {
-			if errKey == key {
-				return true
-			}
-		}
+	if resolvedSet, ok := r.ResolvedErrors.Load(serviceName); ok {
+		resolvedSet := resolvedSet.(map[string]bool)
+		return resolvedSet[key]
 	}
 	return false
 }
 
-// ResolveError removes the error from list of errors and adds to the list of resolved errors
+// ResolveError removes the error from list of errors and adds to the set of resolved errors
 func (r *inMemoryRepository) ResolveError(serviceName string, key string) error {
 	if value, ok := r.AggregatedError.Load(serviceName); ok {
 		value, _ := value.([]ErrorAggregate)
