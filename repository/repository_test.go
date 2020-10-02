@@ -4,8 +4,9 @@ import (
 	"testing"
 )
 
+const serviceName = "test-service"
+
 func TestAddToResolved(t *testing.T) {
-	serviceName := "test-service"
 	er := &inMemoryRepository{}
 
 	// service has empty list of resolved errors
@@ -28,7 +29,6 @@ func TestAddToResolved(t *testing.T) {
 }
 
 func TestRemoveResolved(t *testing.T) {
-	serviceName := "test-service"
 	er := &inMemoryRepository{}
 
 	er.ResolvedErrors.Store(serviceName, map[string]bool{"test-error-0": true})
@@ -43,7 +43,6 @@ func TestRemoveResolved(t *testing.T) {
 }
 
 func TestSearchResolved(t *testing.T) {
-	serviceName := "test-service"
 	er := &inMemoryRepository{}
 	er.ResolvedErrors.Store(serviceName, map[string]bool{"test-error-0": true})
 
@@ -57,7 +56,6 @@ func TestSearchResolved(t *testing.T) {
 }
 
 func TestResolveErrorError(t *testing.T) {
-	serviceName := "test-service"
 	er := &inMemoryRepository{}
 	er.AggregatedError.Store(serviceName, []ErrorAggregate{
 		{AggregationKey: "test-error-0"},

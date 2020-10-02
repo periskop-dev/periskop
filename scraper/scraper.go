@@ -140,7 +140,6 @@ func store(serviceName string, r *repository.ErrorsRepository, errorAggregates e
 			metrics.ErrorOccurrences.WithLabelValues(serviceName, severity,
 				value.AggregationKey).Set(float64(value.TotalCount))
 		}
-
 	}
 	(*r).StoreErrors(serviceName, errors)
 }
