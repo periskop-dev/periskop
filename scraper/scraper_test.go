@@ -6,20 +6,20 @@ import (
 	"testing"
 )
 
-func TestCombineLastErrorsSortsByTimestamp(t *testing.T) {
+func TestCombineErrorsSortsByTimestamp(t *testing.T) {
 	firstContent, _ := ioutil.ReadFile("sample-response1.json")
 	secondContent, _ := ioutil.ReadFile("sample-response2.json")
 
 	var firstResponsePayload responsePayload
 	var secondResponsePayload responsePayload
 
-	json.Unmarshal(firstContent, &firstResponsePayload)   // nolint[errcheck]
+	json.Unmarshal(firstContent, &firstResponsePayload)  // nolint[errcheck]
 	json.Unmarshal(secondContent, &secondResponsePayload) // nolint[errcheck]
 
 	firstOccurrences := firstResponsePayload.ErrorAggregate[0].LatestErrors
 	secondOccurrences := secondResponsePayload.ErrorAggregate[0].LatestErrors
 
-	result := combineLastErrors(firstOccurrences, secondOccurrences)
+	result := combine(firstOccurrences, secondOccurrences)
 
 	expectedUUIDs := []string{"uuid4", "uuid2", "uuid3", "uuid1"}
 

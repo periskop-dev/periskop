@@ -15,7 +15,7 @@ const httpClientTimeoutSeconds = 30
 
 type Request struct {
 	Target        string
-	ResultChannel chan<- responsePayload
+	ResultChannel chan<- []errorAggregate
 	WaitGroup     *sync.WaitGroup
 }
 
@@ -38,7 +38,7 @@ func worker(p Processor) {
 			if errorAggregates, err := p.fetcher(r.Target); err == nil {
 				r.ResultChannel <- errorAggregates
 			} else {
-				r.ResultChannel <- responsePayload{}
+				r.ResultChannel <- make([]errorAggregate, 0)
 			}
 			r.WaitGroup.Done()
 		}
@@ -57,29 +57,29 @@ func NewProcessor(numWorkers int) Processor {
 	}
 }
 
-type ErrorsFetcher func(string) (responsePayload, error)
+type ErrorsFetcher func(string) ([]errorAggregate, error)
 
 func defaultErrorsFetcher() ErrorsFetcher {
-	return func(target string) (responsePayload, error) {
+	return func(target string) ([]errorAggregate, error) {
 		body, err := fetch(target)
 		if err != nil {
 			metrics.ErrorCollector.ReportWithHTTPContext(err, &periskop.HTTPContext{
 				RequestMethod: "GET",
 				RequestURL:    target,
 			}, "scrapped-url-error")
-			return responsePayload{}, err
+			return nil, err
 		}
 
-		var rp responsePayload
-		if err := json.Unmarshal(body, &rp); err != nil {
+		var responsePayload responsePayload
+		if err := json.Unmarshal(body, &responsePayload); err != nil {
 			metrics.ErrorCollector.ReportWithHTTPContext(err, &periskop.HTTPContext{
 				RequestMethod: "GET",
 				RequestURL:    target,
 			})
-			return responsePayload{}, err
+			return nil, err
 		}
-		rp.Target = target
-		return rp, nil
+
+		return responsePayload.ErrorAggregate, nil
 	}
 }
 
