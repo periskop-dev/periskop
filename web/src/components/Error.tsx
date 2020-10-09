@@ -39,7 +39,7 @@ const ErrorComponent: React.FC<Props> = (props) => {
     if (!errorInstance) return ""
 
     return (
-      <div>
+      <div>      
         <ListGroup.Item>
           <h4 className="list-group-item-heading"> Class</h4>
           { errorInstance.class }
@@ -56,6 +56,10 @@ const ErrorComponent: React.FC<Props> = (props) => {
 
     return (
       <ListGroup variant="flush">
+        <ListGroup.Item>
+          <h4 className="list-group-item-heading"> Occurred at</h4>
+          {renderTimeOccurrence(error.timestamp)}
+        </ListGroup.Item>  
         { renderCurl(error.http_context) }
         { renderErrorInstance(error.error) }
         { renderHttpContext(error.http_context) }
@@ -76,7 +80,7 @@ const ErrorComponent: React.FC<Props> = (props) => {
     )
   }
 
-  const renderLastOccurrence = (ts: number) => {
+  const renderTimeOccurrence = (ts: number) => {
     return moment(new Date(ts * 1000)).fromNow()
   }
 
@@ -210,8 +214,12 @@ const ErrorComponent: React.FC<Props> = (props) => {
             {props.activeError.severity}
           </ListGroup.Item>
           <ListGroup.Item>
-            <h4 className="list-group-item-heading"> Last Occurrence</h4>
-            {renderLastOccurrence(props.activeError.latest_errors[0].timestamp)}
+            <h4 className="list-group-item-heading"> First Occurrence</h4>
+            {renderTimeOccurrence(props.activeError.created_at)}
+          </ListGroup.Item>
+          <ListGroup.Item>
+            <h4 className="list-group-item-heading"> Latest Occurrence</h4>
+            {renderTimeOccurrence(props.activeError.latest_errors[0].timestamp)}
           </ListGroup.Item>
         </ListGroup>
         <br/>

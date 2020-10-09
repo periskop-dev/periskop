@@ -4,6 +4,7 @@
             "aggregation_key": "java.lang.Run/ timeException@123", 
             "total_count": 250,
             "severity": "error",
+            "created_at": "2020-10-08T12:46:25.595Z",
             "latest_errors": [
                 {
                     "error": {
@@ -18,7 +19,7 @@
                         }
                     },
                     "uuid": "e81e56ff-7f65-4279-817f-dd607585b9e0",
-                    "timestamp": "2019-10-11T12:46:25.595Z",
+                    "timestamp": "2020-10-09T12:46:25.595Z",
                     "severity": "error"
                 },
                 {
@@ -29,7 +30,7 @@
                         "cause": null
                     },
                     "uuid": "7C49DB3E-8D61-457B-BCD8-10E86D4E014E",
-                    "timestamp": "2019-10-11T12:47:25.595Z",
+                    "timestamp": "2020-10-08T12:46:25.595Z",
                     "severity": "error",
                     "http_context": {
                         "request_method": "GET",
@@ -46,6 +47,7 @@
             "aggregation_key": "java.lang.Exception@456",
             "total_count": 440,
             "severity": "warning",
+            "created_at": "2019-09-11T11:46:25.333Z",
             "latest_errors": [
                 {
                     "error": {
@@ -100,6 +102,7 @@
             "aggregation_key": "java.lang.Exception@789",
             "total_count": 11,
             "severity": "warning",
+            "created_at": "2019-09-11T11:46:25.333Z",
             "latest_errors": [
                 {
                     "error": {

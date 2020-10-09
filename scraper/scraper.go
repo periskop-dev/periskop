@@ -150,6 +150,7 @@ func store(serviceName string, r *repository.ErrorsRepository, errorAggregates e
 				Severity:       severity,
 				TotalCount:     value.TotalCount,
 				LatestErrors:   toRepositoryErrorsWithContent(value.LatestErrors),
+				CreatedAt:      value.CreatedAt.Unix(),
 			})
 		}
 	}
