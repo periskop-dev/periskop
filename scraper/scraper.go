@@ -39,6 +39,9 @@ func NewScraper(resolver servicediscovery.Resolver, r *repository.ErrorsReposito
 func (errorAggregates errorAggregateMap) combine(serviceName string, r *repository.ErrorsRepository,
 	rp responsePayload, targetErrorsCount targetErrorsCountMap) {
 	for _, item := range rp.ErrorAggregate {
+		if _, exists := targetErrorsCount[rp.Target]; !exists {
+			targetErrorsCount[rp.Target] = make(map[string]int)
+		}
 		if existing, exists := errorAggregates[item.AggregationKey]; exists {
 			prevCount := targetErrorsCount[rp.Target][item.AggregationKey]
 			errorAggregates[item.AggregationKey] = errorAggregate{
@@ -50,9 +53,6 @@ func (errorAggregates errorAggregateMap) combine(serviceName string, r *reposito
 			targetErrorsCount[rp.Target][item.AggregationKey] = item.TotalCount
 		} else {
 			errorAggregates[item.AggregationKey] = item
-			if _, exists := targetErrorsCount[rp.Target]; !exists {
-				targetErrorsCount[rp.Target] = make(map[string]int)
-			}
 			targetErrorsCount[rp.Target][item.AggregationKey] = item.TotalCount
 		}
 		// If an error that was previously mark as resolved is scrapped again
