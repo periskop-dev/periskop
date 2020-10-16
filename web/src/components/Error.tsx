@@ -217,10 +217,6 @@ const ErrorComponent: React.FC<Props> = (props) => {
             <h4 className="list-group-item-heading"> First Occurrence</h4>
             {renderTimeOccurrence(props.activeError.created_at)}
           </ListGroup.Item>
-          <ListGroup.Item>
-            <h4 className="list-group-item-heading"> Latest Occurrence</h4>
-            {renderTimeOccurrence(props.activeError.latest_errors[0].timestamp)}
-          </ListGroup.Item>
         </ListGroup>
         <br/>
         <ButtonGroup className="float-right">
