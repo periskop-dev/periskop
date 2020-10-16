@@ -12,28 +12,14 @@ import (
 	"github.com/soundcloud/periskop/servicediscovery"
 )
 
+// map error key -> errorAggregate
 type errorAggregateMap map[string]errorAggregate
 
-func (errorAggregateMap errorAggregateMap) combine(aggregatedErrors []errorAggregate) {
-	for _, item := range aggregatedErrors {
-		if existing, exists := errorAggregateMap[item.AggregationKey]; exists {
-			errorAggregateMap[item.AggregationKey] = errorAggregate{
-				TotalCount:     existing.TotalCount + item.TotalCount,
-				AggregationKey: existing.AggregationKey,
-				Severity:       item.Severity,
-				LatestErrors:   combine(existing.LatestErrors, item.LatestErrors),
-			}
-		} else {
-			errorAggregateMap[item.AggregationKey] = item
-		}
-	}
-}
+// map target -> error key -> error total occurrences
+type targetErrorsCountMap map[string]map[string]int
 
-func combine(first []errorWithContext, second []errorWithContext) []errorWithContext {
-	combined := append(first, second...)
-	sort.Sort(errorOccurrences(combined))
-	return combined
-}
+// map error key -> list of errorWithContext (latest errors)
+type errorInstancesAccumulatorMap map[string][]errorWithContext
 
 type Scraper struct {
 	Resolver      servicediscovery.Resolver
@@ -42,6 +28,7 @@ type Scraper struct {
 	processor     Processor
 }
 
+// NewScraper create a new scraper for a given service name
 func NewScraper(resolver servicediscovery.Resolver, r *repository.ErrorsRepository,
 	serviceConfig config.Service, processor Processor) Scraper {
 	return Scraper{
@@ -52,13 +39,51 @@ func NewScraper(resolver servicediscovery.Resolver, r *repository.ErrorsReposito
 	}
 }
 
-// Scrape stuff
+func (errorAggregates errorAggregateMap) combine(serviceName string, r *repository.ErrorsRepository,
+	rp responsePayload, targetErrorsCount targetErrorsCountMap, errorInstancesAccumulator errorInstancesAccumulatorMap) {
+	for _, item := range rp.ErrorAggregate {
+		if _, exists := targetErrorsCount[rp.Target]; !exists {
+			targetErrorsCount[rp.Target] = make(map[string]int)
+		}
+		prevErrorInstances := errorInstancesAccumulator[item.AggregationKey]
+		if existing, exists := errorAggregates[item.AggregationKey]; exists {
+			prevCount := targetErrorsCount[rp.Target][item.AggregationKey]
+			lastestErrors := combineLastErrors(prevErrorInstances, item.LatestErrors)
+			errorAggregates[item.AggregationKey] = errorAggregate{
+				TotalCount:     existing.TotalCount + (item.TotalCount - prevCount),
+				AggregationKey: existing.AggregationKey,
+				Severity:       item.Severity,
+				LatestErrors:   lastestErrors,
+			}
+			targetErrorsCount[rp.Target][item.AggregationKey] = item.TotalCount
+			errorInstancesAccumulator[item.AggregationKey] = lastestErrors
+		} else {
+			errorAggregates[item.AggregationKey] = item
+			targetErrorsCount[rp.Target][item.AggregationKey] = item.TotalCount
+			errorInstancesAccumulator[item.AggregationKey] = item.LatestErrors
+		}
+		// If an error that was previously mark as resolved is scrapped again
+		// it's going to be added to list of errors
+		(*r).RemoveResolved(serviceName, item.AggregationKey)
+	}
+}
+
+func combineLastErrors(first []errorWithContext, second []errorWithContext) []errorWithContext {
+	combined := append(first, second...)
+	sort.Sort(errorOccurrences(combined))
+	return combined
+}
+
+// Scrape runs go routines scrapping the list of targets of this service,
+// processes the errors and stores them into the repository.
 func (scraper Scraper) Scrape() {
 	serviceConfig := scraper.ServiceConfig
 	resolutions := scraper.Resolver.Resolve()
 	var resolvedAddresses = servicediscovery.EmptyResolvedAddresses()
 	timer := time.NewTimer(scraper.ServiceConfig.Scraper.RefreshInterval)
 
+	var targetErrorsCount = make(targetErrorsCountMap)
+	var errorAggregates = make(errorAggregateMap)
 	for {
 		select {
 		case newResult := <-resolutions:
@@ -68,14 +93,16 @@ func (scraper Scraper) Scrape() {
 
 		case <-timer.C:
 			timer.Stop()
-			var currentAggregatedErrorsMap = make(errorAggregateMap)
+			errorInstancesAccumulator := make(errorInstancesAccumulatorMap)
 			for responsePayload := range scrapeInstances(resolvedAddresses.Addresses, serviceConfig.Scraper.Endpoint,
 				scraper.processor) {
-				currentAggregatedErrorsMap.combine(responsePayload)
+				errorAggregates.combine(serviceConfig.Name, scraper.Repository,
+					responsePayload, targetErrorsCount, errorInstancesAccumulator)
 			}
-			store(serviceConfig.Name, scraper.Repository, currentAggregatedErrorsMap)
+			store(serviceConfig.Name, scraper.Repository, errorAggregates)
+
 			numInstances := len(resolvedAddresses.Addresses)
-			numErrors := len(currentAggregatedErrorsMap)
+			numErrors := len(errorAggregates)
 			metrics.InstancesScrapped.WithLabelValues(serviceConfig.Name).Set(float64(numInstances))
 			metrics.ErrorsScrapped.WithLabelValues(serviceConfig.Name).Add(float64(numErrors))
 			log.Printf("%s: scraped %d errors from %d instances", serviceConfig.Name, numErrors, numInstances)
@@ -84,9 +111,9 @@ func (scraper Scraper) Scrape() {
 	}
 }
 
-func scrapeInstances(addresses []string, endpoint string, processor Processor) <-chan []errorAggregate {
+func scrapeInstances(addresses []string, endpoint string, processor Processor) <-chan responsePayload {
 	var wg sync.WaitGroup
-	out := make(chan []errorAggregate, len(addresses))
+	out := make(chan responsePayload, len(addresses))
 
 	wg.Add(len(addresses))
 	for _, address := range addresses {
@@ -107,18 +134,20 @@ func scrapeInstances(addresses []string, endpoint string, processor Processor) <
 	return out
 }
 
-func store(serviceName string, r *repository.ErrorsRepository, m errorAggregateMap) {
-	errors := make([]repository.ErrorAggregate, 0, len(m))
-	for _, value := range m {
-		severity := severityWithFallback(value.Severity)
-		errors = append(errors, repository.ErrorAggregate{
-			AggregationKey: value.AggregationKey,
-			Severity:       severity,
-			TotalCount:     value.TotalCount,
-			LatestErrors:   toRepositoryErrorsWithContent(value.LatestErrors),
-		})
-		metrics.ErrorOccurrences.WithLabelValues(serviceName, severity,
-			value.AggregationKey).Set(float64(value.TotalCount))
+func store(serviceName string, r *repository.ErrorsRepository, errorAggregates errorAggregateMap) {
+	errors := make([]repository.ErrorAggregate, 0, len(errorAggregates))
+	for _, value := range errorAggregates {
+		if !(*r).SearchResolved(serviceName, value.AggregationKey) {
+			severity := severityWithFallback(value.Severity)
+			errors = append(errors, repository.ErrorAggregate{
+				AggregationKey: value.AggregationKey,
+				Severity:       severity,
+				TotalCount:     value.TotalCount,
+				LatestErrors:   toRepositoryErrorsWithContent(value.LatestErrors),
+			})
+			metrics.ErrorOccurrences.WithLabelValues(serviceName, severity,
+				value.AggregationKey).Set(float64(value.TotalCount))
+		}
 	}
 	(*r).StoreErrors(serviceName, errors)
 }
