@@ -18,6 +18,9 @@ type errorAggregateMap map[string]errorAggregate
 // map target -> error key -> error total occurrences
 type targetErrorsCountMap map[string]map[string]int
 
+// map error key -> list of errorWithContext (latest errors)
+type errorInstancesAccumulatorMap map[string][]errorWithContext
+
 type Scraper struct {
 	Resolver      servicediscovery.Resolver
 	Repository    *repository.ErrorsRepository
@@ -37,23 +40,27 @@ func NewScraper(resolver servicediscovery.Resolver, r *repository.ErrorsReposito
 }
 
 func (errorAggregates errorAggregateMap) combine(serviceName string, r *repository.ErrorsRepository,
-	rp responsePayload, targetErrorsCount targetErrorsCountMap) {
+	rp responsePayload, targetErrorsCount targetErrorsCountMap, errorInstancesAccumulator errorInstancesAccumulatorMap) {
 	for _, item := range rp.ErrorAggregate {
 		if _, exists := targetErrorsCount[rp.Target]; !exists {
 			targetErrorsCount[rp.Target] = make(map[string]int)
 		}
+		prevErrorInstances := errorInstancesAccumulator[item.AggregationKey]
 		if existing, exists := errorAggregates[item.AggregationKey]; exists {
 			prevCount := targetErrorsCount[rp.Target][item.AggregationKey]
+			lastestErrors := combineLastErrors(prevErrorInstances, item.LatestErrors)
 			errorAggregates[item.AggregationKey] = errorAggregate{
 				TotalCount:     existing.TotalCount + (item.TotalCount - prevCount),
 				AggregationKey: existing.AggregationKey,
 				Severity:       item.Severity,
-				LatestErrors:   combineLastErrors(existing.LatestErrors, item.LatestErrors),
+				LatestErrors:   lastestErrors,
 			}
 			targetErrorsCount[rp.Target][item.AggregationKey] = item.TotalCount
+			errorInstancesAccumulator[item.AggregationKey] = lastestErrors
 		} else {
 			errorAggregates[item.AggregationKey] = item
 			targetErrorsCount[rp.Target][item.AggregationKey] = item.TotalCount
+			errorInstancesAccumulator[item.AggregationKey] = item.LatestErrors
 		}
 		// If an error that was previously mark as resolved is scrapped again
 		// it's going to be added to list of errors
@@ -86,10 +93,11 @@ func (scraper Scraper) Scrape() {
 
 		case <-timer.C:
 			timer.Stop()
+			errorInstancesAccumulator := make(errorInstancesAccumulatorMap)
 			for responsePayload := range scrapeInstances(resolvedAddresses.Addresses, serviceConfig.Scraper.Endpoint,
 				scraper.processor) {
 				errorAggregates.combine(serviceConfig.Name, scraper.Repository,
-					responsePayload, targetErrorsCount)
+					responsePayload, targetErrorsCount, errorInstancesAccumulator)
 			}
 			store(serviceConfig.Name, scraper.Repository, errorAggregates)
 
