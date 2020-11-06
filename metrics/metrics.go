@@ -40,14 +40,14 @@ var (
 		},
 		[]string{"type"},
 	)
-	// ErrorOccurrences is a Prometheus gauge to track the number of times that an scrapped aggregated error is produced.
-	ErrorOccurrences = prometheus.NewGaugeVec(
-		prometheus.GaugeOpts{
+	// ErrorOccurrences is a Prometheus counter to track the number of times that an scrapped aggregated error is produced.
+	ErrorOccurrences = prometheus.NewCounterVec(
+		prometheus.CounterOpts{
 			Namespace: PrometheusNamespace,
 			Name:      "error_occurrences",
 			Help:      "Number of occurrences per service, error type and severity.",
 		},
-		[]string{"service_name", "severity", "aggregation_key"},
+		[]string{"service_name", "severity", "target", "aggregation_key"},
 	)
 	ErrorCollector = periskop.NewErrorCollector()
 )
