@@ -31,17 +31,6 @@ export const SORT_FILTERS = {
   "event_count": "Event Count",
 }
 
-
-const sidebarItemClass = (error: AggregatedError): string => {
-  if (error.severity === "info") {
-    return "sidebar-item-info"
-  } else if (error.severity === "warning") {
-    return "sidebar-item-warning"
-  } else {
-    return "sidebar-item-error"
-  }
-}
-
 const SideBar: React.FC<Props> = (props) => {
 
   const onSearchByKeyChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -61,7 +50,8 @@ const SideBar: React.FC<Props> = (props) => {
     return props.errors.map((error, index) => {
       return (
         <ListGroup.Item
-          action className={"sidebar-item" + " " + sidebarItemClass(error)}
+          action
+          className={`sidebar-item sidebar-item-${error.severity}`}
           onClick={_ => props.handleErrorSelect(error.aggregation_key)}
           active={props.activeError === undefined ? false : error.aggregation_key === props.activeError.aggregation_key}
           key={index}
