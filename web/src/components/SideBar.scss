@@ -12,9 +12,20 @@
 
 .grid-component {
     &-actions {
-        display: flex;
-        flex-flow: column;
-        padding-bottom: 15px;       
+        padding-bottom: 15px;
+
+        .filters {
+            display: flex;
+            flex-flow: row wrap;
+
+            & > *:first-child {
+                margin-right: 5px;
+            }
+
+            & > * {
+                margin-bottom: 3px;
+            }
+        }
         
         & > *:first-child {
             margin-bottom: 5px;
