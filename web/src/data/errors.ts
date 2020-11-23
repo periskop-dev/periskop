@@ -89,7 +89,6 @@ const initialState: ErrorsState = {
 }
 
 function errorsReducer(state = initialState, action: ErrorsAction) {
-  console.log(action)
   switch (action.type) {
     case FETCH:
       return {
