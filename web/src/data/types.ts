@@ -46,9 +46,18 @@ export type ErrorsState = {
   activeService?: string,
   latestExceptionIndex: number
   activeSortFilter: SortFilters,
+  severityFilter: SeverityFilter,
+  searchTerm: string,
 }
 
 export type StoreState = {
   servicesReducer: ServicesState,
   errorsReducer: ErrorsState
+}
+
+export enum SeverityFilter {
+  All = "All",
+  Error = "Error",
+  Info = "Info",
+  Warning = "Warning",
 }

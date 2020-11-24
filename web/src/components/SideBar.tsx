@@ -4,24 +4,26 @@ import { ListGroup, Badge, DropdownButton, ButtonGroup, Dropdown } from "react-b
 import { connect } from "react-redux"
 
 import { bindActionCreators, Dispatch, AnyAction } from "redux"
-import { StoreState, AggregatedError, SortFilters } from "data/types"
-import { setActiveError, setActiveErrorSortFilter } from "data/errors"
+import { StoreState, AggregatedError, SortFilters, ErrorsState, SeverityFilter } from "data/types"
+import { setActiveError, setErrorsSortFilter, setErrorsSeverityFilter, setErrorsSearchFilter } from "data/errors"
 
 interface DispatchProps {
   setActiveError: (notifcation: string) => void
-  setActiveErrorSortFilter: (filter: SortFilters) => void
+  setErrorsSortFilter: (filter: SortFilters) => void
+  setErrorsSeverityFilter: (severity: SeverityFilter) => void
+  setErrorsSearchFilter: (searchTerm: string) => void
 }
 
 interface ConnectedProps {
   activeError: AggregatedError
   activeSortFilter: SortFilters
+  activeSeverityFilter: ErrorsState["severityFilter"]
+  searchKey: string 
 }
 
 interface DefaultProps {
   errors: AggregatedError[]
-  searchKey: string
   handleErrorSelect: (errorKey: string) => void
-  onSearchByAggredgatedKey: (errorKey: string) => void
 }
 
 type Props = ConnectedProps & DispatchProps & DefaultProps
@@ -32,21 +34,11 @@ export const SORT_FILTERS = {
 }
 
 
-const sidebarItemClass = (error: AggregatedError): string => {
-  if (error.severity === "info") {
-    return "sidebar-item-info"
-  } else if (error.severity === "warning") {
-    return "sidebar-item-warning"
-  } else {
-    return "sidebar-item-error"
-  }
-}
-
 const SideBar: React.FC<Props> = (props) => {
 
   const onSearchByKeyChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { value } = event.target
-    props.onSearchByAggredgatedKey(value)
+    props.setErrorsSearchFilter(value)
   }
 
   const renderErrors = () => {
@@ -61,7 +53,8 @@ const SideBar: React.FC<Props> = (props) => {
     return props.errors.map((error, index) => {
       return (
         <ListGroup.Item
-          action className={"sidebar-item" + " " + sidebarItemClass(error)}
+          action
+          className={`sidebar-item sidebar-item-${error.severity}`}
           onClick={_ => props.handleErrorSelect(error.aggregation_key)}
           active={props.activeError === undefined ? false : error.aggregation_key === props.activeError.aggregation_key}
           key={index}
@@ -75,23 +68,43 @@ const SideBar: React.FC<Props> = (props) => {
   const renderActions = () => {
     return (
       <div className="grid-component-actions">
-        <DropdownButton
-          id="sort-btn"
-          as={ButtonGroup}
-          variant="secondary"
-          title={`Sort by: ${SORT_FILTERS[props.activeSortFilter]}`}
-          size="sm"
-        >
-          {Object.keys(SORT_FILTERS).map((filter: SortFilters) => (
-            <Dropdown.Item
-              key={`${filter}-sortFilter`}
-              active={filter === props.activeSortFilter}
-              onClick={_ => props.setActiveErrorSortFilter(filter)}
-            >
-              {SORT_FILTERS[filter]}
-            </Dropdown.Item>
-          ))}
-        </DropdownButton>
+        <div className="filters">
+          <DropdownButton
+            id="sort-btn"
+            as={ButtonGroup}
+            variant="secondary"
+            title={`Sort by: ${SORT_FILTERS[props.activeSortFilter]}`}
+            size="sm"
+          >
+            {Object.keys(SORT_FILTERS).map((filter: SortFilters) => (
+              <Dropdown.Item
+                key={`${filter}-sortFilter`}
+                active={filter === props.activeSortFilter}
+                onClick={_ => props.setErrorsSortFilter(filter)}
+              >
+                {SORT_FILTERS[filter]}
+              </Dropdown.Item>
+            ))}
+          </DropdownButton>
+
+          <DropdownButton
+            id="severity-filter"
+            as={ButtonGroup}
+            variant="secondary"
+            title={`Severity: ${props.activeSeverityFilter}`}
+            size="sm"
+          >
+            {Object.keys(SeverityFilter).map((severitiy: SeverityFilter) => (
+              <Dropdown.Item
+                key={`${severitiy}-sortFilter`}
+                active={severitiy === props.activeSeverityFilter}
+                onClick={_ => props.setErrorsSeverityFilter(severitiy)}
+              >
+                {severitiy}
+              </Dropdown.Item>
+            ))}
+          </DropdownButton>
+        </div>
 
         <input
           onChange={onSearchByKeyChange}
@@ -114,13 +127,15 @@ const SideBar: React.FC<Props> = (props) => {
 }
 
 const matchDispatchToProps = (dispatch: Dispatch<AnyAction>): DispatchProps => {
-  return bindActionCreators({ setActiveError, setActiveErrorSortFilter }, dispatch)
+  return bindActionCreators({ setActiveError, setErrorsSortFilter, setErrorsSeverityFilter, setErrorsSearchFilter }, dispatch)
 }
 
 const mapStateToProps = (state: StoreState) => {
   return {
     activeError: state.errorsReducer.activeError,
     activeSortFilter: state.errorsReducer.activeSortFilter,
+    activeSeverityFilter: state.errorsReducer.severityFilter,
+    searchKey: state.errorsReducer.searchTerm,
   }
 }
 

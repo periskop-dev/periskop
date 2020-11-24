@@ -8,38 +8,32 @@ import ErrorComponent from "components/Error"
 import SideBar from "components/SideBar"
 
 import * as RemoteData from "data/remote-data"
-import { StoreState, AggregatedError } from "data/types"
-import { fetchErrors, setActiveError } from "data/errors"
+import { StoreState, AggregatedError, SeverityFilter, ErrorsState } from "data/types"
+import { fetchErrors, setActiveError, setErrorsSeverityFilter, setErrorsSearchFilter } from "data/errors"
 
 import { Row, Col, Container } from "react-bootstrap"
-import { filterErrorsBySubstringMatch } from "util/errors"
+import { getFilteredErrors } from "util/errors"
 
 interface ConnectedProps {
   errors: RemoteData.RemoteData<any, AggregatedError[]>,
   services: RemoteData.RemoteData<any, string[]>,
   activeError: AggregatedError,
   activeService: string,
+  severityFilter: SeverityFilter,
+  searchTerm: string,
 }
 
 interface DispatchProps {
   fetchErrors: (service: string) => void
   setActiveError: (errorKey: string) => void
+  setErrorsSeverityFilter: (severity: SeverityFilter) => void
+  setErrorsSearchFilter: (searchTerm: ErrorsState["searchTerm"]) => void
 }
 
 type Props = ConnectedProps & DispatchProps & RouteComponentProps<{ service: string, errorKey: string }>
 
-export interface State {
-  errors: AggregatedError[]
-  searchTerm: string,
-}
 
-
-class App extends React.Component<Props, State> {
-  state = {
-    errors: [],
-    searchTerm: "",
-  }
-
+class App extends React.Component<Props, {}> {
   constructor(props, context) {
     super(props, context)
     this.handlerErrorSelect = this.handlerErrorSelect.bind(this)
@@ -53,7 +47,6 @@ class App extends React.Component<Props, State> {
 
   componentDidUpdate(prevProps: Props) {
     const { activeService, services, errors, match, fetchErrors, setActiveError } = this.props
-    const { searchTerm } = this.state
 
     if (RemoteData.isSuccess(services)) {
       if (
@@ -65,18 +58,14 @@ class App extends React.Component<Props, State> {
     }
 
     if (RemoteData.isSuccess(errors)) {
-      let decodedErrorKey = decodeURIComponent(match.params.errorKey)
-      let activeError = errors.data.find(e => e.aggregation_key === decodedErrorKey)
-      if (
-        activeError !== undefined &&
-        (activeError !== decodedErrorKey) &&
-        !RemoteData.isLoading(errors)) {
-        setActiveError(activeError.aggregation_key)
-      }
+      const decodedErrorKey = decodeURIComponent(match.params.errorKey)
+      const activeError = errors.data.find(e => e.aggregation_key === decodedErrorKey)
 
-      const hasNewErrors = errors !== prevProps.errors && errors
-      if (hasNewErrors) {
-        this.handleFilterByAggregatedKey(searchTerm)
+      if (!activeError || RemoteData.isLoading(errors)) return
+
+      const hasNewActiveError = prevProps.activeError?.aggregation_key !== activeError.aggregation_key
+      if (hasNewActiveError) {
+        setActiveError(activeError.aggregation_key)
       }
     }
   }
@@ -85,36 +74,15 @@ class App extends React.Component<Props, State> {
     this.props.history.push(`/${this.props.match.params.service}/errors/${encodeURIComponent(errorKey)}`)
   }
 
-  handleFilterByAggregatedKey = (searchTerm: string) => {
-    const { errors } = this.props
-
-    switch (errors.status) {
-      case RemoteData.SUCCESS:
-        return this.setState({
-          errors: filterErrorsBySubstringMatch(errors.data, searchTerm),
-          searchTerm,
-        })
-
-      case RemoteData.LOADING:
-        return <div>fetching errors...</div>
-    }
-  }
-
   renderSideBar() {
     switch (this.props.errors.status) {
       case RemoteData.SUCCESS:
-        if (this.props.errors.data.length === 0) {
-          return <div>no errors returned by api</div>
-        } else {
-          return (
-            <SideBar
-              errors={this.state.errors}
-              handleErrorSelect={this.handlerErrorSelect}
-              onSearchByAggredgatedKey={this.handleFilterByAggregatedKey}
-              searchKey={this.state.searchTerm}
-            />
-          )
-        }
+        return (
+          <SideBar
+            errors={this.props.errors.data}
+            handleErrorSelect={this.handlerErrorSelect}
+          />
+        )
       case RemoteData.LOADING:
         return <div>fetching errors...</div>
     }
@@ -147,17 +115,28 @@ class App extends React.Component<Props, State> {
   }
 }
 
-const mapStateToProps = (state: StoreState) => {
-  return {
-    errors: state.errorsReducer.errors,
-    activeError: state.errorsReducer.activeError,
-    services: state.servicesReducer.services,
-    activeService: state.errorsReducer.activeService
+
+const mapStateToProps = ({ errorsReducer, servicesReducer }: StoreState) => {
+  const { errors, activeError, severityFilter, searchTerm, activeService, activeSortFilter } = errorsReducer
+  const { services } = servicesReducer
+
+  const defaultConnectedProps = { activeError, services, severityFilter, activeService, searchTerm }
+
+  if (RemoteData.isSuccess(errors)) {
+    const filteredErrors = getFilteredErrors(errors.data, searchTerm, severityFilter, activeSortFilter)
+
+    return {
+      ...defaultConnectedProps,
+      errors: RemoteData.succeed(filteredErrors),
+    }
   }
+
+  return { ...defaultConnectedProps, errors }
 }
 
+
 const matchDispatchToProps = (dispatch: Dispatch<AnyAction>): DispatchProps => {
-  return bindActionCreators({ fetchErrors, setActiveError }, dispatch);
+  return bindActionCreators({ fetchErrors, setActiveError, setErrorsSeverityFilter, setErrorsSearchFilter }, dispatch);
 }
 
 export default withRouter(connect<ConnectedProps, {}, RouteComponentProps<{ service: string }>>(mapStateToProps, matchDispatchToProps)(App))
