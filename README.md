@@ -32,6 +32,9 @@ The UI allows navigating and inspecting exceptions as they occur.
 
 ![ui](https://i.imgur.com/Tljxd80.png)
 
+## Run project locally
+Please see [CONTRIBUTING.md](CONTRIBUTING.md)
+
 ## Building & Running
 We are looking into distributing Periskop via Docker Hub.
 In the meantime, you can build and run Periskop from source:
@@ -66,7 +69,3 @@ groups:
       description: "Errors for {{ $labels.service_name }}({{ $labels.aggregation_key }}) is {{ $value }}"
       dashboard: "https://periskop.example.com/#/{{ $labels.service_name }}/errors/{{ $labels.aggregation_key }}"
 ```
-
-## Contributing
-
-Please see [CONTRIBUTING.md](CONTRIBUTING.md)
