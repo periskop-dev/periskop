@@ -1,0 +1,5 @@
+- Check if we need to fetch the error on click
+- Check if we need to remove previously loaded errors
+- Figure out why we are dispatching set_active_error twice
+- Keep URL and Redux state in sync
+- How we sync the active error or other states with the current browser address
