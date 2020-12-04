@@ -22,8 +22,7 @@ render(
                 <NavbarComponent />
                 <main className="app-content">
                     <Route exact path="/" component={Home}/>
-                    <Route exact path="/:service" component={App}/>
-                    <Route path="/:service/errors/:errorKey" component={App}/>
+                    <Route path="/:service" component={App}/>
                 </main>
             </div>
         </Router>

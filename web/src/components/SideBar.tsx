@@ -18,15 +18,15 @@ interface ConnectedProps {
   activeError: AggregatedError
   activeSortFilter: SortFilters
   activeSeverityFilter: ErrorsState["severityFilter"]
-  searchKey: string 
+  searchKey: string
 }
 
-interface DefaultProps {
+interface SidebarProps {
   errors: AggregatedError[]
   handleErrorSelect: (errorKey: string) => void
 }
 
-type Props = ConnectedProps & DispatchProps & DefaultProps
+type Props = ConnectedProps & DispatchProps & SidebarProps
 
 export const SORT_FILTERS = {
   "latest_occurrence": "Latest Occurence",
@@ -126,7 +126,7 @@ const SideBar: React.FC<Props> = (props) => {
   )
 }
 
-const matchDispatchToProps = (dispatch: Dispatch<AnyAction>): DispatchProps => {
+const mapDispatchToProps = (dispatch: Dispatch<AnyAction>): DispatchProps => {
   return bindActionCreators({ setActiveError, setErrorsSortFilter, setErrorsSeverityFilter, setErrorsSearchFilter }, dispatch)
 }
 
@@ -139,4 +139,4 @@ const mapStateToProps = (state: StoreState) => {
   }
 }
 
-export default connect(mapStateToProps, matchDispatchToProps)(SideBar)
+export default connect(mapStateToProps, mapDispatchToProps)(SideBar)
