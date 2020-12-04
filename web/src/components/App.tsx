@@ -63,7 +63,7 @@ class App extends React.Component<Props, {}> {
 
       if (!activeError || RemoteData.isLoading(errors)) return
 
-      const hasNewActiveError = prevProps.activeError?.aggregation_key !== activeError.aggregation_key
+      const hasNewActiveError = this.props.activeError?.aggregation_key !== activeError.aggregation_key
       if (hasNewActiveError) {
         setActiveError(activeError.aggregation_key)
       }

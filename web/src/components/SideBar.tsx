@@ -5,10 +5,9 @@ import { connect } from "react-redux"
 
 import { bindActionCreators, Dispatch, AnyAction } from "redux"
 import { StoreState, AggregatedError, SortFilters, ErrorsState, SeverityFilter } from "data/types"
-import { setActiveError, setErrorsSortFilter, setErrorsSeverityFilter, setErrorsSearchFilter } from "data/errors"
+import { setErrorsSortFilter, setErrorsSeverityFilter, setErrorsSearchFilter } from "data/errors"
 
 interface DispatchProps {
-  setActiveError: (notifcation: string) => void
   setErrorsSortFilter: (filter: SortFilters) => void
   setErrorsSeverityFilter: (severity: SeverityFilter) => void
   setErrorsSearchFilter: (searchTerm: string) => void
@@ -127,7 +126,7 @@ const SideBar: React.FC<Props> = (props) => {
 }
 
 const mapDispatchToProps = (dispatch: Dispatch<AnyAction>): DispatchProps => {
-  return bindActionCreators({ setActiveError, setErrorsSortFilter, setErrorsSeverityFilter, setErrorsSearchFilter }, dispatch)
+  return bindActionCreators({ setErrorsSortFilter, setErrorsSeverityFilter, setErrorsSearchFilter }, dispatch)
 }
 
 const mapStateToProps = (state: StoreState) => {
