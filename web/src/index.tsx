@@ -22,7 +22,7 @@ render(
                 <NavbarComponent />
                 <main className="app-content">
                     <Route exact path="/" component={Home}/>
-                    <Route path="/:service" component={App}/>
+                    <Route path={["/:service/errors/:errorKey", "/:service"]} component={App}/>
                 </main>
             </div>
         </Router>
