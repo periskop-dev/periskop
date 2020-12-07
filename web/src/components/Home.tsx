@@ -25,10 +25,6 @@ class Home extends React.Component<Props, {}> {
     this.handleServiceSelect = this.handleServiceSelect.bind(this)
   }
 
-  componentDidMount() {
-    this.props.fetchServices(this.props.match.params.service)
-  }
-
   handleServiceSelect(service: string) {
     this.props.history.push(`/${service}`)
   }
