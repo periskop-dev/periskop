@@ -23,7 +23,7 @@ func NewServicesListHandler(r *repository.ErrorsRepository) http.Handler {
 func NewErrorsListHandler(r *repository.ErrorsRepository) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
 		vars := mux.Vars(req)
-		numberOfOccurrencesPerError := 10
+		numberOfOccurrencesPerError := 100
 
 		if service, found := vars["service_name"]; found {
 			err := errorsForService(w, r, service, numberOfOccurrencesPerError)
