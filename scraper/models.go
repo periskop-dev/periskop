@@ -12,6 +12,7 @@ type errorAggregate struct {
 	TotalCount     int                `json:"total_count"`
 	Severity       string             `json:"severity"`
 	LatestErrors   []errorWithContext `json:"latest_errors"`
+	CreatedAt      time.Time          `json:"created_at"`
 }
 
 type errorWithContext struct {

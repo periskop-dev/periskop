@@ -88,6 +88,7 @@ func TestErrorsForKnownServiceReturnsErrors(t *testing.T) {
 		{
 			AggregationKey: "key",
 			Severity:       "error",
+			CreatedAt:      time.Unix(0, 0).Unix(),
 			LatestErrors: []repository.ErrorWithContext{
 				{
 					Error:     repository.ErrorInstance{},
@@ -101,7 +102,7 @@ func TestErrorsForKnownServiceReturnsErrors(t *testing.T) {
 	serveMockErrorList(rr, r, "api-test")
 
 	// nolint
-	expected := `[{"aggregation_key":"key","total_count":0,"severity":"error","latest_errors":[{"error":{"class":"","message":"","stacktrace":null,"cause":null},"uuid":"","timestamp":0,"severity":"error","http_context":null}]}]` + "\n"
+	expected := `[{"aggregation_key":"key","total_count":0,"severity":"error","latest_errors":[{"error":{"class":"","message":"","stacktrace":null,"cause":null},"uuid":"","timestamp":0,"severity":"error","http_context":null}],"created_at":0}]` + "\n"
 	if rr.Body.String() != expected {
 		t.Errorf("handler returned unexpected body: got %v want %v",
 			rr.Body.String(), expected)

@@ -30,6 +30,7 @@ export interface AggregatedError {
   "aggregation_key"?: string,
   "total_count"?: number,
   "severity"?: string,
+  "created_at"?: number,
   "latest_errors"?: Error[]
 }
 
