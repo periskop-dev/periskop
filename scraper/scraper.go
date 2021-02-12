@@ -66,7 +66,7 @@ func (errorAggregates errorAggregateMap) combine(serviceName string, r *reposito
 
 		metrics.ErrorOccurrences.WithLabelValues(serviceName, item.Severity, rp.Target,
 			item.AggregationKey).Add(float64(currentCount))
-		targetErrorsCount[rp.Target][item.AggregationKey] = currentCount
+		targetErrorsCount[rp.Target][item.AggregationKey] = item.TotalCount
 		errorInstancesAccumulator[item.AggregationKey] = lastestErrors
 		// If an error that was previously mark as resolved is scrapped again
 		// it's going to be added to list of errors
