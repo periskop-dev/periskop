@@ -23,7 +23,7 @@ task:
 task:
   name: Build Api
   container:
-    image: golang:latest
+    image: golang:1.16
   env:
     GOPROXY: https://proxy.golang.org
   modules_cache:
