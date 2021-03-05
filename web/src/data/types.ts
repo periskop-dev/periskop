@@ -30,12 +30,13 @@ export interface AggregatedError {
   "aggregation_key"?: string,
   "total_count"?: number,
   "severity"?: string,
+  "created_at"?: number,
   "latest_errors"?: Error[]
 }
 
 export type ServicesState = {
   services: RemoteData.RemoteData<any, string[]>
-} 
+}
 
 export type SortFilters = keyof typeof SORT_FILTERS
 
@@ -45,10 +46,19 @@ export type ErrorsState = {
   updatedAt?: number,
   activeService?: string,
   latestExceptionIndex: number
-  activeSortFilter: SortFilters,  
+  activeSortFilter: SortFilters,
+  severityFilter: SeverityFilter,
+  searchTerm: string,
 }
 
 export type StoreState = {
   servicesReducer: ServicesState,
   errorsReducer: ErrorsState
+}
+
+export enum SeverityFilter {
+  All = "All",
+  Error = "Error",
+  Info = "Info",
+  Warning = "Warning",
 }

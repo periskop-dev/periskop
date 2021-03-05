@@ -17,10 +17,10 @@ build-web:
 	npm run build:dist --prefix $(WEB_FOLDER)
 
 run-api:
-	GO111MODULE=on go build -o periskop && SERVER_URL=localhost ./periskop -port=$(PORT) -config ./config.dev.yaml
+	go build -o periskop && SERVER_URL=localhost ./periskop -port=$(PORT) -config ./config.dev.yaml
 
 run-mock-target:
-	cd mocktarget && GO111MODULE=on go build -o mock-target mocktarget.go && ./mock-target
+	cd mocktarget && go build -o mock-target mocktarget/mocktarget.go && ./mock-target
 
 run-web:
 	npm start --prefix $(WEB_FOLDER)
@@ -28,10 +28,10 @@ run-web:
 run: build-web run-api
 
 build-api:
-	GO111MODULE=on go build ./...
+	go build ./...
 
 test-api:
-	GO111MODULE=on go test ./...
+	go test ./...
 
 lint-api:
 	golangci-lint run
@@ -44,7 +44,7 @@ down:
 	docker-compose down
 
 build-up:
-	SERVER_URL=$(DOCKER_IP) docker-compose up --build -d	
+	SERVER_URL=$(DOCKER_IP) docker-compose up --build -d
 
 up: clean
 	SERVER_URL=$(DOCKER_IP) docker-compose up -d

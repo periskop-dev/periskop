@@ -8,6 +8,7 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/gorilla/mux"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/soundcloud/periskop-go"
 
@@ -60,14 +61,29 @@ func main() {
 		go s.Scrape()
 	}
 
-	http.HandleFunc("/-/health", healthHandler)
+	webFolder := filepath.Join(basePath, "web/dist")
+	log.Printf("Using webFolder %s", webFolder)
+	fs := http.FileServer(http.Dir(webFolder))
 
+	// API routing
+	r := mux.NewRouter()
+	r.Handle("/services/",
+		api.NewServicesListHandler(&repo)).Methods(http.MethodGet)
+	r.Handle("/services/{service_name}/errors/",
+		api.NewErrorsListHandler(&repo)).Methods(http.MethodGet)
+	r.Handle("/services/{service_name}/errors/{error_key:.*}/",
+		api.NewErrorResolveHandler(&repo)).Methods(http.MethodDelete, http.MethodOptions)
+	r.PathPrefix("/").Handler(http.StripPrefix("/", fs))
+	r.Use(api.CORSLocalhostMiddleware(r))
+	http.Handle("/", r)
+
+	// Telemetry endpoints
 	errorExporter := periskop.NewErrorExporter(&metrics.ErrorCollector)
 	periskopHandler := periskop.NewHandler(errorExporter)
 
-	http.Handle("/services/", api.NewHandler(&repo, serverURL))
 	http.Handle("/metrics", promhttp.Handler())
 	http.Handle("/errors", periskopHandler)
+	http.HandleFunc("/-/health", healthHandler)
 
 	address := fmt.Sprintf("0.0.0.0:%s", *port)
 	log.Printf("Serving on address %s", address)

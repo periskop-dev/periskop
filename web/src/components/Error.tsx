@@ -3,17 +3,19 @@ import { ListGroup, Table, Button, Badge } from "react-bootstrap"
 import * as moment from "moment"
 import { AggregatedError, Error, HttpContext, Headers, StoreState, ErrorInstance } from "data/types"
 import { ButtonGroup } from "react-bootstrap"
-import { setCurrentExceptionIndex } from "data/errors"
+import { setCurrentExceptionIndex, resolveError } from "data/errors"
 import { bindActionCreators, Dispatch, AnyAction } from "redux"
 import { connect } from "react-redux"
 
 interface ConnectedProps {
   activeError: AggregatedError,
+  activeService: string,
   latestExceptionIndex: number,
 }
 
 interface DispatchProps {
-  setCurrentExceptionIndex: (num: number) => void
+  setCurrentExceptionIndex: (num: number) => void,
+  resolveError: (service: string, errorKey: string) => void
 }
 
 type Props = ConnectedProps & DispatchProps
@@ -37,7 +39,7 @@ const ErrorComponent: React.FC<Props> = (props) => {
     if (!errorInstance) return ""
 
     return (
-      <div>
+      <div>      
         <ListGroup.Item>
           <h4 className="list-group-item-heading"> Class</h4>
           { errorInstance.class }
@@ -54,6 +56,10 @@ const ErrorComponent: React.FC<Props> = (props) => {
 
     return (
       <ListGroup variant="flush">
+        <ListGroup.Item>
+          <h4 className="list-group-item-heading"> Occurred at</h4>
+          {renderTimeOccurrence(error.timestamp)}
+        </ListGroup.Item>  
         { renderCurl(error.http_context) }
         { renderErrorInstance(error.error) }
         { renderHttpContext(error.http_context) }
@@ -74,7 +80,7 @@ const ErrorComponent: React.FC<Props> = (props) => {
     )
   }
 
-  const renderLastOccurrence = (ts: number) => {
+  const renderTimeOccurrence = (ts: number) => {
     return moment(new Date(ts * 1000)).fromNow()
   }
 
@@ -183,9 +189,16 @@ const ErrorComponent: React.FC<Props> = (props) => {
     )
   }
 
+  const resolveError = () => {
+    props.resolveError(props.activeService, props.activeError.aggregation_key)
+  }
+    
   const renderAggregatedError = () => {
     return (
       <div className={"grid-component"}>
+        <ButtonGroup className="float-right">
+          <Button variant="outline-danger" size="sm" onClick={() => resolveError()}>Resolve</Button>
+        </ButtonGroup>
         <h3 className="list-group-item-heading"> Summary</h3>
         <ListGroup>
           <ListGroup.Item>
@@ -201,8 +214,8 @@ const ErrorComponent: React.FC<Props> = (props) => {
             {props.activeError.severity}
           </ListGroup.Item>
           <ListGroup.Item>
-            <h4 className="list-group-item-heading"> Last Occurrence</h4>
-            {renderLastOccurrence(props.activeError.latest_errors[0].timestamp)}
+            <h4 className="list-group-item-heading"> First Occurrence</h4>
+            {renderTimeOccurrence(props.activeError.created_at)}
           </ListGroup.Item>
         </ListGroup>
         <br/>
@@ -210,7 +223,7 @@ const ErrorComponent: React.FC<Props> = (props) => {
           <Button variant="outline-dark" size="sm" onClick={() => showPreviousException()}>Previous</Button>
           <Button variant="outline-dark" size="sm" onClick={() => showNextException()} >Next</Button>
         </ButtonGroup>
-        <h3 className="list-group-item-heading"> Latest Occurences <Badge variant="light">{props.latestExceptionIndex+1 + "/" + props.activeError.latest_errors.length}</Badge></h3>
+        <h3 className="list-group-item-heading"> Latest Occurrences <Badge variant="light">{props.latestExceptionIndex+1 + "/" + props.activeError.latest_errors.length}</Badge></h3>
         {renderError(props.activeError.latest_errors[props.latestExceptionIndex]) }
       </div>
     )
@@ -226,12 +239,13 @@ const ErrorComponent: React.FC<Props> = (props) => {
 const mapStateToProps = (state: StoreState) => {
   return {
     activeError: state.errorsReducer.activeError,
+    activeService: state.errorsReducer.activeService,
     latestExceptionIndex: state.errorsReducer.latestExceptionIndex,
   }
 }
 
 const matchDispatchToProps = (dispatch: Dispatch<AnyAction>): DispatchProps => {
-  return bindActionCreators({ setCurrentExceptionIndex }, dispatch)
+  return bindActionCreators({ setCurrentExceptionIndex, resolveError }, dispatch)
 }
 
 export default connect(mapStateToProps, matchDispatchToProps)(ErrorComponent)

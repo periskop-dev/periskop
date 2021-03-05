@@ -4,6 +4,7 @@ import "time"
 
 type responsePayload struct {
 	ErrorAggregate []errorAggregate `json:"aggregated_errors"`
+	Target         string           `json:"target"`
 }
 
 type errorAggregate struct {
@@ -11,6 +12,7 @@ type errorAggregate struct {
 	TotalCount     int                `json:"total_count"`
 	Severity       string             `json:"severity"`
 	LatestErrors   []errorWithContext `json:"latest_errors"`
+	CreatedAt      time.Time          `json:"created_at"`
 }
 
 type errorWithContext struct {

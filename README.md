@@ -1,4 +1,4 @@
-# <img src="https://i.imgur.com/NcT3qgf.png" width="65%">
+# <img src="https://i.imgur.com/z8BLePO.png" width="65%">
 
 [![Build Status](https://api.cirrus-ci.com/github/soundcloud/periskop.svg)](https://cirrus-ci.com/github/soundcloud/periskop)
 
@@ -31,6 +31,9 @@ The format for scraped errors is defined in [a proto3 IDL](representation/errors
 The UI allows navigating and inspecting exceptions as they occur.
 
 ![ui](https://i.imgur.com/Tljxd80.png)
+
+## Run project locally
+Please see [CONTRIBUTING.md](CONTRIBUTING.md)
 
 ## Building & Running
 We are looking into distributing Periskop via Docker Hub.
@@ -66,7 +69,3 @@ groups:
       description: "Errors for {{ $labels.service_name }}({{ $labels.aggregation_key }}) is {{ $value }}"
       dashboard: "https://periskop.example.com/#/{{ $labels.service_name }}/errors/{{ $labels.aggregation_key }}"
 ```
-
-## Contributing
-
-Please see [CONTRIBUTING.md](CONTRIBUTING.md)

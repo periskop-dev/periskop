@@ -1,9 +1,7 @@
 ## Build api
-FROM golang:1.14.1 AS api-builder
+FROM golang:1.16 AS api-builder
 
 WORKDIR /periskop
-
-ENV GO111MODULE=on
 
 COPY go.mod .
 COPY go.sum .

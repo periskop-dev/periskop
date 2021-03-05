@@ -10,9 +10,11 @@ function configureStore() {
 
   const rootReducer = () => ({});
 
+  // @ts-ignore
+  const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
   return createStore(
     rootReducer,
-    compose(applyMiddleware(...middlewares))
+    composeEnhancers(applyMiddleware(...middlewares))
   );
 }
 
