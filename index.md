@@ -1,37 +1,71 @@
-## Welcome to GitHub Pages
+# <img src="https://i.imgur.com/z8BLePO.png" width="65%">
 
-You can use the [editor on GitHub](https://github.com/soundcloud/periskop/edit/gh-pages/index.md) to maintain and preview the content for your website in Markdown files.
+[![Build Status](https://api.cirrus-ci.com/github/soundcloud/periskop.svg)](https://cirrus-ci.com/github/soundcloud/periskop)
 
-Whenever you commit to this repository, GitHub Pages will run [Jekyll](https://jekyllrb.com/) to rebuild the pages in your site, from the content in your Markdown files.
+Pull based, language agnostic exception aggregator for microservice environments.
 
-### Markdown
+Periskop scales well with the number of exceptions and application instances:
 
-Markdown is a lightweight and easy-to-use syntax for styling your writing. It includes conventions for
+  - Exceptions are pre-aggregated in client libraries and stored efficiently in memory, while keeping a sample of concrete occurrences for inspection.
+  - Exceptions are scraped and aggregated across instances by the server component.
+  - More application instances result in longer refresh cycles but the memory usage remains constant.
 
-```markdown
-Syntax highlighted code block
+A UI component is provided for convenience.
 
-# Header 1
-## Header 2
-### Header 3
+## Scraping
 
-- Bulleted
-- List
+Errors are scraped and aggregated using a configured endpoint from each of the instances discovered via service discovery.
 
-1. Numbered
-2. List
+Periskop supports all service discovery mechanisms supported by Prometheus. The configuration format for service discovery
+mirrors the one from Prometheus. See [Prometheus's official documentation](https://prometheus.io/docs/prometheus/latest/configuration/configuration/)
+for reference.
 
-**Bold** and _Italic_ and `Code` text
+A full example of service configuration for Periskop can be found in the [sample configuration](config.dev.yaml).
 
-[Link](url) and ![Image](src)
+## Format
+
+The format for scraped errors is defined in [a proto3 IDL](representation/errors.proto). Currently the only supported protocol is snake_cased JSON over HTTP ([example](scraper/sample-response1.json)).
+
+## UI
+
+The UI allows navigating and inspecting exceptions as they occur.
+
+![ui](https://i.imgur.com/Tljxd80.png)
+
+## Run project locally
+Please see [CONTRIBUTING.md](CONTRIBUTING.md)
+
+## Building & Running
+We are looking into distributing Periskop via Docker Hub.
+In the meantime, you can build and run Periskop from source:
+
+```
+docker build --tag periskop .
+docker run -v path/to/config.yaml:/etc/periskop/periskop.yaml -p 8080:8080 periskop
 ```
 
-For more details see [GitHub Flavored Markdown](https://guides.github.com/features/mastering-markdown/).
+## Client Libraries
 
-### Jekyll Themes
+  - [periskop-scala](https://github.com/soundcloud/periskop-scala)
+  - [periskop-go](https://github.com/soundcloud/periskop-go)
+  - [periskop-python](https://github.com/soundcloud/periskop-python)
+  
 
-Your Pages site will use the layout and styles from the Jekyll theme you have selected in your [repository settings](https://github.com/soundcloud/periskop/settings/pages). The name of this theme is saved in the Jekyll `_config.yml` configuration file.
+## Alert reported exceptions
 
-### Support or Contact
+All reported errors are instrumented with [Prometheus](https://prometheus.io) which provides alerting capabilities using [Alertmanager](https://prometheus.io/docs/alerting/alertmanager/). You can configure an alert when you reach some threshold of errors. Here's an example:
 
-Having trouble with Pages? Check out our [documentation](https://docs.github.com/categories/github-pages-basics/) or [contact support](https://support.github.com/contact) and we’ll help you sort it out.
+```yaml
+groups:
+- name: periskop
+  rules:
+  - alert: TooManyErrors
+    expr: periskop_error_occurrences{severity="error"} > 1000
+    for: 5m
+    labels:
+      severity: critical    
+    annotations:
+      summary: "Too many errors on {{ $labels.service_name }}"
+      description: "Errors for {{ $labels.service_name }}({{ $labels.aggregation_key }}) is {{ $value }}"
+      dashboard: "https://periskop.example.com/#/{{ $labels.service_name }}/errors/{{ $labels.aggregation_key }}"
+```
