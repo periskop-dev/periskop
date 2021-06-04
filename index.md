@@ -1,4 +1,4 @@
-# <img src="https://i.imgur.com/z8BLePO.png width="75%"">
+# <img src="https://i.imgur.com/z8BLePO.png width="75%">
 
 Pull based, language agnostic exception aggregator for microservice environments.
 
