@@ -1,4 +1,4 @@
-# <img src="https://i.imgur.com/z8BLePO.png" width="65%">
+# <img src="https://i.imgur.com/z8BLePO.png" width="75%">
 
 [![Build Status](https://api.cirrus-ci.com/github/soundcloud/periskop.svg)](https://cirrus-ci.com/github/soundcloud/periskop)
 
@@ -31,18 +31,6 @@ The format for scraped errors is defined in [a proto3 IDL](representation/errors
 The UI allows navigating and inspecting exceptions as they occur.
 
 ![ui](https://i.imgur.com/Tljxd80.png)
-
-## Run project locally
-Please see [CONTRIBUTING.md](CONTRIBUTING.md)
-
-## Building & Running
-We are looking into distributing Periskop via Docker Hub.
-In the meantime, you can build and run Periskop from source:
-
-```
-docker build --tag periskop .
-docker run -v path/to/config.yaml:/etc/periskop/periskop.yaml -p 8080:8080 periskop
-```
 
 ## Client Libraries
 
