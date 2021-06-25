@@ -64,7 +64,6 @@ func (errorAggregates errorAggregateMap) combine(serviceName string, r *reposito
 					serviceName, r, rp,
 					targetErrorsCount, errorInstancesAccumulator)
 			} else {
-				errorCountDelta = 0
 				log.Printf("warning: count of errors for '%s' target is inconsistent: prev %d, current %d.",
 					rp.Target,
 					prevCount,
@@ -73,7 +72,6 @@ func (errorAggregates errorAggregateMap) combine(serviceName string, r *reposito
 				log.Printf(" Counters won't be updated\n")
 			}
 		} else {
-			errorCountDelta = item.TotalCount
 			errorAggregates[item.AggregationKey] = item
 			updateValues(item, item.TotalCount, lastestErrors,
 				serviceName, r, rp,
