@@ -83,7 +83,6 @@ func (errorAggregates errorAggregateMap) combine(serviceName string, r *reposito
 func updateValues(item errorAggregate, errorCountDelta int, latestErrors []errorWithContext,
 	serviceName string, r *repository.ErrorsRepository, rp responsePayload,
 	targetErrorsCount targetErrorsCountMap, errorInstancesAccumulator errorInstancesAccumulatorMap) {
-
 	metrics.ErrorOccurrences.WithLabelValues(serviceName, item.Severity, rp.Target,
 		item.AggregationKey).Add(float64(errorCountDelta))
 	targetErrorsCount[rp.Target][item.AggregationKey] = item.TotalCount
