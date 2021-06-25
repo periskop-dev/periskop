@@ -60,6 +60,9 @@ func (errorAggregates errorAggregateMap) combine(serviceName string, r *reposito
 					LatestErrors:   lastestErrors,
 					CreatedAt:      existing.CreatedAt,
 				}
+				updateValues(item, errorCountDelta, lastestErrors,
+					serviceName, r, rp,
+					targetErrorsCount, errorInstancesAccumulator)
 			} else {
 				errorCountDelta = 0
 				log.Printf("warning: count of errors for '%s' target is inconsistent: prev %d, current %d.",
@@ -72,16 +75,24 @@ func (errorAggregates errorAggregateMap) combine(serviceName string, r *reposito
 		} else {
 			errorCountDelta = item.TotalCount
 			errorAggregates[item.AggregationKey] = item
+			updateValues(item, item.TotalCount, lastestErrors,
+				serviceName, r, rp,
+				targetErrorsCount, errorInstancesAccumulator)
 		}
-
-		metrics.ErrorOccurrences.WithLabelValues(serviceName, item.Severity, rp.Target,
-			item.AggregationKey).Add(float64(errorCountDelta))
-		targetErrorsCount[rp.Target][item.AggregationKey] = item.TotalCount
-		errorInstancesAccumulator[item.AggregationKey] = lastestErrors
-		// If an error that was previously mark as resolved is scrapped again
-		// it's going to be added to list of errors
-		(*r).RemoveResolved(serviceName, item.AggregationKey)
 	}
+}
+
+func updateValues(item errorAggregate, errorCountDelta int, latestErrors []errorWithContext,
+	serviceName string, r *repository.ErrorsRepository, rp responsePayload,
+	targetErrorsCount targetErrorsCountMap, errorInstancesAccumulator errorInstancesAccumulatorMap) {
+
+	metrics.ErrorOccurrences.WithLabelValues(serviceName, item.Severity, rp.Target,
+		item.AggregationKey).Add(float64(errorCountDelta))
+	targetErrorsCount[rp.Target][item.AggregationKey] = item.TotalCount
+	errorInstancesAccumulator[item.AggregationKey] = latestErrors
+	// If an error that was previously mark as resolved is scrapped again
+	// it's going to be added to list of errors
+	(*r).RemoveResolved(serviceName, item.AggregationKey)
 }
 
 func combineLastErrors(first []errorWithContext, second []errorWithContext) []errorWithContext {
