@@ -62,7 +62,12 @@ func (errorAggregates errorAggregateMap) combine(serviceName string, r *reposito
 				}
 			} else {
 				errorCountDelta = 0
-				log.Printf("warning: count of errors for '%s' target is inconsistent: prev %d, current %d.\nCounters won't be updated \n", rp.Target, prevCount, item.TotalCount)
+				log.Printf("warning: count of errors for '%s' target is inconsistent: prev %d, current %d.",
+					rp.Target,
+					prevCount,
+					item.TotalCount,
+				)
+				log.Printf(" Counters won't be updated\n")
 			}
 		} else {
 			errorCountDelta = item.TotalCount
