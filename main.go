@@ -30,13 +30,6 @@ func main() {
 
 	flag.Parse()
 
-	basePath, err := filepath.Abs(filepath.Dir(os.Args[0]))
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	log.Printf("Using baseDir %s", basePath)
-
 	if _, err := os.Stat(*configurationFile); err != nil {
 		log.Fatalf("Invalid configuration file %s", *configurationFile)
 	}
@@ -56,21 +49,13 @@ func main() {
 		go s.Scrape()
 	}
 
-	webFolder := filepath.Join(basePath, "web/dist")
-	log.Printf("Using webFolder %s", webFolder)
-	fs := http.FileServer(http.Dir(webFolder))
+	router := mux.NewRouter()
 
 	// API routing
-	r := mux.NewRouter()
-	r.Handle("/services/",
-		api.NewServicesListHandler(&repo)).Methods(http.MethodGet)
-	r.Handle("/services/{service_name}/errors/",
-		api.NewErrorsListHandler(&repo)).Methods(http.MethodGet)
-	r.Handle("/services/{service_name}/errors/{error_key:.*}/",
-		api.NewErrorResolveHandler(&repo)).Methods(http.MethodDelete, http.MethodOptions)
-	r.PathPrefix("/").Handler(http.StripPrefix("/", fs))
-	r.Use(api.CORSLocalhostMiddleware(r))
-	http.Handle("/", r)
+	setupAPIRouting(repo, router)
+
+	// Web routing
+	setupWebRouting(router)
 
 	// Telemetry endpoints
 	errorExporter := periskop.NewErrorExporter(&metrics.ErrorCollector)
@@ -83,6 +68,33 @@ func main() {
 	address := fmt.Sprintf(":%s", *port)
 	log.Printf("Serving on address %s", address)
 	log.Fatal(http.ListenAndServe(address, nil))
+}
+
+func setupWebRouting(r *mux.Router) {
+	basePath, err := filepath.Abs(filepath.Dir(os.Args[0]))
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	log.Printf("Using baseDir %s", basePath)
+
+	webFolder := filepath.Join(basePath, "web/dist")
+	log.Printf("Using webFolder %s", webFolder)
+	fs := http.FileServer(http.Dir(webFolder))
+	r.PathPrefix("/").Handler(http.StripPrefix("/", fs))
+}
+
+func setupAPIRouting(repo repository.ErrorsRepository, r *mux.Router) {
+	r.Handle("/services/",
+		api.NewServicesListHandler(&repo)).Methods(http.MethodGet)
+	r.Handle("/services/{service_name}/errors/",
+		api.NewErrorsListHandler(&repo)).Methods(http.MethodGet)
+	r.Handle("/services/{service_name}/errors/{error_key:.*}/",
+		api.NewErrorResolveHandler(&repo)).Methods(http.MethodDelete, http.MethodOptions)
+	r.Handle("/targets/",
+		api.NewTargetsHandler(&repo)).Methods(http.MethodGet)
+	r.Use(api.CORSLocalhostMiddleware(r))
+	http.Handle("/", r)
 }
 
 func healthHandler(w http.ResponseWriter, r *http.Request) {

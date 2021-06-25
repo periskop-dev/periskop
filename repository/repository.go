@@ -44,12 +44,19 @@ type ErrorsRepository interface {
 	ResolveError(serviceName string, key string) error
 	SearchResolved(serviceName string, key string) bool
 	RemoveResolved(serviceName string, key string)
+	StoreTargets(serviceName string, targets []Target)
+	GetTargets() map[string][]Target
+}
+
+type Target struct {
+	Endpoint string `json:"endpoint"`
 }
 
 func NewInMemory() ErrorsRepository {
 	return &inMemoryRepository{
 		AggregatedError: sync.Map{},
 		ResolvedErrors:  sync.Map{},
+		Targets:         sync.Map{},
 	}
 }
 
@@ -58,10 +65,16 @@ type inMemoryRepository struct {
 	AggregatedError sync.Map
 	// map service name -> set of resolved errors
 	ResolvedErrors sync.Map
+	// map service name -> list of scraped targets
+	Targets sync.Map
 }
 
 func (r *inMemoryRepository) StoreErrors(serviceName string, errors []ErrorAggregate) {
 	r.AggregatedError.Store(serviceName, errors)
+}
+
+func (r *inMemoryRepository) StoreTargets(serviceName string, targets []Target) {
+	r.Targets.Store(serviceName, targets)
 }
 
 func (r *inMemoryRepository) GetServices() []string {
@@ -72,6 +85,15 @@ func (r *inMemoryRepository) GetServices() []string {
 		return true
 	})
 	return keys
+}
+
+func (r *inMemoryRepository) GetTargets() map[string][]Target {
+	targets := make(map[string][]Target)
+	r.Targets.Range(func(key, value interface{}) bool {
+		targets[key.(string)] = value.([]Target)
+		return true
+	})
+	return targets
 }
 
 func (r *inMemoryRepository) GetErrors(serviceName string, numberOfErrors int) ([]ErrorAggregate, error) {

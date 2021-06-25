@@ -94,6 +94,7 @@ func (scraper Scraper) Scrape() {
 		select {
 		case newResult := <-resolutions:
 			resolvedAddresses = newResult
+			storeTargets(serviceConfig.Name, scraper.Repository, resolvedAddresses)
 			log.Printf("Received new dns resolution result for %s. Address resolved: %d\n", serviceConfig.Name,
 				len(resolvedAddresses.Addresses))
 
@@ -105,7 +106,7 @@ func (scraper Scraper) Scrape() {
 				errorAggregates.combine(serviceConfig.Name, scraper.Repository,
 					responsePayload, targetErrorsCount, errorInstancesAccumulator)
 			}
-			store(serviceConfig.Name, scraper.Repository, errorAggregates)
+			storeErrors(serviceConfig.Name, scraper.Repository, errorAggregates)
 
 			numInstances := len(resolvedAddresses.Addresses)
 			numErrors := len(errorAggregates)
@@ -140,7 +141,7 @@ func scrapeInstances(addresses []string, endpoint string, processor Processor) <
 	return out
 }
 
-func store(serviceName string, r *repository.ErrorsRepository, errorAggregates errorAggregateMap) {
+func storeErrors(serviceName string, r *repository.ErrorsRepository, errorAggregates errorAggregateMap) {
 	errors := make([]repository.ErrorAggregate, 0, len(errorAggregates))
 	for _, value := range errorAggregates {
 		if !(*r).SearchResolved(serviceName, value.AggregationKey) {
@@ -155,6 +156,16 @@ func store(serviceName string, r *repository.ErrorsRepository, errorAggregates e
 		}
 	}
 	(*r).StoreErrors(serviceName, errors)
+}
+
+func storeTargets(serviceName string, r *repository.ErrorsRepository, addr servicediscovery.ResolvedAddresses) {
+	targets := make([]repository.Target, 0, len(addr.Addresses))
+	for _, value := range addr.Addresses {
+		targets = append(targets, repository.Target{
+			Endpoint: value,
+		})
+	}
+	(*r).StoreTargets(serviceName, targets)
 }
 
 func toRepositoryErrorsWithContent(occurrences []errorWithContext) []repository.ErrorWithContext {
