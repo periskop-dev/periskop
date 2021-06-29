@@ -3,6 +3,7 @@ package com.soundcloud.periskop;
 
 message Errors {
     repeated AggregatedError aggregatedErrors = 1;
+    string target_uuid = 2; // Must be unique per exception collector instance
 }
 
 message AggregatedError {
