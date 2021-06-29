@@ -4,6 +4,8 @@ import (
 	"encoding/json"
 	"io/ioutil"
 	"testing"
+
+	"github.com/soundcloud/periskop/repository"
 )
 
 func TestCombineLastErrorsSortsByTimestamp(t *testing.T) {
@@ -27,5 +29,69 @@ func TestCombineLastErrorsSortsByTimestamp(t *testing.T) {
 		if element.UUID != expectedUUIDs[i] {
 			t.Errorf("Expected %s, Found %s", expectedUUIDs[i], element.UUID)
 		}
+	}
+}
+
+func TestScrapeCombine(t *testing.T) {
+	var targetErrorsCount = make(targetErrorsCountMap)
+	var errorAggregates = make(errorAggregateMap)
+	errorInstancesAccumulator := make(errorInstancesAccumulatorMap)
+	repo := repository.NewInMemory()
+
+	firstContent, _ := ioutil.ReadFile("sample-response1.json")
+	var rp responsePayload
+	json.Unmarshal(firstContent, &rp) // nolint[errcheck]
+	rp.Target = "test"
+
+	errorAggregates.combine("test", &repo, rp, targetErrorsCount, errorInstancesAccumulator)
+
+	count := targetErrorsCount["test"]["com.soundcloud.Foon@e28e036e"]
+	if count != 2 {
+		t.Errorf("Expected 2 element, Found %d", count)
+	}
+
+	countErrorInstances := len(errorInstancesAccumulator["com.soundcloud.Foon@e28e036e"])
+	if countErrorInstances != 2 {
+		t.Errorf("Expected 2 element, Found %d", countErrorInstances)
+	}
+
+	rp.ErrorAggregate[0].TotalCount = 4
+	errorAggregates.combine("test", &repo, rp, targetErrorsCount, errorInstancesAccumulator)
+
+	count = targetErrorsCount["test"]["com.soundcloud.Foon@e28e036e"]
+	if count != 4 {
+		t.Errorf("Expected 4 element, Found %d", count)
+	}
+
+	countErrorInstances = len(errorInstancesAccumulator["com.soundcloud.Foon@e28e036e"])
+	if countErrorInstances != 4 {
+		t.Errorf("Expected 2 element, Found %d", countErrorInstances)
+	}
+}
+
+func TestScapeCombineNotUpdate(t *testing.T) {
+	var targetErrorsCount = make(targetErrorsCountMap)
+	var errorAggregates = make(errorAggregateMap)
+	errorInstancesAccumulator := make(errorInstancesAccumulatorMap)
+	repo := repository.NewInMemory()
+
+	firstContent, _ := ioutil.ReadFile("sample-response1.json")
+	var rp responsePayload
+	json.Unmarshal(firstContent, &rp) // nolint[errcheck]
+	rp.Target = "test"
+
+	errorAggregates.combine("test", &repo, rp, targetErrorsCount, errorInstancesAccumulator)
+
+	rp.ErrorAggregate[0].TotalCount = 1
+	errorAggregates.combine("test", &repo, rp, targetErrorsCount, errorInstancesAccumulator)
+
+	count := targetErrorsCount["test"]["com.soundcloud.Foon@e28e036e"]
+	if count != 2 {
+		t.Errorf("Expected 2 element, Found %d", count)
+	}
+
+	countErrorInstances := len(errorInstancesAccumulator["com.soundcloud.Foon@e28e036e"])
+	if countErrorInstances != 2 {
+		t.Errorf("Expected 2 element, Found %d", countErrorInstances)
 	}
 }
