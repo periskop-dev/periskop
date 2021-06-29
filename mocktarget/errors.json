@@ -120,6 +120,26 @@
                     }
                 }
             ]
+        },
+        {
+            "aggregation_key": "info-message",
+            "total_count": 1,
+            "severity": "info",
+            "created_at": "2019-09-15T11:46:25.333Z",
+            "latest_errors": [
+                {
+                    "error": {
+                        "message": "Something not so bad"
+                    },
+                    "uuid": "e81e56ff-7f65-4279-1234-dd6075777777",
+                    "timestamp": "2019-09-15T11:46:25.333Z",
+                    "severity": "info",
+                    "http_context": {
+                        "request_method": "GET",
+                        "request_url": "http://notsobadrequest.org/third-endpoint"
+                    }
+                }
+            ]
         }
     ]
 }

@@ -40,10 +40,7 @@ const ErrorComponent: React.FC<Props> = (props) => {
 
     return (
       <div>      
-        <ListGroup.Item>
-          <h4 className="list-group-item-heading"> Class</h4>
-          { errorInstance.class }
-        </ListGroup.Item>
+        { renderClass(errorInstance.class) }
         { renderMessage(errorInstance.message) }
         { renderStackTrace(errorInstance.stacktrace) }
         { renderCause(errorInstance.cause) }
@@ -93,6 +90,19 @@ const ErrorComponent: React.FC<Props> = (props) => {
       <ListGroup.Item>
         <h4 className="list-group-item-heading"> Cause</h4>
         { renderErrorInstance(cause) }
+      </ListGroup.Item>
+    )
+  }
+
+  const renderClass = (klass: string) => {
+    if (klass === null || klass.trim().length === 0) {
+      return ""
+    }
+
+    return (
+      <ListGroup.Item>
+        <h4 className="list-group-item-heading"> Class</h4>
+        { klass }
       </ListGroup.Item>
     )
   }
