@@ -46,32 +46,50 @@ func (errorAggregates errorAggregateMap) combine(serviceName string, r *reposito
 			targetErrorsCount[rp.Target] = make(map[string]int)
 		}
 		prevErrorInstances := errorInstancesAccumulator[item.AggregationKey]
-		var currentCount int
+		var errorCountDelta int
 		lastestErrors := combineLastErrors(prevErrorInstances, item.LatestErrors)
 
 		if existing, exists := errorAggregates[item.AggregationKey]; exists {
 			prevCount := targetErrorsCount[rp.Target][item.AggregationKey]
-			currentCount = item.TotalCount - prevCount
-			errorAggregates[item.AggregationKey] = errorAggregate{
-				TotalCount:     existing.TotalCount + currentCount,
-				AggregationKey: existing.AggregationKey,
-				Severity:       item.Severity,
-				LatestErrors:   lastestErrors,
-				CreatedAt:      existing.CreatedAt,
+			if prevCount <= item.TotalCount {
+				errorCountDelta = item.TotalCount - prevCount
+				errorAggregates[item.AggregationKey] = errorAggregate{
+					TotalCount:     existing.TotalCount + errorCountDelta,
+					AggregationKey: existing.AggregationKey,
+					Severity:       item.Severity,
+					LatestErrors:   lastestErrors,
+					CreatedAt:      existing.CreatedAt,
+				}
+				updateValues(item, errorCountDelta, lastestErrors,
+					serviceName, r, rp,
+					targetErrorsCount, errorInstancesAccumulator)
+			} else {
+				log.Printf("warning: count of errors for '%s' target is inconsistent: prev %d, current %d.",
+					rp.Target,
+					prevCount,
+					item.TotalCount,
+				)
+				log.Printf(" Counters won't be updated\n")
 			}
 		} else {
-			currentCount = item.TotalCount
 			errorAggregates[item.AggregationKey] = item
+			updateValues(item, item.TotalCount, lastestErrors,
+				serviceName, r, rp,
+				targetErrorsCount, errorInstancesAccumulator)
 		}
-
-		metrics.ErrorOccurrences.WithLabelValues(serviceName, item.Severity, rp.Target,
-			item.AggregationKey).Add(float64(currentCount))
-		targetErrorsCount[rp.Target][item.AggregationKey] = item.TotalCount
-		errorInstancesAccumulator[item.AggregationKey] = lastestErrors
-		// If an error that was previously mark as resolved is scrapped again
-		// it's going to be added to list of errors
-		(*r).RemoveResolved(serviceName, item.AggregationKey)
 	}
+}
+
+func updateValues(item errorAggregate, errorCountDelta int, latestErrors []errorWithContext,
+	serviceName string, r *repository.ErrorsRepository, rp responsePayload,
+	targetErrorsCount targetErrorsCountMap, errorInstancesAccumulator errorInstancesAccumulatorMap) {
+	metrics.ErrorOccurrences.WithLabelValues(serviceName, item.Severity, rp.Target,
+		item.AggregationKey).Add(float64(errorCountDelta))
+	targetErrorsCount[rp.Target][item.AggregationKey] = item.TotalCount
+	errorInstancesAccumulator[item.AggregationKey] = latestErrors
+	// If an error that was previously mark as resolved is scrapped again
+	// it's going to be added to list of errors
+	(*r).RemoveResolved(serviceName, item.AggregationKey)
 }
 
 func combineLastErrors(first []errorWithContext, second []errorWithContext) []errorWithContext {
