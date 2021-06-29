@@ -149,3 +149,40 @@ func serveMockErrorResolve(rr *httptest.ResponseRecorder, r repository.ErrorsRep
 	req, _ := http.NewRequest("DELETE", fmt.Sprintf("/services/%s/errors/%s/", serviceName, errKey), nil)
 	router.ServeHTTP(rr, req)
 }
+
+func TestTargetsWithEmptyRepoReturnsSuccess(t *testing.T) {
+	r := repository.NewInMemory()
+
+	rr := httptest.NewRecorder()
+	serveMockTargets(rr, r)
+
+	if status := rr.Code; status != http.StatusOK {
+		t.Errorf("handler returned wrong status code: got %v want %v",
+			status, http.StatusOK)
+	}
+}
+
+func TestTargetsReturnsListOfTargets(t *testing.T) {
+	r := repository.NewInMemory()
+	targets := []repository.Target{
+		{Endpoint: "localhost:3000/"},
+	}
+	r.StoreTargets("api-test", targets)
+
+	rr := httptest.NewRecorder()
+	serveMockTargets(rr, r)
+
+	expected := "{\"api-test\":[{\"endpoint\":\"localhost:3000/\"}]}\n"
+	if rr.Body.String() != expected {
+		t.Errorf("handler returned unexpected body: got %v want %v",
+			rr.Body.String(), expected)
+	}
+}
+
+func serveMockTargets(rr *httptest.ResponseRecorder, r repository.ErrorsRepository) {
+	handler := NewTargetsHandler(&r)
+	router := mux.NewRouter()
+	router.Handle("/targets/", handler).Methods(http.MethodGet)
+	req, _ := http.NewRequest("GET", "/targets/", nil)
+	router.ServeHTTP(rr, req)
+}

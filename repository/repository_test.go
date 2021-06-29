@@ -72,3 +72,17 @@ func TestResolveErrorError(t *testing.T) {
 		}
 	}
 }
+
+func TestSetAndRetrieveTargets(t *testing.T) {
+	er := &inMemoryRepository{}
+	er.StoreTargets(serviceName, []Target{
+		{Endpoint: "localhost:3000/"},
+		{Endpoint: "localhost:3001/"},
+	})
+
+	retrievedTargets := er.GetTargets()
+	if retrievedTargets[serviceName][0].Endpoint != "localhost:3000/" ||
+		retrievedTargets[serviceName][1].Endpoint != "localhost:3001/" {
+		t.Errorf("Inconsistent target fetch and retrieval")
+	}
+}
