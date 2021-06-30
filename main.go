@@ -31,7 +31,7 @@ func main() {
 	flag.Parse()
 
 	if _, err := os.Stat(*configurationFile); err != nil {
-		log.Fatalf("Invalid configuration file %s", *configurationFile)
+		log.Fatalf("Missing configuration file %s", *configurationFile)
 	}
 
 	log.Printf("Using configFile %s", *configurationFile)
