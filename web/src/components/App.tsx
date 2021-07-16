@@ -9,7 +9,7 @@ import SideBar from "components/SideBar"
 
 import * as RemoteData from "data/remote-data"
 import { StoreState, AggregatedError, SeverityFilter, ErrorsState } from "data/types"
-import { fetchErrors, setActiveError, setErrorsSeverityFilter, setErrorsSearchFilter } from "data/errors"
+import { fetchErrors, setActiveError, setErrorsSeverityFilter, setErrorsSearchFilter, setUrlSearchFilter } from "data/errors"
 
 import { Row, Col, Container } from "react-bootstrap"
 import { getFilteredErrors } from "util/errors"
@@ -28,6 +28,7 @@ interface DispatchProps {
   setActiveError: (errorKey: string) => void
   setErrorsSeverityFilter: (severity: SeverityFilter) => void
   setErrorsSearchFilter: (searchTerm: ErrorsState["searchTerm"]) => void
+  setUrlSearchFilter: (searchTerm: ErrorsState["urlSearchTerm"]) => void
 }
 
 type Props = ConnectedProps & DispatchProps & RouteComponentProps<{ service: string, errorKey: string }>
@@ -117,13 +118,13 @@ class App extends React.Component<Props, {}> {
 
 
 const mapStateToProps = ({ errorsReducer, servicesReducer }: StoreState) => {
-  const { errors, activeError, severityFilter, searchTerm, activeService, activeSortFilter } = errorsReducer
+  const { errors, activeError, severityFilter, searchTerm, activeService, activeSortFilter, urlSearchTerm } = errorsReducer
   const { services } = servicesReducer
 
-  const defaultConnectedProps = { activeError, services, severityFilter, activeService, searchTerm }
+  const defaultConnectedProps = { activeError, services, severityFilter, activeService, searchTerm, urlSearchTerm }
 
   if (RemoteData.isSuccess(errors)) {
-    const filteredErrors = getFilteredErrors(errors.data, searchTerm, severityFilter, activeSortFilter)
+    const filteredErrors = getFilteredErrors(errors.data, searchTerm, urlSearchTerm, severityFilter, activeSortFilter)
 
     return {
       ...defaultConnectedProps,
@@ -136,7 +137,7 @@ const mapStateToProps = ({ errorsReducer, servicesReducer }: StoreState) => {
 
 
 const matchDispatchToProps = (dispatch: Dispatch<AnyAction>): DispatchProps => {
-  return bindActionCreators({ fetchErrors, setActiveError, setErrorsSeverityFilter, setErrorsSearchFilter }, dispatch);
+  return bindActionCreators({ fetchErrors, setActiveError, setErrorsSeverityFilter, setErrorsSearchFilter, setUrlSearchFilter }, dispatch);
 }
 
 export default withRouter(connect<ConnectedProps, {}, RouteComponentProps<{ service: string }>>(mapStateToProps, matchDispatchToProps)(App))

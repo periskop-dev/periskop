@@ -13,6 +13,19 @@ export const filterErrorsBySubstringMatch = (errors: AggregatedError[], searchTe
   return errors.filter((error) => error.aggregation_key.toLowerCase().includes(searchTerm.toLowerCase()))
 }
 
+export const filterErrorsByUrlStringMatch = (errors: AggregatedError[], searchTerm: string) => {
+  return errors.map((error) => {
+    error.latest_errors.filter(e => {
+      if (e.http_context !== null) {
+        return e.http_context.request_url.toLowerCase().includes(searchTerm.toLowerCase())
+      } else {
+        return false
+      }
+    })
+    return error
+  })
+}
+
 export const filterErrorsBySeverity = (errors: AggregatedError[], severity: ErrorsState["severityFilter"]) => {
   if (severity === SeverityFilter.All) return errors
 
@@ -22,11 +35,13 @@ export const filterErrorsBySeverity = (errors: AggregatedError[], severity: Erro
 export const getFilteredErrors = (
   errors: AggregatedError[],
   searchTerm: string,
+  urlSearchTerm: string,
   severity: SeverityFilter,
   sortFilter: SortFilters,
 ) => {
   const sortedErrors = ErrorsSortActions[sortFilter](errors)
   const searchedErrors = filterErrorsBySubstringMatch(sortedErrors, searchTerm)
-  const filteredErrors = filterErrorsBySeverity(searchedErrors, severity)
+  const urlSearchedErrors = filterErrorsByUrlStringMatch(searchedErrors, urlSearchTerm)
+  const filteredErrors = filterErrorsBySeverity(urlSearchedErrors, severity)
   return filteredErrors
 }

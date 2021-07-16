@@ -5,19 +5,21 @@ import { connect } from "react-redux"
 
 import { bindActionCreators, Dispatch, AnyAction } from "redux"
 import { StoreState, AggregatedError, SortFilters, ErrorsState, SeverityFilter } from "data/types"
-import { setErrorsSortFilter, setErrorsSeverityFilter, setErrorsSearchFilter } from "data/errors"
+import { setErrorsSortFilter, setErrorsSeverityFilter, setErrorsSearchFilter, setUrlSearchFilter } from "data/errors"
 
 interface DispatchProps {
   setErrorsSortFilter: (filter: SortFilters) => void
   setErrorsSeverityFilter: (severity: SeverityFilter) => void
   setErrorsSearchFilter: (searchTerm: string) => void
+  setUrlSearchFilter: (searchTerm: string) => void
 }
 
 interface ConnectedProps {
   activeError: AggregatedError
   activeSortFilter: SortFilters
   activeSeverityFilter: ErrorsState["severityFilter"]
-  searchKey: string
+  searchKey: string,
+  urlSearchTerm: string
 }
 
 interface SidebarProps {
@@ -38,6 +40,11 @@ const SideBar: React.FC<Props> = (props) => {
   const onSearchByKeyChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { value } = event.target
     props.setErrorsSearchFilter(value)
+  }
+
+  const onSearchUrlByKeyChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const { value } = event.target
+    props.setUrlSearchFilter(value)
   }
 
   const renderErrors = () => {
@@ -110,6 +117,11 @@ const SideBar: React.FC<Props> = (props) => {
           placeholder="Search for an error"
           value={props.searchKey}
         />
+        <input
+          onChange={onSearchUrlByKeyChange}
+          placeholder={`filter by endpoint`}
+          value={props.urlSearchTerm}
+        />
       </div>
     )
   }
@@ -126,7 +138,7 @@ const SideBar: React.FC<Props> = (props) => {
 }
 
 const mapDispatchToProps = (dispatch: Dispatch<AnyAction>): DispatchProps => {
-  return bindActionCreators({ setErrorsSortFilter, setErrorsSeverityFilter, setErrorsSearchFilter }, dispatch)
+  return bindActionCreators({ setErrorsSortFilter, setErrorsSeverityFilter, setErrorsSearchFilter, setUrlSearchFilter }, dispatch)
 }
 
 const mapStateToProps = (state: StoreState) => {
@@ -135,6 +147,7 @@ const mapStateToProps = (state: StoreState) => {
     activeSortFilter: state.errorsReducer.activeSortFilter,
     activeSeverityFilter: state.errorsReducer.severityFilter,
     searchKey: state.errorsReducer.searchTerm,
+    urlSearchTerm: state.errorsReducer.urlSearchTerm
   }
 }
 

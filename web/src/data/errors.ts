@@ -13,6 +13,7 @@ export const SET_CURRENT_EXCEPTION_INDEX = "periskop/errors/SET_CURRENT_EXCEPTIO
 export const SET_ERRORS_SORT_FILTER = "periskop/errors/SET_ERRORS_SORT_FILTER"
 export const SET_ERRORS_SEVERITY_FILTER = "periskop/errors/SET_ERRORS_SEVERITY_FILTER"
 export const SET_ERRORS_SEARCH_FILTER = "periskop/errors/SET_ERRORS_SEARCH_FILTER"
+export const SET_URL_SEARCH_FILTER = "periskop/errors/SET_URL_SEARCH_FILTER"
 export const RESOLVE_ERROR = "periskop/errors/RESOLVE_ERROR"
 export const RESOLVE_ERROR_FAILURE = "periskop/errors/RESOLVE_ERROR_FAILURE"
 
@@ -25,6 +26,7 @@ export type ErrorsAction =
   | { type: typeof SET_ERRORS_SORT_FILTER; filter: SortFilters }
   | { type: typeof SET_ERRORS_SEVERITY_FILTER; severity: ErrorsState["severityFilter"] }
   | { type: typeof SET_ERRORS_SEARCH_FILTER; searchTerm: string }
+  | { type: typeof SET_URL_SEARCH_FILTER; searchTerm: string }
   | { type: typeof RESOLVE_ERROR; service: string, errorKey: String }
   | { type: typeof RESOLVE_ERROR_FAILURE; service: string, errorKey: String }
 
@@ -75,6 +77,10 @@ export const setErrorsSearchFilter = (searchTerm: ErrorsState["searchTerm"]) => 
   return { type: SET_ERRORS_SEARCH_FILTER, searchTerm }
 }
 
+export const setUrlSearchFilter = (searchTerm: ErrorsState["searchTerm"]) => {
+  return { type: SET_URL_SEARCH_FILTER, searchTerm }
+}
+
 export const resolveError = (service: string, errorKey: string) => {
   return (dispatch: ThunkDispatch<{}, {}, ErrorsAction>) => {
     dispatch({ type: RESOLVE_ERROR, service: service, errorKey: errorKey })
@@ -100,6 +106,7 @@ const initialState: ErrorsState = {
   activeSortFilter: "latest_occurrence",
   severityFilter: SeverityFilter.All,
   searchTerm: "",
+  urlSearchTerm: ""
 }
 
 function errorsReducer(state = initialState, action: ErrorsAction) {
@@ -155,6 +162,11 @@ function errorsReducer(state = initialState, action: ErrorsAction) {
       return {
         ...state,
         searchTerm: action.searchTerm,
+      }
+    case SET_URL_SEARCH_FILTER:
+      return {
+        ...state,
+        urlSearchTerm: action.searchTerm
       }
     default:
       return state

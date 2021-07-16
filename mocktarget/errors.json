@@ -35,7 +35,7 @@
                     "severity": "error",
                     "http_context": {
                         "request_method": "GET",
-                        "request_url": "http://badrequest.org/another-endpoint",
+                        "request_url": "http://badrequest.org/third-endpoint",
                         "request_headers": {
                             "accept": "application/json",
                             "host": "badrequest.org"
