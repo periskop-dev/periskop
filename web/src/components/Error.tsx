@@ -10,8 +10,7 @@ import { connect } from "react-redux"
 interface ConnectedProps {
   activeError: AggregatedError,
   activeService: string,
-  latestExceptionIndex: number,
-  searchTerm: string
+  latestExceptionIndex: number
 }
 
 interface DispatchProps {

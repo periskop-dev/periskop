@@ -47,6 +47,7 @@ class App extends React.Component<Props, {}> {
 
   componentDidUpdate(prevProps: Props) {
     const { activeService, services, errors, match, fetchErrors, setActiveError } = this.props
+
     if (RemoteData.isSuccess(services)) {
       if (
         services.data.includes(match.params.service) &&
@@ -123,7 +124,7 @@ const mapStateToProps = ({ errorsReducer, servicesReducer }: StoreState) => {
 
   if (RemoteData.isSuccess(errors)) {
     const filteredErrors = getFilteredErrors(errors.data, searchTerm, severityFilter, activeSortFilter)
-    
+
     return {
       ...defaultConnectedProps,
       errors: RemoteData.succeed(filteredErrors),
