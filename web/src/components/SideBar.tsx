@@ -11,15 +11,13 @@ interface DispatchProps {
   setErrorsSortFilter: (filter: SortFilters) => void
   setErrorsSeverityFilter: (severity: SeverityFilter) => void
   setErrorsSearchFilter: (searchTerm: string) => void
-  setUrlSearchFilter: (searchTerm: string) => void
 }
 
 interface ConnectedProps {
   activeError: AggregatedError
   activeSortFilter: SortFilters
   activeSeverityFilter: ErrorsState["severityFilter"]
-  searchKey: string,
-  urlSearchTerm: string
+  searchKey: string
 }
 
 interface SidebarProps {
@@ -40,11 +38,6 @@ const SideBar: React.FC<Props> = (props) => {
   const onSearchByKeyChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { value } = event.target
     props.setErrorsSearchFilter(value)
-  }
-
-  const onSearchUrlByKeyChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const { value } = event.target
-    props.setUrlSearchFilter(value)
   }
 
   const renderErrors = () => {
@@ -117,11 +110,6 @@ const SideBar: React.FC<Props> = (props) => {
           placeholder="Search for an error"
           value={props.searchKey}
         />
-        <input
-          onChange={onSearchUrlByKeyChange}
-          placeholder={`filter by endpoint`}
-          value={props.urlSearchTerm}
-        />
       </div>
     )
   }
@@ -146,8 +134,7 @@ const mapStateToProps = (state: StoreState) => {
     activeError: state.errorsReducer.activeError,
     activeSortFilter: state.errorsReducer.activeSortFilter,
     activeSeverityFilter: state.errorsReducer.severityFilter,
-    searchKey: state.errorsReducer.searchTerm,
-    urlSearchTerm: state.errorsReducer.urlSearchTerm
+    searchKey: state.errorsReducer.searchTerm
   }
 }
 

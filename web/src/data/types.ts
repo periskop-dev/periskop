@@ -48,8 +48,7 @@ export type ErrorsState = {
   latestExceptionIndex: number
   activeSortFilter: SortFilters,
   severityFilter: SeverityFilter,
-  searchTerm: string,
-  urlSearchTerm: string
+  searchTerm: string
 }
 
 export type StoreState = {

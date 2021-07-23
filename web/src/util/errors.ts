@@ -10,20 +10,14 @@ export const errorSortByEventCount = (errors: AggregatedError[]) => {
 }
 
 export const filterErrorsBySubstringMatch = (errors: AggregatedError[], searchTerm: string) => {
-  return errors.filter((error) => error.aggregation_key.toLowerCase().includes(searchTerm.toLowerCase()))
-}
+  const errorsCopy = JSON.parse(JSON.stringify(errors))
 
-export const filterErrorsByUrlStringMatch = (errors: AggregatedError[], searchTerm: string) => {
-  return errors.map((error) => {
-    error.latest_errors.filter(e => {
-      if (e.http_context !== null) {
-        return e.http_context.request_url.toLowerCase().includes(searchTerm.toLowerCase())
-      } else {
-        return false
-      }
-    })
+  const filteredErrors = errorsCopy.map((error) => {
+    error.latest_errors = error.latest_errors.filter(e => JSON.stringify(e).toLowerCase().includes(searchTerm.toLowerCase()))
     return error
   })
+
+  return filteredErrors.filter(e => e.latest_errors.length > 0)
 }
 
 export const filterErrorsBySeverity = (errors: AggregatedError[], severity: ErrorsState["severityFilter"]) => {
@@ -35,13 +29,12 @@ export const filterErrorsBySeverity = (errors: AggregatedError[], severity: Erro
 export const getFilteredErrors = (
   errors: AggregatedError[],
   searchTerm: string,
-  urlSearchTerm: string,
   severity: SeverityFilter,
   sortFilter: SortFilters,
 ) => {
   const sortedErrors = ErrorsSortActions[sortFilter](errors)
   const searchedErrors = filterErrorsBySubstringMatch(sortedErrors, searchTerm)
-  const urlSearchedErrors = filterErrorsByUrlStringMatch(searchedErrors, urlSearchTerm)
-  const filteredErrors = filterErrorsBySeverity(urlSearchedErrors, severity)
+  const filteredErrors = filterErrorsBySeverity(searchedErrors, severity)
+
   return filteredErrors
 }

@@ -11,6 +11,7 @@ interface ConnectedProps {
   activeError: AggregatedError,
   activeService: string,
   latestExceptionIndex: number,
+  searchTerm: string
 }
 
 interface DispatchProps {
@@ -22,7 +23,6 @@ type Props = ConnectedProps & DispatchProps
 
 
 const ErrorComponent: React.FC<Props> = (props) => {
-
   const calculateNewIndex = (index: number, inc: number, size: number) => {
     return (index + inc % size + size) % size
   }
@@ -37,7 +37,7 @@ const ErrorComponent: React.FC<Props> = (props) => {
 
   const renderErrorInstance = (errorInstance: ErrorInstance) => {
     if (!errorInstance) return ""
-
+    
     return (
       <div>      
         { renderClass(errorInstance.class) }
@@ -204,6 +204,7 @@ const ErrorComponent: React.FC<Props> = (props) => {
   }
     
   const renderAggregatedError = () => {
+
     return (
       <div className={"grid-component"}>
         <ButtonGroup className="float-right">
@@ -247,10 +248,15 @@ const ErrorComponent: React.FC<Props> = (props) => {
 }
 
 const mapStateToProps = (state: StoreState) => {
+  const searchTerm = state.errorsReducer.searchTerm
+  const activeError = state.errorsReducer.activeError
+  const errorCopy = JSON.parse(JSON.stringify(activeError))
+  errorCopy.latest_errors = errorCopy.latest_errors.filter(e => JSON.stringify(e).toLowerCase().includes(searchTerm.toLowerCase()))
+
   return {
-    activeError: state.errorsReducer.activeError,
+    activeError: errorCopy,
     activeService: state.errorsReducer.activeService,
-    latestExceptionIndex: state.errorsReducer.latestExceptionIndex,
+    latestExceptionIndex: state.errorsReducer.latestExceptionIndex
   }
 }
 
