@@ -5,7 +5,7 @@ import { connect } from "react-redux"
 
 import { bindActionCreators, Dispatch, AnyAction } from "redux"
 import { StoreState, AggregatedError, SortFilters, ErrorsState, SeverityFilter } from "data/types"
-import { setErrorsSortFilter, setErrorsSeverityFilter, setErrorsSearchFilter, setUrlSearchFilter } from "data/errors"
+import { setErrorsSortFilter, setErrorsSeverityFilter, setErrorsSearchFilter } from "data/errors"
 
 interface DispatchProps {
   setErrorsSortFilter: (filter: SortFilters) => void
@@ -126,7 +126,7 @@ const SideBar: React.FC<Props> = (props) => {
 }
 
 const mapDispatchToProps = (dispatch: Dispatch<AnyAction>): DispatchProps => {
-  return bindActionCreators({ setErrorsSortFilter, setErrorsSeverityFilter, setErrorsSearchFilter, setUrlSearchFilter }, dispatch)
+  return bindActionCreators({ setErrorsSortFilter, setErrorsSeverityFilter, setErrorsSearchFilter }, dispatch)
 }
 
 const mapStateToProps = (state: StoreState) => {
