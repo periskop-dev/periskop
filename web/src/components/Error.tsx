@@ -250,6 +250,8 @@ const ErrorComponent: React.FC<Props> = (props) => {
 const mapStateToProps = (state: StoreState) => {
   const searchTerm = state.errorsReducer.searchTerm
   const activeError = state.errorsReducer.activeError
+
+  // clone the aggregate so that we don't mutate the state
   const errorCopy = JSON.parse(JSON.stringify(activeError))
   errorCopy.latest_errors = errorCopy.latest_errors.filter(e => JSON.stringify(e).toLowerCase().includes(searchTerm.toLowerCase()))
 
