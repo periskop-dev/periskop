@@ -22,6 +22,7 @@ type Props = ConnectedProps & DispatchProps
 
 
 const ErrorComponent: React.FC<Props> = (props) => {
+
   const calculateNewIndex = (index: number, inc: number, size: number) => {
     return (index + inc % size + size) % size
   }
@@ -36,7 +37,6 @@ const ErrorComponent: React.FC<Props> = (props) => {
 
   const renderErrorInstance = (errorInstance: ErrorInstance) => {
     if (!errorInstance) return ""
-    
     return (
       <div>      
         { renderClass(errorInstance.class) }
@@ -203,7 +203,6 @@ const ErrorComponent: React.FC<Props> = (props) => {
   }
     
   const renderAggregatedError = () => {
-
     return (
       <div className={"grid-component"}>
         <ButtonGroup className="float-right">
