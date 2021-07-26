@@ -36,7 +36,7 @@
                         "cause": null
                     },
                     "uuid": "uuid4",
-                    "timestamp": "2018-09-13T15:26:30.630Z",
+                    "timestamp": "2018-09-13T16:26:30.630Z",
                     "severity": "error",
                     "http_context": {
                         "request_method": "GET",
