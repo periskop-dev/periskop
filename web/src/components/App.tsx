@@ -8,8 +8,7 @@ import ErrorComponent from "components/Error"
 import SideBar from "components/SideBar"
 
 import * as RemoteData from "data/remote-data"
-import { StoreState, AggregatedError, SeverityFilter, ErrorsState, Targets } from "data/types"
-import { fetchTargets } from "data/targets"
+import { StoreState, AggregatedError, SeverityFilter, ErrorsState } from "data/types"
 import { fetchErrors, setActiveError, setErrorsSeverityFilter, setErrorsSearchFilter } from "data/errors"
 
 import { Row, Col, Container } from "react-bootstrap"
@@ -22,7 +21,6 @@ interface ConnectedProps {
   activeService: string,
   severityFilter: SeverityFilter,
   searchTerm: string,
-  targets: RemoteData.RemoteData<any, Targets>,
 }
 
 interface DispatchProps {
@@ -30,7 +28,6 @@ interface DispatchProps {
   setActiveError: (errorKey: string) => void
   setErrorsSeverityFilter: (severity: SeverityFilter) => void
   setErrorsSearchFilter: (searchTerm: ErrorsState["searchTerm"]) => void
-  fetchTargets: () => void
 }
 
 type Props = ConnectedProps & DispatchProps & RouteComponentProps<{ service: string, errorKey: string }>
@@ -44,24 +41,20 @@ class App extends React.Component<Props, {}> {
 
   componentDidMount() {
     if (RemoteData.isSuccess(this.props.services)) {
-      if (this.props.match.params.service !== "targets") {
+      if (this.props.services.data.includes(this.props.match.params.service)) {
         this.props.fetchErrors(this.props.match.params.service)
       }
-      this.props.fetchTargets()
     }
   }
 
   componentDidUpdate(prevProps: Props) {
-    const { activeService, services, errors, match, fetchErrors, setActiveError, fetchTargets } = this.props
+    const { activeService, services, errors, match, fetchErrors, setActiveError } = this.props
 
     if (RemoteData.isSuccess(services)) {
       if (services.data.includes(match.params.service)
-        && (activeService !== match.params.service)
+        && activeService !== match.params.service
         && !RemoteData.isLoading(errors)) {
-          if (match.params.service !== "targets") {
-            fetchErrors(match.params.service)
-          }
-          fetchTargets()
+          fetchErrors(match.params.service)
       }
     }
 
@@ -124,12 +117,11 @@ class App extends React.Component<Props, {}> {
 }
 
 
-const mapStateToProps = ({ errorsReducer, servicesReducer, targetsReducer }: StoreState) => {
+const mapStateToProps = ({ errorsReducer, servicesReducer }: StoreState) => {
   const { errors, activeError, severityFilter, searchTerm, activeService, activeSortFilter } = errorsReducer
   const { services } = servicesReducer
-  const { targets } = targetsReducer
 
-  const defaultConnectedProps = { activeError, services, severityFilter, activeService, searchTerm, targets }
+  const defaultConnectedProps = { activeError, services, severityFilter, activeService, searchTerm }
 
   if (RemoteData.isSuccess(errors)) {
     const filteredErrors = getFilteredErrors(errors.data, searchTerm, severityFilter, activeSortFilter)
@@ -145,7 +137,7 @@ const mapStateToProps = ({ errorsReducer, servicesReducer, targetsReducer }: Sto
 
 
 const matchDispatchToProps = (dispatch: Dispatch<AnyAction>): DispatchProps => {
-  return bindActionCreators({ fetchErrors, setActiveError, setErrorsSeverityFilter, setErrorsSearchFilter, fetchTargets }, dispatch);
+  return bindActionCreators({ fetchErrors, setActiveError, setErrorsSeverityFilter, setErrorsSearchFilter }, dispatch);
 }
 
 export default withRouter(connect<ConnectedProps, {}, RouteComponentProps<{ service: string }>>(mapStateToProps, matchDispatchToProps)(App))
