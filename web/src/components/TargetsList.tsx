@@ -25,7 +25,14 @@ class TargetsList extends React.Component<Props, {}> {
   }
 
   renderTarget(targetName: string, targets: Target[], index: number) {
-    const hosts = targets.map((target, index) => <ListGroup.Item key={targetName+String(index)}>{target.endpoint}</ListGroup.Item>)
+    const hosts = targets.map(
+      (target, index) =>
+        <ListGroup.Item key={targetName+String(index)}>
+          <a href={target.endpoint} target="_blank">
+            {target.endpoint}
+          </a>
+        </ListGroup.Item>
+    )
     const accordionBody = targets.length > 0 ? hosts : "No endpoints in target"
     return (
       <Card>
