@@ -41,7 +41,9 @@ class App extends React.Component<Props, {}> {
 
   componentDidMount() {
     if (RemoteData.isSuccess(this.props.services)) {
-      this.props.fetchErrors(this.props.match.params.service)
+      if (this.props.services.data.includes(this.props.match.params.service)) {
+        this.props.fetchErrors(this.props.match.params.service)
+      }
     }
   }
 
@@ -49,11 +51,10 @@ class App extends React.Component<Props, {}> {
     const { activeService, services, errors, match, fetchErrors, setActiveError } = this.props
 
     if (RemoteData.isSuccess(services)) {
-      if (
-        services.data.includes(match.params.service) &&
-        (activeService !== match.params.service) &&
-        !RemoteData.isLoading(errors)) {
-        fetchErrors(match.params.service)
+      if (services.data.includes(match.params.service)
+        && activeService !== match.params.service
+        && !RemoteData.isLoading(errors)) {
+          fetchErrors(match.params.service)
       }
     }
 

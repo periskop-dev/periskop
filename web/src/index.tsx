@@ -10,6 +10,7 @@ import NavbarComponent from "components/Navbar"
 
 import App from "components/App"
 import Home from "components/Home"
+import TargetsList from "components/TargetsList"
 import { Route, Router } from "react-router"
 import { createHashHistory } from "history"
 
@@ -22,6 +23,7 @@ render(
                 <NavbarComponent />
                 <main className="app-content">
                     <Route exact path="/" component={Home}/>
+                    <Route exact path="/targets" component={TargetsList}/>
                     <Route path={["/:service/errors/:errorKey", "/:service"]} component={App}/>
                 </main>
             </div>
