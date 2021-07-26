@@ -52,7 +52,7 @@ func (errorAggregates errorAggregateMap) combine(serviceName string, r *reposito
 		if existing, exists := errorAggregates[item.AggregationKey]; exists {
 			prevCount := targetErrorsCount[rp.Target][item.AggregationKey]
 			if prevCount <= item.TotalCount {
-				// Set the CreatedAt of the aggregated error the oldest occurrence of it
+				// Set the CreatedAt of its oldest occurrence
 				createdAt := existing.CreatedAt
 				if item.CreatedAt.Before(createdAt) {
 					createdAt = item.CreatedAt
