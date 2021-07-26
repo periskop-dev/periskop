@@ -29,7 +29,7 @@ class TargetsList extends React.Component<Props, {}> {
     const accordionBody = targets.length > 0 ? hosts : "No endpoints in target"
     return (
       <Card>
-        <Card.Header>
+        <Card.Header style={{cursor:"pointer"}}>
           <Accordion.Toggle as={ListGroup} eventKey={String(index)}>
             {targetName}
           </Accordion.Toggle>
