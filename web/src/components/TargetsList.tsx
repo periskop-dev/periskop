@@ -24,6 +24,10 @@ class TargetsList extends React.Component<Props, {}> {
     super(props)
   }
 
+  componentDidMount() {
+    this.props.fetchTargets()
+  }
+
   renderTarget(targetName: string, targets: Target[], index: number) {
     const hosts = targets.map(
       (target, index) =>
