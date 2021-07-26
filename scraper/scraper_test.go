@@ -95,3 +95,27 @@ func TestScapeCombineNotUpdate(t *testing.T) {
 		t.Errorf("Expected 2 element, Found %d", countErrorInstances)
 	}
 }
+
+func TestScapeCombineCreatedAt(t *testing.T) {
+	var targetErrorsCount = make(targetErrorsCountMap)
+	var errorAggregates = make(errorAggregateMap)
+	errorInstancesAccumulator := make(errorInstancesAccumulatorMap)
+	repo := repository.NewInMemory()
+
+	firstContent, _ := ioutil.ReadFile("sample-response1.json")
+	var rp responsePayload
+	json.Unmarshal(firstContent, &rp) // nolint[errcheck]
+	rp.Target = "test1"
+	errorAggregates.combine("test1", &repo, rp, targetErrorsCount, errorInstancesAccumulator)
+
+	secondContent, _ := ioutil.ReadFile("sample-response2.json")
+	json.Unmarshal(secondContent, &rp) // nolint[errcheck]
+	rp.Target = "test2"
+	errorAggregates.combine("test2", &repo, rp, targetErrorsCount, errorInstancesAccumulator)
+
+	createdAtHour := errorAggregates["com.soundcloud.Foon@e28e036e"].CreatedAt.Hour()
+
+	if createdAtHour != 15 {
+		t.Errorf("Expected 15h, Found %d", createdAtHour)
+	}
+}
