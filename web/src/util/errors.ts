@@ -10,12 +10,11 @@ export const errorSortByEventCount = (errors: AggregatedError[]) => {
 }
 
 export const filterErrorsBySubstringMatch = (errors: AggregatedError[], searchTerm: string) => {
-  // clone the aggregate so that we don't mutate the state
-  const errorsCopy = JSON.parse(JSON.stringify(errors))
-
-  const filteredErrors = errorsCopy.map((error) => {
-    error.latest_errors = error.latest_errors.filter(e => JSON.stringify(e).toLowerCase().includes(searchTerm.toLowerCase()))
-    return error
+  const filteredErrors = errors.map(error => {
+    return {
+      ...error,
+      latest_errors: error.latest_errors.filter(e => JSON.stringify(e).toLowerCase().includes(searchTerm.toLowerCase()))
+    }
   })
 
   return filteredErrors.filter(e => e.latest_errors.length > 0)
