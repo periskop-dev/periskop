@@ -182,7 +182,8 @@ func storeErrors(serviceName string, r *repository.ErrorsRepository, errorAggreg
 	(*r).StoreErrors(serviceName, errors)
 }
 
-func storeTargets(serviceName string, path string, r *repository.ErrorsRepository, addr servicediscovery.ResolvedAddresses) {
+func storeTargets(serviceName string, path string,
+	r *repository.ErrorsRepository, addr servicediscovery.ResolvedAddresses) {
 	targets := make([]repository.Target, 0, len(addr.Addresses))
 	for _, host := range addr.Addresses {
 		targets = append(targets, repository.Target{
