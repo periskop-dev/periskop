@@ -118,7 +118,7 @@ func (scraper Scraper) Scrape() {
 		select {
 		case newResult := <-resolutions:
 			resolvedAddresses = newResult
-			storeTargets(serviceConfig.Name, scraper.Repository, resolvedAddresses)
+			storeTargets(serviceConfig.Name, serviceConfig.Scraper.Endpoint, scraper.Repository, resolvedAddresses)
 			log.Printf("Received new dns resolution result for %s. Address resolved: %d\n", serviceConfig.Name,
 				len(resolvedAddresses.Addresses))
 
@@ -182,11 +182,11 @@ func storeErrors(serviceName string, r *repository.ErrorsRepository, errorAggreg
 	(*r).StoreErrors(serviceName, errors)
 }
 
-func storeTargets(serviceName string, r *repository.ErrorsRepository, addr servicediscovery.ResolvedAddresses) {
+func storeTargets(serviceName string, path string, r *repository.ErrorsRepository, addr servicediscovery.ResolvedAddresses) {
 	targets := make([]repository.Target, 0, len(addr.Addresses))
-	for _, value := range addr.Addresses {
+	for _, host := range addr.Addresses {
 		targets = append(targets, repository.Target{
-			Endpoint: value,
+			Endpoint: host + path,
 		})
 	}
 	(*r).StoreTargets(serviceName, targets)
