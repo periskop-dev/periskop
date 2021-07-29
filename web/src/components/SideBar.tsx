@@ -134,7 +134,7 @@ const mapStateToProps = (state: StoreState) => {
     activeError: state.errorsReducer.activeError,
     activeSortFilter: state.errorsReducer.activeSortFilter,
     activeSeverityFilter: state.errorsReducer.severityFilter,
-    searchKey: state.errorsReducer.searchTerm,
+    searchKey: state.errorsReducer.searchTerm
   }
 }
 
