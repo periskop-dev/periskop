@@ -165,14 +165,14 @@ func TestTargetsWithEmptyRepoReturnsSuccess(t *testing.T) {
 func TestTargetsReturnsListOfTargets(t *testing.T) {
 	r := repository.NewInMemory()
 	targets := []repository.Target{
-		{Endpoint: "localhost:3000/"},
+		{Endpoint: "localhost:3000/-/exceptions"},
 	}
 	r.StoreTargets("api-test", targets)
 
 	rr := httptest.NewRecorder()
 	serveMockTargets(rr, r)
 
-	expected := "{\"api-test\":[{\"endpoint\":\"localhost:3000/\"}]}\n"
+	expected := "{\"api-test\":[{\"endpoint\":\"localhost:3000/-/exceptions\"}]}\n"
 	if rr.Body.String() != expected {
 		t.Errorf("handler returned unexpected body: got %v want %v",
 			rr.Body.String(), expected)
