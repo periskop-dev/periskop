@@ -32,7 +32,7 @@ class TargetsList extends React.Component<Props, {}> {
     const hosts = targets.map(
       (target, index) =>
         <ListGroup.Item key={targetName+String(index)}>
-          <a href={target.endpoint} target="_blank">
+          <a href={`http://${target.endpoint}`} target="_blank">
             {target.endpoint}
           </a>
         </ListGroup.Item>
