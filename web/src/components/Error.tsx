@@ -10,7 +10,7 @@ import { connect } from "react-redux"
 interface ConnectedProps {
   activeError: AggregatedError,
   activeService: string,
-  latestExceptionIndex: number,
+  latestExceptionIndex: number
 }
 
 interface DispatchProps {
@@ -37,7 +37,6 @@ const ErrorComponent: React.FC<Props> = (props) => {
 
   const renderErrorInstance = (errorInstance: ErrorInstance) => {
     if (!errorInstance) return ""
-
     return (
       <div>      
         { renderClass(errorInstance.class) }
@@ -247,10 +246,16 @@ const ErrorComponent: React.FC<Props> = (props) => {
 }
 
 const mapStateToProps = (state: StoreState) => {
+  const activeError = state.errorsReducer.activeError
+  const searchTerm = state.errorsReducer.searchTerm
+
   return {
-    activeError: state.errorsReducer.activeError,
+    activeError: {
+      ...activeError,
+      latest_errors: activeError.latest_errors.filter(e => JSON.stringify(e).toLowerCase().includes(searchTerm.toLowerCase()))
+    },
     activeService: state.errorsReducer.activeService,
-    latestExceptionIndex: state.errorsReducer.latestExceptionIndex,
+    latestExceptionIndex: state.errorsReducer.latestExceptionIndex
   }
 }
 
