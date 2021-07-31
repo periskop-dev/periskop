@@ -5,7 +5,7 @@ import (
 	"time"
 )
 
-func TestCreate(t *testing.T) {
+func TestStoreErrors(t *testing.T) {
 	r := NewORMRepository()
 	errors := []ErrorAggregate{
 		{
