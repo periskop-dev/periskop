@@ -21,4 +21,16 @@ func TestStoreErrors(t *testing.T) {
 			},
 		}}
 	r.StoreErrors("test", errors)
+	if r.countErrors("test") == 0 {
+		t.Errorf("Found 0 errors, expected 1")
+	}
+
+	aggr, err := r.GetErrors("test", 5)
+	if err != nil {
+		t.Errorf("Fail to fetch errors: %s", err)
+	}
+
+	if len(aggr) < 0 {
+		t.Errorf("Found 0 errors, expected 1")
+	}
 }

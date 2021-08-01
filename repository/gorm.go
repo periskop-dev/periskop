@@ -1,6 +1,8 @@
 package repository
 
 import (
+	"database/sql/driver"
+	"encoding/json"
 	"fmt"
 
 	"github.com/soundcloud/periskop/metrics"
@@ -15,12 +17,24 @@ type ormRepository struct {
 type ErrorsRepository2 interface {
 	StoreErrors(serviceName string, errors []ErrorAggregate)
 	GetErrors(serviceName string, numberOfErrors int) ([]ErrorAggregate, error)
+	countErrors(serviceName string) int64
+}
+
+type ErrorsArray []ErrorAggregate
+
+func (e *ErrorsArray) Scan(src interface{}) error {
+	return json.Unmarshal([]byte(src.(string)), &e)
+}
+
+func (e ErrorsArray) Value() (driver.Value, error) {
+	val, err := json.Marshal(e)
+	return string(val), err
 }
 
 type AggregatedError struct {
 	gorm.Model
 	ServiceName string
-	Errors      []ErrorAggregate
+	Errors      ErrorsArray
 }
 
 func NewORMRepository() ErrorsRepository2 {
@@ -36,15 +50,25 @@ func (r *ormRepository) StoreErrors(serviceName string, errors []ErrorAggregate)
 	r.db.Create(&AggregatedError{ServiceName: serviceName, Errors: errors})
 }
 
+func (r *ormRepository) countErrors(serviceName string) int64 {
+	res := r.db.Find(&AggregatedError{})
+	return res.RowsAffected
+}
+
 func (r *ormRepository) GetErrors(serviceName string, numberOfErrors int) ([]ErrorAggregate, error) {
-	aggr := AggregatedError{}
-	r.db.Where("service_name = ?", serviceName).Find(&aggr)
-	if len(aggr.Errors) > 0 {
-		topCap := len(aggr.Errors)
+	aggregatedErr := AggregatedError{}
+	r.db.Where(&AggregatedError{ServiceName: serviceName}).First(&aggregatedErr)
+	result := []ErrorAggregate{}
+	for _, errorObj := range aggregatedErr.Errors {
+		topCap := len(errorObj.LatestErrors)
 		if numberOfErrors < topCap {
 			topCap = numberOfErrors
 		}
-		return aggr.Errors[0:topCap], nil
+		errorObj.LatestErrors = errorObj.LatestErrors[0:topCap]
+		result = append(result, errorObj)
+	}
+	if len(result) > 0 {
+		return result, nil
 	} else {
 		metrics.ServiceErrors.WithLabelValues("service_not_found").Inc()
 		return nil, fmt.Errorf("service %s not found", serviceName)
