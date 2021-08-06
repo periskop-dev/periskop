@@ -18,23 +18,23 @@ type ErrorsRepository2 interface {
 	StoreErrors(serviceName string, errors []ErrorAggregate)
 	GetErrors(serviceName string, numberOfErrors int) ([]ErrorAggregate, error)
 	countErrors(serviceName string) int64
+	ResolveError(serviceName string, key string) error
 }
 
-type ErrorsArray []ErrorAggregate
-
-func (e *ErrorsArray) Scan(src interface{}) error {
+func (e *ErrorAggregate) Scan(src interface{}) error {
 	return json.Unmarshal([]byte(src.(string)), &e)
 }
 
-func (e ErrorsArray) Value() (driver.Value, error) {
+func (e ErrorAggregate) Value() (driver.Value, error) {
 	val, err := json.Marshal(e)
 	return string(val), err
 }
 
 type AggregatedError struct {
 	gorm.Model
-	ServiceName string
-	Errors      ErrorsArray
+	ServiceName    string
+	AggregationKey string
+	Errors         ErrorAggregate
 }
 
 func NewORMRepository() ErrorsRepository2 {
@@ -47,19 +47,31 @@ func NewORMRepository() ErrorsRepository2 {
 }
 
 func (r *ormRepository) StoreErrors(serviceName string, errors []ErrorAggregate) {
-	r.db.Create(&AggregatedError{ServiceName: serviceName, Errors: errors})
+	// Delete previous records
+	r.db.Where("service_name = ?", serviceName).Unscoped().Delete(&AggregatedError{})
+
+	for _, errorAggregate := range errors {
+		r.db.Create(&AggregatedError{
+			ServiceName:    serviceName,
+			Errors:         errorAggregate,
+			AggregationKey: errorAggregate.AggregationKey,
+		})
+	}
 }
 
 func (r *ormRepository) countErrors(serviceName string) int64 {
-	res := r.db.Find(&AggregatedError{ServiceName: serviceName})
-	return res.RowsAffected
+	var count int64
+	r.db.Model(&AggregatedError{ServiceName: serviceName}).Count(&count)
+	return count
 }
 
 func (r *ormRepository) GetErrors(serviceName string, numberOfErrors int) ([]ErrorAggregate, error) {
-	aggregatedErr := AggregatedError{}
-	r.db.Where(&AggregatedError{ServiceName: serviceName}).First(&aggregatedErr)
+	aggregatedErrors := []AggregatedError{}
+	r.db.Where(&AggregatedError{ServiceName: serviceName}).Find(&aggregatedErrors)
+
 	result := []ErrorAggregate{}
-	for _, errorObj := range aggregatedErr.Errors {
+	for _, aggregatedError := range aggregatedErrors {
+		errorObj := aggregatedError.Errors
 		topCap := len(errorObj.LatestErrors)
 		if numberOfErrors < topCap {
 			topCap = numberOfErrors
@@ -73,4 +85,9 @@ func (r *ormRepository) GetErrors(serviceName string, numberOfErrors int) ([]Err
 		metrics.ServiceErrors.WithLabelValues("service_not_found").Inc()
 		return nil, fmt.Errorf("service %s not found", serviceName)
 	}
+}
+
+func (r *ormRepository) ResolveError(serviceName string, key string) error {
+	r.db.Where("service_name = ?", serviceName).Where("aggregation_key = ?", key).Delete(&AggregatedError{})
+	return nil
 }

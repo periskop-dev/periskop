@@ -38,9 +38,9 @@ type HTTPContext struct {
 }
 
 type ErrorsRepository interface {
+	GetErrors(serviceName string, numberOfErrors int) ([]ErrorAggregate, error)
 	StoreErrors(serviceName string, errors []ErrorAggregate)
 	GetServices() []string
-	GetErrors(serviceName string, numberOfErrors int) ([]ErrorAggregate, error)
 	ResolveError(serviceName string, key string) error
 	SearchResolved(serviceName string, key string) bool
 	RemoveResolved(serviceName string, key string)
@@ -103,6 +103,7 @@ func (r *inMemoryRepository) GetServices() []string {
 }
 
 // ResolveError removes the error from list of errors and adds to the set of resolved errors
+// TODO: rename variables
 func (r *inMemoryRepository) ResolveError(serviceName string, key string) error {
 	if value, ok := r.AggregatedError.Load(serviceName); ok {
 		value, _ := value.([]ErrorAggregate)
