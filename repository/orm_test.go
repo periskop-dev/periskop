@@ -80,6 +80,29 @@ func TestGetErrors(t *testing.T) {
 	}
 }
 
+func TestGetServices(t *testing.T) {
+	r := NewORMRepository()
+	errors := []ErrorAggregate{
+		{
+			AggregationKey: "key",
+			Severity:       "error",
+			CreatedAt:      time.Unix(0, 0).Unix(),
+			LatestErrors: []ErrorWithContext{
+				{
+					Error:     ErrorInstance{},
+					Severity:  "error",
+					Timestamp: time.Unix(0, 0).Unix(),
+				},
+			},
+		}}
+	r.StoreErrors("test", errors)
+	r.StoreErrors("test2", errors)
+	services := r.GetServices()
+	if !reflect.DeepEqual(services, []string{"test", "test2"}) {
+		t.Errorf("Error fetching services,  got %v", services)
+	}
+}
+
 func TestResolvedErrors(t *testing.T) {
 	r := NewORMRepository()
 	errors := []ErrorAggregate{
@@ -99,5 +122,51 @@ func TestResolvedErrors(t *testing.T) {
 	r.ResolveError("test", "key")
 	if r.countErrors("test") != 0 {
 		t.Errorf("Found %d errors, expected 0", r.countErrors("test"))
+	}
+}
+
+func TestORMRemoveResolved(t *testing.T) {
+	r := NewORMRepository()
+	errors := []ErrorAggregate{
+		{
+			AggregationKey: "key",
+			Severity:       "error",
+			CreatedAt:      time.Unix(0, 0).Unix(),
+			LatestErrors: []ErrorWithContext{
+				{
+					Error:     ErrorInstance{},
+					Severity:  "error",
+					Timestamp: time.Unix(0, 0).Unix(),
+				},
+			},
+		}}
+	r.StoreErrors("test_remove_resolved", errors)
+	r.ResolveError("test_remove_resolved", "key")
+	r.RemoveResolved("test_remove_resolved", "key")
+	if r.countErrors("test_remove_resolved") != 1 {
+		t.Errorf("Found %d errors, expected 1", r.countErrors("test_remove_resolved"))
+	}
+}
+
+func TestORMSearchResolved(t *testing.T) {
+	r := NewORMRepository()
+	errors := []ErrorAggregate{
+		{
+			AggregationKey: "key",
+			Severity:       "error",
+			CreatedAt:      time.Unix(0, 0).Unix(),
+			LatestErrors: []ErrorWithContext{
+				{
+					Error:     ErrorInstance{},
+					Severity:  "error",
+					Timestamp: time.Unix(0, 0).Unix(),
+				},
+			},
+		}}
+	r.StoreErrors("test", errors)
+	r.ResolveError("test", "key")
+
+	if !r.SearchResolved("test", "key") {
+		t.Errorf("Error should be mark as resolved")
 	}
 }
