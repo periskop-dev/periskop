@@ -21,8 +21,9 @@ func TestStoreErrors(t *testing.T) {
 			},
 		}}
 	r.StoreErrors("test", errors)
-	if r.countErrors("test") == 0 {
-		t.Errorf("Found 0 errors, expected 1")
+	r.StoreErrors("test", errors)
+	if r.countErrors("test") != 1 {
+		t.Errorf("Found %d errors, expected 1", r.countErrors("test"))
 	}
 
 	aggr, err := r.GetErrors("test", 5)

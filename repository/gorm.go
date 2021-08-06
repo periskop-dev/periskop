@@ -51,7 +51,7 @@ func (r *ormRepository) StoreErrors(serviceName string, errors []ErrorAggregate)
 }
 
 func (r *ormRepository) countErrors(serviceName string) int64 {
-	res := r.db.Find(&AggregatedError{})
+	res := r.db.Find(&AggregatedError{ServiceName: serviceName})
 	return res.RowsAffected
 }
 
