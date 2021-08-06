@@ -69,33 +69,6 @@ type inMemoryRepository struct {
 	Targets sync.Map
 }
 
-func (r *inMemoryRepository) StoreErrors(serviceName string, errors []ErrorAggregate) {
-	r.AggregatedError.Store(serviceName, errors)
-}
-
-func (r *inMemoryRepository) StoreTargets(serviceName string, targets []Target) {
-	r.Targets.Store(serviceName, targets)
-}
-
-func (r *inMemoryRepository) GetServices() []string {
-	keys := make([]string, 0)
-	r.AggregatedError.Range(func(key, value interface{}) bool {
-		k, _ := key.(string)
-		keys = append(keys, k)
-		return true
-	})
-	return keys
-}
-
-func (r *inMemoryRepository) GetTargets() map[string][]Target {
-	targets := make(map[string][]Target)
-	r.Targets.Range(func(key, value interface{}) bool {
-		targets[key.(string)] = value.([]Target)
-		return true
-	})
-	return targets
-}
-
 func (r *inMemoryRepository) GetErrors(serviceName string, numberOfErrors int) ([]ErrorAggregate, error) {
 	if value, ok := r.AggregatedError.Load(serviceName); ok {
 		value, _ := value.([]ErrorAggregate)
@@ -113,6 +86,37 @@ func (r *inMemoryRepository) GetErrors(serviceName string, numberOfErrors int) (
 	}
 	metrics.ServiceErrors.WithLabelValues("service_not_found").Inc()
 	return nil, fmt.Errorf("service %s not found", serviceName)
+}
+
+func (r *inMemoryRepository) StoreErrors(serviceName string, errors []ErrorAggregate) {
+	r.AggregatedError.Store(serviceName, errors)
+}
+
+func (r *inMemoryRepository) GetServices() []string {
+	keys := make([]string, 0)
+	r.AggregatedError.Range(func(key, value interface{}) bool {
+		k, _ := key.(string)
+		keys = append(keys, k)
+		return true
+	})
+	return keys
+}
+
+// ResolveError removes the error from list of errors and adds to the set of resolved errors
+func (r *inMemoryRepository) ResolveError(serviceName string, key string) error {
+	if value, ok := r.AggregatedError.Load(serviceName); ok {
+		value, _ := value.([]ErrorAggregate)
+		newValues := []ErrorAggregate{}
+		for _, errorObj := range value {
+			if errorObj.AggregationKey != key {
+				newValues = append(newValues, errorObj)
+			}
+		}
+		r.StoreErrors(serviceName, newValues)
+		r.addToResolved(serviceName, key)
+		return nil
+	}
+	return fmt.Errorf("service %s not found", serviceName)
 }
 
 // addToResolved saves the error to resolved error set
@@ -144,19 +148,15 @@ func (r *inMemoryRepository) SearchResolved(serviceName string, key string) bool
 	return false
 }
 
-// ResolveError removes the error from list of errors and adds to the set of resolved errors
-func (r *inMemoryRepository) ResolveError(serviceName string, key string) error {
-	if value, ok := r.AggregatedError.Load(serviceName); ok {
-		value, _ := value.([]ErrorAggregate)
-		newValues := []ErrorAggregate{}
-		for _, errorObj := range value {
-			if errorObj.AggregationKey != key {
-				newValues = append(newValues, errorObj)
-			}
-		}
-		r.StoreErrors(serviceName, newValues)
-		r.addToResolved(serviceName, key)
-		return nil
-	}
-	return fmt.Errorf("service %s not found", serviceName)
+func (r *inMemoryRepository) StoreTargets(serviceName string, targets []Target) {
+	r.Targets.Store(serviceName, targets)
+}
+
+func (r *inMemoryRepository) GetTargets() map[string][]Target {
+	targets := make(map[string][]Target)
+	r.Targets.Range(func(key, value interface{}) bool {
+		targets[key.(string)] = value.([]Target)
+		return true
+	})
+	return targets
 }
