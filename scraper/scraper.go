@@ -95,7 +95,9 @@ func updateValues(item errorAggregate, errorCountDelta int, latestErrors []error
 	errorInstancesAccumulator[item.AggregationKey] = latestErrors
 	// If an error that was previously mark as resolved is scrapped again
 	// it's going to be added to list of errors
-	(*r).RemoveResolved(serviceName, item.AggregationKey)
+	if (*r).SearchResolved(serviceName, item.AggregationKey) {
+		(*r).RemoveResolved(serviceName, item.AggregationKey)
+	}
 }
 
 func combineLastErrors(first []errorWithContext, second []errorWithContext) []errorWithContext {
