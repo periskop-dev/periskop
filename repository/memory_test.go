@@ -6,8 +6,8 @@ import (
 
 const serviceName = "test-service"
 
-func TestAddToResolved(t *testing.T) {
-	er := &inMemoryRepository{}
+func TestMemoryAddToResolved(t *testing.T) {
+	er := &memoryRepository{}
 
 	// service has empty list of resolved errors
 	er.addToResolved(serviceName, "test-error-0")
@@ -28,8 +28,8 @@ func TestAddToResolved(t *testing.T) {
 	}
 }
 
-func TestRemoveResolved(t *testing.T) {
-	er := &inMemoryRepository{}
+func TestMemoryRemoveResolved(t *testing.T) {
+	er := &memoryRepository{}
 
 	er.ResolvedErrors.Store(serviceName, map[string]bool{"test-error-0": true})
 	er.RemoveResolved(serviceName, "test-error-0")
@@ -42,8 +42,8 @@ func TestRemoveResolved(t *testing.T) {
 	}
 }
 
-func TestSearchResolved(t *testing.T) {
-	er := &inMemoryRepository{}
+func TestMemorySearchResolved(t *testing.T) {
+	er := &memoryRepository{}
 	er.ResolvedErrors.Store(serviceName, map[string]bool{"test-error-0": true})
 
 	if !er.SearchResolved(serviceName, "test-error-0") {
@@ -55,8 +55,8 @@ func TestSearchResolved(t *testing.T) {
 	}
 }
 
-func TestResolveErrorError(t *testing.T) {
-	er := &inMemoryRepository{}
+func TestMemoryResolveError(t *testing.T) {
+	er := &memoryRepository{}
 	er.AggregatedError.Store(serviceName, []ErrorAggregate{
 		{AggregationKey: "test-error-0"},
 		{AggregationKey: "test-error-1"},
@@ -73,8 +73,8 @@ func TestResolveErrorError(t *testing.T) {
 	}
 }
 
-func TestSetAndRetrieveTargets(t *testing.T) {
-	er := &inMemoryRepository{}
+func TestMemorySetAndRetrieveTargets(t *testing.T) {
+	er := &memoryRepository{}
 	er.StoreTargets(serviceName, []Target{
 		{Endpoint: "localhost:3000/-/exceptions"},
 		{Endpoint: "localhost:3001/-/exceptions"},

@@ -1,10 +1,11 @@
 package repository
 
 import (
-	"fmt"
-	"sync"
+	"log"
 
-	"github.com/soundcloud/periskop/metrics"
+	"github.com/soundcloud/periskop/config"
+	"gorm.io/driver/sqlite"
+	"gorm.io/gorm"
 )
 
 type ErrorAggregate struct {
@@ -52,112 +53,17 @@ type Target struct {
 	Endpoint string `json:"endpoint"`
 }
 
-func NewInMemory() ErrorsRepository {
-	return &inMemoryRepository{
-		AggregatedError: sync.Map{},
-		ResolvedErrors:  sync.Map{},
-		Targets:         sync.Map{},
-	}
-}
-
-type inMemoryRepository struct {
-	// map service name -> list of errors
-	AggregatedError sync.Map
-	// map service name -> set of resolved errors
-	ResolvedErrors sync.Map
-	// map service name -> list of scraped targets
-	Targets sync.Map
-}
-
-func (r *inMemoryRepository) GetErrors(serviceName string, numberOfErrors int) ([]ErrorAggregate, error) {
-	if value, ok := r.AggregatedError.Load(serviceName); ok {
-		value, _ := value.([]ErrorAggregate)
-		result := make([]ErrorAggregate, 0, len(value))
-		for _, errorObj := range value {
-			topCap := len(errorObj.LatestErrors)
-			if numberOfErrors < topCap {
-				topCap = numberOfErrors
-			}
-			errorObj.LatestErrors = errorObj.LatestErrors[0:topCap]
-			result = append(result, errorObj)
+func NewRepository(repositoryConfig config.Repository) ErrorsRepository {
+	if repositoryConfig.Type == "sqlite" {
+		log.Printf("Using SQLite %s repository", repositoryConfig.Path)
+		db, err := gorm.Open(sqlite.Open(repositoryConfig.Path), &gorm.Config{})
+		if err != nil {
+			panic("failed to connect database")
 		}
-
-		return result, nil
-	}
-	metrics.ServiceErrors.WithLabelValues("service_not_found").Inc()
-	return nil, fmt.Errorf("service %s not found", serviceName)
-}
-
-func (r *inMemoryRepository) StoreErrors(serviceName string, errors []ErrorAggregate) {
-	r.AggregatedError.Store(serviceName, errors)
-}
-
-func (r *inMemoryRepository) GetServices() []string {
-	keys := make([]string, 0)
-	r.AggregatedError.Range(func(key, value interface{}) bool {
-		k, _ := key.(string)
-		keys = append(keys, k)
-		return true
-	})
-	return keys
-}
-
-// ResolveError removes the error from list of errors and adds to the set of resolved errors
-// TODO: rename variables
-func (r *inMemoryRepository) ResolveError(serviceName string, key string) error {
-	if value, ok := r.AggregatedError.Load(serviceName); ok {
-		value, _ := value.([]ErrorAggregate)
-		newValues := []ErrorAggregate{}
-		for _, errorObj := range value {
-			if errorObj.AggregationKey != key {
-				newValues = append(newValues, errorObj)
-			}
-		}
-		r.StoreErrors(serviceName, newValues)
-		r.addToResolved(serviceName, key)
-		return nil
-	}
-	return fmt.Errorf("service %s not found", serviceName)
-}
-
-// addToResolved saves the error to resolved error set
-func (r *inMemoryRepository) addToResolved(serviceName string, key string) {
-	if resolvedSet, ok := r.ResolvedErrors.Load(serviceName); ok {
-		resolvedSet := resolvedSet.(map[string]bool)
-		resolvedSet[key] = true
-		r.ResolvedErrors.Store(serviceName, resolvedSet)
+		return NewORMRepository(db)
 	} else {
-		r.ResolvedErrors.Store(serviceName, map[string]bool{key: true})
+		log.Printf("Using in memory repository")
+		return NewMemoryRepository()
 	}
-}
 
-// RemoveResolved removes a resolved error from resolved error set
-func (r *inMemoryRepository) RemoveResolved(serviceName string, key string) {
-	if resolvedSet, ok := r.ResolvedErrors.Load(serviceName); ok {
-		resolvedSet := resolvedSet.(map[string]bool)
-		delete(resolvedSet, key)
-		r.ResolvedErrors.Store(serviceName, resolvedSet)
-	}
-}
-
-// SearchResolved searches if an error is inside the set of resolved errors
-func (r *inMemoryRepository) SearchResolved(serviceName string, key string) bool {
-	if resolvedSet, ok := r.ResolvedErrors.Load(serviceName); ok {
-		resolvedSet := resolvedSet.(map[string]bool)
-		return resolvedSet[key]
-	}
-	return false
-}
-
-func (r *inMemoryRepository) StoreTargets(serviceName string, targets []Target) {
-	r.Targets.Store(serviceName, targets)
-}
-
-func (r *inMemoryRepository) GetTargets() map[string][]Target {
-	targets := make(map[string][]Target)
-	r.Targets.Range(func(key, value interface{}) bool {
-		targets[key.(string)] = value.([]Target)
-		return true
-	})
-	return targets
 }

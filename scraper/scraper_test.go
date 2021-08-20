@@ -36,7 +36,7 @@ func TestScrapeCombine(t *testing.T) {
 	var targetErrorsCount = make(targetErrorsCountMap)
 	var errorAggregates = make(errorAggregateMap)
 	errorInstancesAccumulator := make(errorInstancesAccumulatorMap)
-	repo := repository.NewInMemory()
+	repo := repository.NewMemoryRepository()
 
 	firstContent, _ := ioutil.ReadFile("sample-response1.json")
 	var rp responsePayload
@@ -73,7 +73,7 @@ func TestScapeCombineNotUpdate(t *testing.T) {
 	var targetErrorsCount = make(targetErrorsCountMap)
 	var errorAggregates = make(errorAggregateMap)
 	errorInstancesAccumulator := make(errorInstancesAccumulatorMap)
-	repo := repository.NewInMemory()
+	repo := repository.NewMemoryRepository()
 
 	firstContent, _ := ioutil.ReadFile("sample-response1.json")
 	var rp responsePayload
@@ -100,7 +100,7 @@ func TestScapeCombineCreatedAt(t *testing.T) {
 	var targetErrorsCount = make(targetErrorsCountMap)
 	var errorAggregates = make(errorAggregateMap)
 	errorInstancesAccumulator := make(errorInstancesAccumulatorMap)
-	repo := repository.NewInMemory()
+	repo := repository.NewMemoryRepository()
 
 	firstContent, _ := ioutil.ReadFile("sample-response1.json")
 	var rp responsePayload

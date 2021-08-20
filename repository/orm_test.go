@@ -23,7 +23,7 @@ func newSQLiteMemory() *gorm.DB {
 	return db
 }
 
-func TestStoreErrors(t *testing.T) {
+func TestORMStoreErrors(t *testing.T) {
 	db := newSQLiteMemory()
 	r := NewORMRepository(db)
 	errors := []ErrorAggregate{
@@ -46,7 +46,7 @@ func TestStoreErrors(t *testing.T) {
 	}
 }
 
-func TestGetErrors(t *testing.T) {
+func TestORMGetErrors(t *testing.T) {
 	db := newSQLiteMemory()
 	r := NewORMRepository(db)
 	err0 := ErrorAggregate{
@@ -99,7 +99,7 @@ func TestGetErrors(t *testing.T) {
 	}
 }
 
-func TestGetServices(t *testing.T) {
+func TestORMGetServices(t *testing.T) {
 	db := newSQLiteMemory()
 	r := NewORMRepository(db)
 	errors := []ErrorAggregate{
@@ -123,7 +123,7 @@ func TestGetServices(t *testing.T) {
 	}
 }
 
-func TestResolvedErrors(t *testing.T) {
+func TestORMResolvedErrors(t *testing.T) {
 	db := newSQLiteMemory()
 	r := NewORMRepository(db)
 	errors := []ErrorAggregate{
