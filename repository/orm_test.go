@@ -21,10 +21,10 @@ func TestStoreErrors(t *testing.T) {
 				},
 			},
 		}}
-	r.StoreErrors("test", errors)
-	r.StoreErrors("test", errors)
-	if r.countErrors("test") != 1 {
-		t.Errorf("Found %d errors, expected 1", r.countErrors("test"))
+	r.StoreErrors("test_store", errors)
+	r.StoreErrors("test_store", errors)
+	if r.countErrors("test_store") != 1 {
+		t.Errorf("Found %d errors, expected 1", r.countErrors("test_store"))
 	}
 }
 
@@ -60,9 +60,9 @@ func TestGetErrors(t *testing.T) {
 	}
 	errors := []ErrorAggregate{err0, err1}
 
-	r.StoreErrors("test", errors)
+	r.StoreErrors("test_get", errors)
 
-	aggregatedErrors, err := r.GetErrors("test", 5)
+	aggregatedErrors, err := r.GetErrors("test_get", 5)
 	if err != nil {
 		t.Errorf("Fail to fetch errors: %s", err)
 	}
@@ -95,10 +95,10 @@ func TestGetServices(t *testing.T) {
 				},
 			},
 		}}
-	r.StoreErrors("test", errors)
-	r.StoreErrors("test2", errors)
+	r.StoreErrors("test_services0", errors)
+	r.StoreErrors("test_services1", errors)
 	services := r.GetServices()
-	if !reflect.DeepEqual(services, []string{"test", "test2"}) {
+	if !reflect.DeepEqual(services, []string{"test_services0", "test_services1"}) {
 		t.Errorf("Error fetching services,  got %v", services)
 	}
 }
@@ -118,10 +118,10 @@ func TestResolvedErrors(t *testing.T) {
 				},
 			},
 		}}
-	r.StoreErrors("test", errors)
-	r.ResolveError("test", "key")
-	if r.countErrors("test") != 0 {
-		t.Errorf("Found %d errors, expected 0", r.countErrors("test"))
+	r.StoreErrors("test_resolved", errors)
+	r.ResolveError("test_resolved", "key")
+	if r.countErrors("test_resolved") != 0 {
+		t.Errorf("Found %d errors, expected 0", r.countErrors("test_resolved"))
 	}
 }
 
@@ -163,10 +163,11 @@ func TestORMSearchResolved(t *testing.T) {
 				},
 			},
 		}}
-	r.StoreErrors("test", errors)
-	r.ResolveError("test", "key")
+	r.StoreErrors("test_search", errors)
+	r.StoreErrors("test_search_other", errors)
+	r.ResolveError("test_search", "key")
 
-	if !r.SearchResolved("test", "key") {
+	if !r.SearchResolved("test_search", "key") {
 		t.Errorf("Error should be mark as resolved")
 	}
 }

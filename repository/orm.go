@@ -41,7 +41,7 @@ type AggregatedError struct {
 }
 
 func NewORMRepository() ErrorsRepository2 {
-	db, err := gorm.Open(sqlite.Open("test.db"), &gorm.Config{})
+	db, err := gorm.Open(sqlite.Open(""), &gorm.Config{})
 	if err != nil {
 		panic("failed to connect database")
 	}
@@ -107,11 +107,11 @@ func (r *ormRepository) ResolveError(serviceName string, key string) error {
 }
 
 func (r *ormRepository) RemoveResolved(serviceName string, key string) {
-	r.db.Model(&AggregatedError{}).Where("service_name = ?", serviceName).Where("aggregation_key = ?", key).Update("deleted_at", "null")
+	r.db.Model(&AggregatedError{}).Where("service_name = ?", serviceName).Where("aggregation_key = ?", key).Unscoped().Update("deleted_at", nil)
 }
 
 func (r *ormRepository) SearchResolved(serviceName string, key string) bool {
 	var count int64
-	r.db.Model(&AggregatedError{ServiceName: serviceName, AggregationKey: key}).Unscoped().Count(&count)
+	r.db.Model(&AggregatedError{}).Where("service_name = ?", serviceName).Where("aggregation_key = ?", key).Unscoped().Count(&count)
 	return count == 1
 }
