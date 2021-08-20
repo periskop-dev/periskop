@@ -4,10 +4,28 @@ import (
 	"reflect"
 	"testing"
 	"time"
+
+	"gorm.io/driver/sqlite"
+	"gorm.io/gorm"
 )
 
+func countErrors(db *gorm.DB, serviceName string) int64 {
+	var count int64
+	db.Model(&AggregatedError{}).Where("service_name = ?", serviceName).Count(&count)
+	return count
+}
+
+func newSQLiteMemory() *gorm.DB {
+	db, err := gorm.Open(sqlite.Open(""), &gorm.Config{})
+	if err != nil {
+		panic("failed to connect database")
+	}
+	return db
+}
+
 func TestStoreErrors(t *testing.T) {
-	r := NewORMRepository()
+	db := newSQLiteMemory()
+	r := NewORMRepository(db)
 	errors := []ErrorAggregate{
 		{
 			AggregationKey: "key",
@@ -23,13 +41,14 @@ func TestStoreErrors(t *testing.T) {
 		}}
 	r.StoreErrors("test_store", errors)
 	r.StoreErrors("test_store", errors)
-	if r.countErrors("test_store") != 1 {
-		t.Errorf("Found %d errors, expected 1", r.countErrors("test_store"))
+	if countErrors(db, "test_store") != 1 {
+		t.Errorf("Found %d errors, expected 1", countErrors(db, "test_store"))
 	}
 }
 
 func TestGetErrors(t *testing.T) {
-	r := NewORMRepository()
+	db := newSQLiteMemory()
+	r := NewORMRepository(db)
 	err0 := ErrorAggregate{
 		AggregationKey: "key0",
 		Severity:       "error",
@@ -81,7 +100,8 @@ func TestGetErrors(t *testing.T) {
 }
 
 func TestGetServices(t *testing.T) {
-	r := NewORMRepository()
+	db := newSQLiteMemory()
+	r := NewORMRepository(db)
 	errors := []ErrorAggregate{
 		{
 			AggregationKey: "key",
@@ -104,7 +124,8 @@ func TestGetServices(t *testing.T) {
 }
 
 func TestResolvedErrors(t *testing.T) {
-	r := NewORMRepository()
+	db := newSQLiteMemory()
+	r := NewORMRepository(db)
 	errors := []ErrorAggregate{
 		{
 			AggregationKey: "key",
@@ -120,13 +141,14 @@ func TestResolvedErrors(t *testing.T) {
 		}}
 	r.StoreErrors("test_resolved", errors)
 	r.ResolveError("test_resolved", "key")
-	if r.countErrors("test_resolved") != 0 {
-		t.Errorf("Found %d errors, expected 0", r.countErrors("test_resolved"))
+	if countErrors(db, "test_resolved") != 0 {
+		t.Errorf("Found %d errors, expected 0", countErrors(db, "test_resolved"))
 	}
 }
 
 func TestORMRemoveResolved(t *testing.T) {
-	r := NewORMRepository()
+	db := newSQLiteMemory()
+	r := NewORMRepository(db)
 	errors := []ErrorAggregate{
 		{
 			AggregationKey: "key",
@@ -143,13 +165,14 @@ func TestORMRemoveResolved(t *testing.T) {
 	r.StoreErrors("test_remove_resolved", errors)
 	r.ResolveError("test_remove_resolved", "key")
 	r.RemoveResolved("test_remove_resolved", "key")
-	if r.countErrors("test_remove_resolved") != 1 {
-		t.Errorf("Found %d errors, expected 1", r.countErrors("test_remove_resolved"))
+	if countErrors(db, "test_remove_resolved") != 1 {
+		t.Errorf("Found %d errors, expected 1", countErrors(db, "test_remove_resolved"))
 	}
 }
 
 func TestORMSearchResolved(t *testing.T) {
-	r := NewORMRepository()
+	db := newSQLiteMemory()
+	r := NewORMRepository(db)
 	errors := []ErrorAggregate{
 		{
 			AggregationKey: "key",
