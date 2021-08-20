@@ -39,7 +39,9 @@ func NewORMRepository(db *gorm.DB) ErrorsRepository {
 
 func (r *ormRepository) GetErrors(serviceName string, numberOfErrors int) ([]ErrorAggregate, error) {
 	aggregatedErrors := []AggregatedError{}
-	r.DB.Where(&AggregatedError{ServiceName: serviceName}).Find(&aggregatedErrors)
+	r.DB.
+		Where(&AggregatedError{ServiceName: serviceName}).
+		Find(&aggregatedErrors)
 
 	result := []ErrorAggregate{}
 	for _, aggregatedError := range aggregatedErrors {
@@ -61,7 +63,10 @@ func (r *ormRepository) GetErrors(serviceName string, numberOfErrors int) ([]Err
 
 func (r *ormRepository) StoreErrors(serviceName string, errors []ErrorAggregate) {
 	// Delete previous records
-	r.DB.Where("service_name = ?", serviceName).Unscoped().Delete(&AggregatedError{})
+	r.DB.
+		Where("service_name = ?", serviceName).
+		Unscoped().
+		Delete(&AggregatedError{})
 
 	for _, errorAggregate := range errors {
 		r.DB.Create(&AggregatedError{
@@ -75,7 +80,9 @@ func (r *ormRepository) StoreErrors(serviceName string, errors []ErrorAggregate)
 func (r *ormRepository) GetServices() []string {
 	aggregatedErrors := []AggregatedError{}
 	keys := make([]string, 0)
-	r.DB.Distinct("service_name").Find(&aggregatedErrors)
+	r.DB.
+		Distinct("service_name").
+		Find(&aggregatedErrors)
 	for _, aggregatedError := range aggregatedErrors {
 		keys = append(keys, aggregatedError.ServiceName)
 	}
@@ -83,17 +90,30 @@ func (r *ormRepository) GetServices() []string {
 }
 
 func (r *ormRepository) ResolveError(serviceName string, key string) error {
-	r.DB.Where("service_name = ?", serviceName).Where("aggregation_key = ?", key).Delete(&AggregatedError{})
+	r.DB.
+		Where("service_name = ?", serviceName).
+		Where("aggregation_key = ?", key).
+		Delete(&AggregatedError{})
 	return nil
 }
 
 func (r *ormRepository) RemoveResolved(serviceName string, key string) {
-	r.DB.Model(&AggregatedError{}).Where("service_name = ?", serviceName).Where("aggregation_key = ?", key).Unscoped().Update("deleted_at", nil)
+	r.DB.Model(&AggregatedError{}).
+		Where("service_name = ?", serviceName).
+		Where("aggregation_key = ?", key).
+		Unscoped().
+		Update("deleted_at", nil)
 }
 
 func (r *ormRepository) SearchResolved(serviceName string, key string) bool {
 	var count int64
-	r.DB.Model(&AggregatedError{}).Where("service_name = ?", serviceName).Where("aggregation_key = ?", key).Unscoped().Count(&count)
+	r.DB.
+		Model(&AggregatedError{}).
+		Where("service_name = ?", serviceName).
+		Where("aggregation_key = ?", key).
+		Where("deleted_at is NOT NULL").
+		Unscoped().
+		Count(&count)
 	return count == 1
 }
 
@@ -108,9 +128,4 @@ func (r *ormRepository) GetTargets() map[string][]Target {
 		return true
 	})
 	return targets
-}
-
-func (r *ormRepository) ResolveError2(serviceName string, key string) error {
-	r.DB.Where("service_name = ?", serviceName).Where("aggregation_key = ?", key).Delete(&AggregatedError{})
-	return nil
 }

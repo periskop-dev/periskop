@@ -193,4 +193,8 @@ func TestORMSearchResolved(t *testing.T) {
 	if !r.SearchResolved("test_search", "key") {
 		t.Errorf("Error should be mark as resolved")
 	}
+
+	if r.SearchResolved("test_search_other", "key") {
+		t.Errorf("Error shouldn't be mark as resolved")
+	}
 }
