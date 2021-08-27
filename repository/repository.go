@@ -40,6 +40,10 @@ type HTTPContext struct {
 	RequestBody    string            `json:"request_body"`
 }
 
+type Target struct {
+	Endpoint string `json:"endpoint"`
+}
+
 type ErrorsRepository interface {
 	GetErrors(serviceName string, numberOfErrors int) ([]ErrorAggregate, error)
 	StoreErrors(serviceName string, errors []ErrorAggregate)
@@ -51,10 +55,8 @@ type ErrorsRepository interface {
 	GetTargets() map[string][]Target
 }
 
-type Target struct {
-	Endpoint string `json:"endpoint"`
-}
-
+// NewRepository it's a factory function for ErrorRepository interfaces.
+// It creates a repository based on the configured repository.
 func NewRepository(repositoryConfig config.Repository) ErrorsRepository {
 	if repositoryConfig.Type == "sqlite" {
 		log.Printf("Using SQLite %s repository", repositoryConfig.Path)
@@ -81,5 +83,4 @@ func NewRepository(repositoryConfig config.Repository) ErrorsRepository {
 		log.Printf("Using in memory repository")
 		return NewMemoryRepository()
 	}
-
 }

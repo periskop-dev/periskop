@@ -58,17 +58,16 @@ func (r *memoryRepository) GetServices() []string {
 }
 
 // ResolveError removes the error from list of errors and adds to the set of resolved errors
-// TODO: rename variables
 func (r *memoryRepository) ResolveError(serviceName string, key string) error {
 	if value, ok := r.AggregatedError.Load(serviceName); ok {
-		value, _ := value.([]ErrorAggregate)
-		newValues := []ErrorAggregate{}
-		for _, errorObj := range value {
-			if errorObj.AggregationKey != key {
-				newValues = append(newValues, errorObj)
+		prevErrors, _ := value.([]ErrorAggregate)
+		errors := []ErrorAggregate{}
+		for _, errorAggregate := range prevErrors {
+			if errorAggregate.AggregationKey != key {
+				errors = append(errors, errorAggregate)
 			}
 		}
-		r.StoreErrors(serviceName, newValues)
+		r.StoreErrors(serviceName, errors)
 		r.addToResolved(serviceName, key)
 		return nil
 	}

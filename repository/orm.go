@@ -61,6 +61,7 @@ func (r *ormRepository) GetErrors(serviceName string, numberOfErrors int) ([]Err
 	}
 }
 
+// StoreErrors deletes previous stored errors for a service name and store the new list of errors in json format
 func (r *ormRepository) StoreErrors(serviceName string, errors []ErrorAggregate) {
 	// Delete previous records
 	r.DB.
@@ -77,6 +78,7 @@ func (r *ormRepository) StoreErrors(serviceName string, errors []ErrorAggregate)
 	}
 }
 
+// GetServices fetches the list of unique services
 func (r *ormRepository) GetServices() []string {
 	aggregatedErrors := []AggregatedError{}
 	keys := make([]string, 0)
@@ -89,6 +91,7 @@ func (r *ormRepository) GetServices() []string {
 	return keys
 }
 
+// ResolveError marks the given error as soft-deleted (updating deleted_at)
 func (r *ormRepository) ResolveError(serviceName string, key string) error {
 	r.DB.
 		Where("service_name = ?", serviceName).
@@ -97,6 +100,7 @@ func (r *ormRepository) ResolveError(serviceName string, key string) error {
 	return nil
 }
 
+// RemoveResolved removes a soft-deletion of the given error
 func (r *ormRepository) RemoveResolved(serviceName string, key string) {
 	r.DB.Model(&AggregatedError{}).
 		Where("service_name = ?", serviceName).
@@ -105,6 +109,7 @@ func (r *ormRepository) RemoveResolved(serviceName string, key string) {
 		Update("deleted_at", nil)
 }
 
+// SearchResolved returns true if the given error was marked previously as resolved
 func (r *ormRepository) SearchResolved(serviceName string, key string) bool {
 	var count int64
 	r.DB.
