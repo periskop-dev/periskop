@@ -4,6 +4,8 @@ import (
 	"log"
 
 	"github.com/soundcloud/periskop/config"
+	"gorm.io/driver/mysql"
+	"gorm.io/driver/postgres"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 )
@@ -57,6 +59,20 @@ func NewRepository(repositoryConfig config.Repository) ErrorsRepository {
 	if repositoryConfig.Type == "sqlite" {
 		log.Printf("Using SQLite %s repository", repositoryConfig.Path)
 		db, err := gorm.Open(sqlite.Open(repositoryConfig.Path), &gorm.Config{})
+		if err != nil {
+			panic("failed to connect database")
+		}
+		return NewORMRepository(db)
+	} else if repositoryConfig.Type == "mysql" {
+		log.Printf("Using MySQL repository")
+		db, err := gorm.Open(mysql.Open(repositoryConfig.Dsn), &gorm.Config{})
+		if err != nil {
+			panic("failed to connect database")
+		}
+		return NewORMRepository(db)
+	} else if repositoryConfig.Type == "postgres" {
+		log.Printf("Using PostgresSQL repository")
+		db, err := gorm.Open(postgres.Open(repositoryConfig.Dsn), &gorm.Config{})
 		if err != nil {
 			panic("failed to connect database")
 		}

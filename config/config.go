@@ -19,6 +19,7 @@ type PeriskopConfig struct {
 type Repository struct {
 	Type string `yaml:"type"`
 	Path string `yaml:"path,omitempty"`
+	Dsn  string `yaml:"dsn,omitempty"`
 }
 
 type Service struct {
