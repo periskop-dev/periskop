@@ -11,7 +11,6 @@ func NewMemoryRepository() ErrorsRepository {
 	return &memoryRepository{
 		AggregatedError: sync.Map{},
 		ResolvedErrors:  sync.Map{},
-		Targets:         sync.Map{},
 	}
 }
 
@@ -20,33 +19,35 @@ type memoryRepository struct {
 	AggregatedError sync.Map
 	// map service name -> set of resolved errors
 	ResolvedErrors sync.Map
-	// map service name -> list of scraped targets
-	Targets sync.Map
+	targetsRepository
 }
 
+// GetErrors fetches the last numberOfErrors of each aggregation of errors for the given service
 func (r *memoryRepository) GetErrors(serviceName string, numberOfErrors int) ([]ErrorAggregate, error) {
 	if value, ok := r.AggregatedError.Load(serviceName); ok {
-		value, _ := value.([]ErrorAggregate)
-		result := make([]ErrorAggregate, 0, len(value))
-		for _, errorObj := range value {
-			topCap := len(errorObj.LatestErrors)
-			if numberOfErrors < topCap {
-				topCap = numberOfErrors
+		prevErrors, _ := value.([]ErrorAggregate)
+		errors := make([]ErrorAggregate, 0, len(prevErrors))
+		for _, errorAggregate := range prevErrors {
+			maxErrors := len(errorAggregate.LatestErrors)
+			if numberOfErrors < maxErrors {
+				maxErrors = numberOfErrors
 			}
-			errorObj.LatestErrors = errorObj.LatestErrors[0:topCap]
-			result = append(result, errorObj)
+			errorAggregate.LatestErrors = errorAggregate.LatestErrors[0:maxErrors]
+			errors = append(errors, errorAggregate)
 		}
 
-		return result, nil
+		return errors, nil
 	}
 	metrics.ServiceErrors.WithLabelValues("service_not_found").Inc()
 	return nil, fmt.Errorf("service %s not found", serviceName)
 }
 
+// StoreErrors stores and replaces a lists of aggregated errors for the given service
 func (r *memoryRepository) StoreErrors(serviceName string, errors []ErrorAggregate) {
 	r.AggregatedError.Store(serviceName, errors)
 }
 
+// GetServices fetches the list of unique services
 func (r *memoryRepository) GetServices() []string {
 	keys := make([]string, 0)
 	r.AggregatedError.Range(func(key, value interface{}) bool {
@@ -101,17 +102,4 @@ func (r *memoryRepository) SearchResolved(serviceName string, key string) bool {
 		return resolvedSet[key]
 	}
 	return false
-}
-
-func (r *memoryRepository) StoreTargets(serviceName string, targets []Target) {
-	r.Targets.Store(serviceName, targets)
-}
-
-func (r *memoryRepository) GetTargets() map[string][]Target {
-	targets := make(map[string][]Target)
-	r.Targets.Range(func(key, value interface{}) bool {
-		targets[key.(string)] = value.([]Target)
-		return true
-	})
-	return targets
 }

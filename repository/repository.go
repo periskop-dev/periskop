@@ -2,6 +2,7 @@ package repository
 
 import (
 	"log"
+	"sync"
 
 	"github.com/soundcloud/periskop/config"
 	"gorm.io/driver/mysql"
@@ -44,6 +45,11 @@ type Target struct {
 	Endpoint string `json:"endpoint"`
 }
 
+type TargetsRepository interface {
+	StoreTargets(serviceName string, targets []Target)
+	GetTargets() map[string][]Target
+}
+
 type ErrorsRepository interface {
 	GetErrors(serviceName string, numberOfErrors int) ([]ErrorAggregate, error)
 	StoreErrors(serviceName string, errors []ErrorAggregate)
@@ -51,8 +57,27 @@ type ErrorsRepository interface {
 	ResolveError(serviceName string, key string) error
 	SearchResolved(serviceName string, key string) bool
 	RemoveResolved(serviceName string, key string)
-	StoreTargets(serviceName string, targets []Target)
-	GetTargets() map[string][]Target
+	TargetsRepository
+}
+
+type targetsRepository struct {
+	// map service name -> list of scraped targets
+	Targets sync.Map
+}
+
+// StoreTargets stores a list of scrapped targets (hosts) for a service
+func (r *targetsRepository) StoreTargets(serviceName string, targets []Target) {
+	r.Targets.Store(serviceName, targets)
+}
+
+// GetTargets gets a list of scrapped targets (hosts) for a service
+func (r *targetsRepository) GetTargets() map[string][]Target {
+	targets := make(map[string][]Target)
+	r.Targets.Range(func(key, value interface{}) bool {
+		targets[key.(string)] = value.([]Target)
+		return true
+	})
+	return targets
 }
 
 // NewRepository it's a factory function for ErrorRepository interfaces.

@@ -4,7 +4,6 @@ import (
 	"database/sql/driver"
 	"encoding/json"
 	"fmt"
-	"sync"
 
 	"github.com/soundcloud/periskop/metrics"
 	"gorm.io/gorm"
@@ -12,8 +11,7 @@ import (
 
 type ormRepository struct {
 	DB *gorm.DB
-	// map service name -> list of scraped targets
-	Targets sync.Map
+	targetsRepository
 }
 
 func (e *ErrorAggregate) Scan(src interface{}) error {
@@ -34,7 +32,7 @@ type AggregatedError struct {
 
 func NewORMRepository(db *gorm.DB) ErrorsRepository {
 	db.AutoMigrate(&AggregatedError{})
-	return &ormRepository{DB: db, Targets: sync.Map{}}
+	return &ormRepository{DB: db}
 }
 
 func (r *ormRepository) GetErrors(serviceName string, numberOfErrors int) ([]ErrorAggregate, error) {
@@ -43,18 +41,18 @@ func (r *ormRepository) GetErrors(serviceName string, numberOfErrors int) ([]Err
 		Where(&AggregatedError{ServiceName: serviceName}).
 		Find(&aggregatedErrors)
 
-	result := []ErrorAggregate{}
+	errors := []ErrorAggregate{}
 	for _, aggregatedError := range aggregatedErrors {
 		errorObj := aggregatedError.Errors
-		topCap := len(errorObj.LatestErrors)
-		if numberOfErrors < topCap {
-			topCap = numberOfErrors
+		maxErrors := len(errorObj.LatestErrors)
+		if numberOfErrors < maxErrors {
+			maxErrors = numberOfErrors
 		}
-		errorObj.LatestErrors = errorObj.LatestErrors[0:topCap]
-		result = append(result, errorObj)
+		errorObj.LatestErrors = errorObj.LatestErrors[0:maxErrors]
+		errors = append(errors, errorObj)
 	}
-	if len(result) > 0 {
-		return result, nil
+	if len(errors) > 0 {
+		return errors, nil
 	} else {
 		metrics.ServiceErrors.WithLabelValues("service_not_found").Inc()
 		return nil, fmt.Errorf("service %s not found", serviceName)
@@ -120,17 +118,4 @@ func (r *ormRepository) SearchResolved(serviceName string, key string) bool {
 		Unscoped().
 		Count(&count)
 	return count == 1
-}
-
-func (r *ormRepository) StoreTargets(serviceName string, targets []Target) {
-	r.Targets.Store(serviceName, targets)
-}
-
-func (r *ormRepository) GetTargets() map[string][]Target {
-	targets := make(map[string][]Target)
-	r.Targets.Range(func(key, value interface{}) bool {
-		targets[key.(string)] = value.([]Target)
-		return true
-	})
-	return targets
 }
