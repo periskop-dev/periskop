@@ -83,28 +83,32 @@ func (r *targetsRepository) GetTargets() map[string][]Target {
 // NewRepository it's a factory function for ErrorRepository interfaces.
 // It creates a repository based on the configured repository.
 func NewRepository(repositoryConfig config.Repository) ErrorsRepository {
-	if repositoryConfig.Type == "sqlite" {
+	switch repositoryConfig.Type {
+	case "sqlite":
 		log.Printf("Using SQLite %s repository", repositoryConfig.Path)
 		db, err := gorm.Open(sqlite.Open(repositoryConfig.Path), &gorm.Config{})
 		if err != nil {
 			panic("failed to connect database")
 		}
 		return NewORMRepository(db)
-	} else if repositoryConfig.Type == "mysql" {
+	case "mysql":
 		log.Printf("Using MySQL repository")
 		db, err := gorm.Open(mysql.Open(repositoryConfig.Dsn), &gorm.Config{})
 		if err != nil {
 			panic("failed to connect database")
 		}
 		return NewORMRepository(db)
-	} else if repositoryConfig.Type == "postgres" {
+	case "postgresql", "postgres":
 		log.Printf("Using PostgresSQL repository")
 		db, err := gorm.Open(postgres.Open(repositoryConfig.Dsn), &gorm.Config{})
 		if err != nil {
 			panic("failed to connect database")
 		}
 		return NewORMRepository(db)
-	} else {
+	case "memory":
+		log.Printf("Using in memory repository")
+		return NewMemoryRepository()
+	default:
 		log.Printf("Using in memory repository")
 		return NewMemoryRepository()
 	}

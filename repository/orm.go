@@ -31,7 +31,10 @@ type AggregatedError struct {
 }
 
 func NewORMRepository(db *gorm.DB) ErrorsRepository {
-	db.AutoMigrate(&AggregatedError{})
+	err := db.AutoMigrate(&AggregatedError{})
+	if err != nil {
+		panic("failed to create database migration")
+	}
 	return &ormRepository{DB: db}
 }
 
@@ -53,10 +56,9 @@ func (r *ormRepository) GetErrors(serviceName string, numberOfErrors int) ([]Err
 	}
 	if len(errors) > 0 {
 		return errors, nil
-	} else {
-		metrics.ServiceErrors.WithLabelValues("service_not_found").Inc()
-		return nil, fmt.Errorf("service %s not found", serviceName)
 	}
+	metrics.ServiceErrors.WithLabelValues("service_not_found").Inc()
+	return nil, fmt.Errorf("service %s not found", serviceName)
 }
 
 // StoreErrors deletes previous stored errors for a service name and store the new list of errors in json format
