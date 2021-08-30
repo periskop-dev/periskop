@@ -25,8 +25,8 @@ func (e ErrorAggregate) Value() (driver.Value, error) {
 
 type AggregatedError struct {
 	gorm.Model
-	ServiceName    string `gorm:"index"`
-	AggregationKey string `gorm:"index"`
+	ServiceName    string
+	AggregationKey string
 	Errors         ErrorAggregate
 }
 
@@ -63,27 +63,19 @@ func (r *ormRepository) GetErrors(serviceName string, numberOfErrors int) ([]Err
 
 // ReplaceErrors deletes previous stored errors for a service name and stores the new list of errors in json format
 func (r *ormRepository) ReplaceErrors(serviceName string, errors []ErrorAggregate) {
-	r.DB.Transaction(func(tx *gorm.DB) error {
-		// Delete previous records
-		if err := tx.
-			Where("service_name = ?", serviceName).
-			Unscoped().
-			Delete(&AggregatedError{}).Error; err != nil {
-			return err
-		}
+	// Delete previous records
+	r.DB.
+		Where("service_name = ?", serviceName).
+		Unscoped().
+		Delete(&AggregatedError{})
 
-		for _, errorAggregate := range errors {
-			if err := tx.
-				Create(&AggregatedError{
-					ServiceName:    serviceName,
-					Errors:         errorAggregate,
-					AggregationKey: errorAggregate.AggregationKey,
-				}).Error; err != nil {
-				return err
-			}
-		}
-		return nil
-	})
+	for _, errorAggregate := range errors {
+		r.DB.Create(&AggregatedError{
+			ServiceName:    serviceName,
+			Errors:         errorAggregate,
+			AggregationKey: errorAggregate.AggregationKey,
+		})
+	}
 }
 
 // GetServices fetches the list of unique services
