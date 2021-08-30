@@ -80,7 +80,7 @@ func (r *targetsRepository) GetTargets() map[string][]Target {
 	return targets
 }
 
-// NewRepository it's a factory function for ErrorRepository interfaces.
+// NewRepository is a factory function for ErrorRepository interfaces.
 // It creates a repository based on the configured repository.
 func NewRepository(repositoryConfig config.Repository) ErrorsRepository {
 	switch repositoryConfig.Type {

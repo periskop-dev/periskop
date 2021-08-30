@@ -48,7 +48,7 @@ docker run -v path/to/config.yaml:/etc/periskop/periskop.yaml -p 8080:8080 peris
 
 ## Enable persistance storage
 
-By default Periskop stores all the scrapped errors in memory [repository](repository/memory.go). You can configure you Periskop deployment to use persistance storage. 
+By default Periskop stores all the scrapped errors in memory [repository](repository/memory.go). You can configure your Periskop deployment to use persistent storage.
 Currently the supported persistance storages are SQLite, MySQL and PostgreSQL. 
 
 For SQLite, add these lines to your `config.yaml` file:
