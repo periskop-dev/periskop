@@ -98,7 +98,7 @@ func NewRepository(repositoryConfig config.Repository) ErrorsRepository {
 			panic("failed to connect database")
 		}
 		return NewORMRepository(db)
-	case "postgresql", "postgres":
+	case "postgres":
 		log.Printf("Using PostgresSQL repository")
 		db, err := gorm.Open(postgres.Open(repositoryConfig.Dsn), &gorm.Config{})
 		if err != nil {

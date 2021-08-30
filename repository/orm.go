@@ -119,5 +119,5 @@ func (r *ormRepository) SearchResolved(serviceName string, key string) bool {
 		Where("deleted_at is NOT NULL").
 		Unscoped().
 		Count(&count)
-	return count == 1
+	return count >= 1
 }

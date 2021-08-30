@@ -58,13 +58,19 @@ repository:
   path: periskop.db
 ```
 
-For MySQL and PostgreSQL:
+For MySQL:
 ```yaml
 repository:
   type: mysql
   dsn: user:pass@tcp(127.0.0.1:3306)/dbname?charset=utf8mb4&parseTime=True&loc=Local
 ```
   
+For PostgreSQL:
+```yaml
+repository:
+  type: postgres
+  dsn: host=localhost user=gorm password=gorm dbname=gorm port=9920 sslmode=disable
+```
 
 ## Alert reported exceptions
 
