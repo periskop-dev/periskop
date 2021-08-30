@@ -61,8 +61,8 @@ func (r *ormRepository) GetErrors(serviceName string, numberOfErrors int) ([]Err
 	return nil, fmt.Errorf("service %s not found", serviceName)
 }
 
-// StoreErrors deletes previous stored errors for a service name and stores the new list of errors in json format
-func (r *ormRepository) StoreErrors(serviceName string, errors []ErrorAggregate) {
+// ReplaceErrors deletes previous stored errors for a service name and stores the new list of errors in json format
+func (r *ormRepository) ReplaceErrors(serviceName string, errors []ErrorAggregate) {
 	// Delete previous records
 	r.DB.
 		Where("service_name = ?", serviceName).

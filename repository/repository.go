@@ -52,7 +52,7 @@ type TargetsRepository interface {
 
 type ErrorsRepository interface {
 	GetErrors(serviceName string, numberOfErrors int) ([]ErrorAggregate, error)
-	StoreErrors(serviceName string, errors []ErrorAggregate)
+	ReplaceErrors(serviceName string, errors []ErrorAggregate)
 	GetServices() []string
 	ResolveError(serviceName string, key string) error
 	SearchResolved(serviceName string, key string) bool

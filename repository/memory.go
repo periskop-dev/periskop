@@ -42,8 +42,8 @@ func (r *memoryRepository) GetErrors(serviceName string, numberOfErrors int) ([]
 	return nil, fmt.Errorf("service %s not found", serviceName)
 }
 
-// StoreErrors stores and replaces a lists of aggregated errors for the given service
-func (r *memoryRepository) StoreErrors(serviceName string, errors []ErrorAggregate) {
+// ReplaceErrors replaces a lists of aggregated errors for the given service
+func (r *memoryRepository) ReplaceErrors(serviceName string, errors []ErrorAggregate) {
 	r.AggregatedError.Store(serviceName, errors)
 }
 
@@ -68,7 +68,7 @@ func (r *memoryRepository) ResolveError(serviceName string, key string) error {
 				errors = append(errors, errorAggregate)
 			}
 		}
-		r.StoreErrors(serviceName, errors)
+		r.ReplaceErrors(serviceName, errors)
 		r.addToResolved(serviceName, key)
 		return nil
 	}
