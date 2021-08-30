@@ -38,7 +38,7 @@ func TestServicesWithEmptyRepoReturnsEmptyArray(t *testing.T) {
 
 func TestServicesWithNonEmptyRepoReturnsServiceNames(t *testing.T) {
 	r := repository.NewMemoryRepository()
-	r.StoreErrors("api-test", []repository.ErrorAggregate{})
+	r.ReplaceErrors("api-test", []repository.ErrorAggregate{})
 
 	rr := httptest.NewRecorder()
 	serveMockServiceList(rr, r)
@@ -71,7 +71,7 @@ func TestErrorsForUnknownServiceReturnsNotFound(t *testing.T) {
 
 func TestErrorsForKnownServiceReturnsSuccess(t *testing.T) {
 	r := repository.NewMemoryRepository()
-	r.StoreErrors("api-test", []repository.ErrorAggregate{})
+	r.ReplaceErrors("api-test", []repository.ErrorAggregate{})
 
 	rr := httptest.NewRecorder()
 	serveMockErrorList(rr, r, "api-test")
@@ -84,7 +84,7 @@ func TestErrorsForKnownServiceReturnsSuccess(t *testing.T) {
 
 func TestErrorsForKnownServiceReturnsErrors(t *testing.T) {
 	r := repository.NewMemoryRepository()
-	r.StoreErrors("api-test", []repository.ErrorAggregate{
+	r.ReplaceErrors("api-test", []repository.ErrorAggregate{
 		{
 			AggregationKey: "key",
 			Severity:       "error",
@@ -130,7 +130,7 @@ func TestResolveErrorForUnknownServiceReturnsNotFound(t *testing.T) {
 
 func TestResolveErrorsReturnsSuccess(t *testing.T) {
 	r := repository.NewMemoryRepository()
-	r.StoreErrors("api-test", []repository.ErrorAggregate{})
+	r.ReplaceErrors("api-test", []repository.ErrorAggregate{})
 
 	rr := httptest.NewRecorder()
 	serveMockErrorResolve(rr, r, "api-test", "test")

@@ -181,7 +181,7 @@ func storeErrors(serviceName string, r *repository.ErrorsRepository, errorAggreg
 			})
 		}
 	}
-	(*r).StoreErrors(serviceName, errors)
+	(*r).ReplaceErrors(serviceName, errors)
 }
 
 func storeTargets(serviceName string, path string,
