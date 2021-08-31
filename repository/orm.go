@@ -63,7 +63,7 @@ func (r *ormRepository) GetErrors(serviceName string, numberOfErrors int) ([]Err
 
 // ReplaceErrors deletes previous stored errors for a service name and stores the new list of errors in json format
 func (r *ormRepository) ReplaceErrors(serviceName string, errors []ErrorAggregate) {
-	r.DB.Transaction(func(tx *gorm.DB) error {
+	err := r.DB.Transaction(func(tx *gorm.DB) error {
 		// Delete previous records
 		if err := tx.
 			Where("service_name = ?", serviceName).
@@ -84,6 +84,9 @@ func (r *ormRepository) ReplaceErrors(serviceName string, errors []ErrorAggregat
 		}
 		return nil
 	})
+	if err != nil {
+		metrics.ErrorCollector.Report(err)
+	}
 }
 
 // GetServices fetches the list of unique services
