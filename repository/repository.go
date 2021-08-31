@@ -1,10 +1,14 @@
 package repository
 
 import (
-	"fmt"
+	"log"
 	"sync"
 
-	"github.com/soundcloud/periskop/metrics"
+	"github.com/soundcloud/periskop/config"
+	"gorm.io/driver/mysql"
+	"gorm.io/driver/postgres"
+	"gorm.io/driver/sqlite"
+	"gorm.io/gorm"
 )
 
 type ErrorAggregate struct {
@@ -37,57 +41,37 @@ type HTTPContext struct {
 	RequestBody    string            `json:"request_body"`
 }
 
-type ErrorsRepository interface {
-	StoreErrors(serviceName string, errors []ErrorAggregate)
-	GetServices() []string
-	GetErrors(serviceName string, numberOfErrors int) ([]ErrorAggregate, error)
-	ResolveError(serviceName string, key string) error
-	SearchResolved(serviceName string, key string) bool
-	RemoveResolved(serviceName string, key string)
-	StoreTargets(serviceName string, targets []Target)
-	GetTargets() map[string][]Target
-}
-
 type Target struct {
 	Endpoint string `json:"endpoint"`
 }
 
-func NewInMemory() ErrorsRepository {
-	return &inMemoryRepository{
-		AggregatedError: sync.Map{},
-		ResolvedErrors:  sync.Map{},
-		Targets:         sync.Map{},
-	}
+type TargetsRepository interface {
+	StoreTargets(serviceName string, targets []Target)
+	GetTargets() map[string][]Target
 }
 
-type inMemoryRepository struct {
-	// map service name -> list of errors
-	AggregatedError sync.Map
-	// map service name -> set of resolved errors
-	ResolvedErrors sync.Map
+type ErrorsRepository interface {
+	GetErrors(serviceName string, numberOfErrors int) ([]ErrorAggregate, error)
+	ReplaceErrors(serviceName string, errors []ErrorAggregate)
+	GetServices() []string
+	ResolveError(serviceName string, key string) error
+	SearchResolved(serviceName string, key string) bool
+	RemoveResolved(serviceName string, key string)
+	TargetsRepository
+}
+
+type targetsRepository struct {
 	// map service name -> list of scraped targets
 	Targets sync.Map
 }
 
-func (r *inMemoryRepository) StoreErrors(serviceName string, errors []ErrorAggregate) {
-	r.AggregatedError.Store(serviceName, errors)
-}
-
-func (r *inMemoryRepository) StoreTargets(serviceName string, targets []Target) {
+// StoreTargets stores a list of scrapped targets (hosts) for a service
+func (r *targetsRepository) StoreTargets(serviceName string, targets []Target) {
 	r.Targets.Store(serviceName, targets)
 }
 
-func (r *inMemoryRepository) GetServices() []string {
-	keys := make([]string, 0)
-	r.AggregatedError.Range(func(key, value interface{}) bool {
-		k, _ := key.(string)
-		keys = append(keys, k)
-		return true
-	})
-	return keys
-}
-
-func (r *inMemoryRepository) GetTargets() map[string][]Target {
+// GetTargets gets a list of scrapped targets (hosts) for a service
+func (r *targetsRepository) GetTargets() map[string][]Target {
 	targets := make(map[string][]Target)
 	r.Targets.Range(func(key, value interface{}) bool {
 		targets[key.(string)] = value.([]Target)
@@ -96,67 +80,39 @@ func (r *inMemoryRepository) GetTargets() map[string][]Target {
 	return targets
 }
 
-func (r *inMemoryRepository) GetErrors(serviceName string, numberOfErrors int) ([]ErrorAggregate, error) {
-	if value, ok := r.AggregatedError.Load(serviceName); ok {
-		value, _ := value.([]ErrorAggregate)
-		result := make([]ErrorAggregate, 0, len(value))
-		for _, errorObj := range value {
-			topCap := len(errorObj.LatestErrors)
-			if numberOfErrors < topCap {
-				topCap = numberOfErrors
-			}
-			errorObj.LatestErrors = errorObj.LatestErrors[0:topCap]
-			result = append(result, errorObj)
+// NewRepository is a factory function for ErrorRepository interfaces.
+// It creates a repository based on the configured repository.
+func NewRepository(repositoryConfig config.Repository) ErrorsRepository {
+	// default config for gorm
+	gormConfig := &gorm.Config{SkipDefaultTransaction: true, PrepareStmt: true}
+
+	switch repositoryConfig.Type {
+	case "sqlite":
+		log.Printf("Using SQLite %s repository", repositoryConfig.Path)
+		db, err := gorm.Open(sqlite.Open(repositoryConfig.Path), gormConfig)
+		if err != nil {
+			panic("failed to connect database")
 		}
-
-		return result, nil
-	}
-	metrics.ServiceErrors.WithLabelValues("service_not_found").Inc()
-	return nil, fmt.Errorf("service %s not found", serviceName)
-}
-
-// addToResolved saves the error to resolved error set
-func (r *inMemoryRepository) addToResolved(serviceName string, key string) {
-	if resolvedSet, ok := r.ResolvedErrors.Load(serviceName); ok {
-		resolvedSet := resolvedSet.(map[string]bool)
-		resolvedSet[key] = true
-		r.ResolvedErrors.Store(serviceName, resolvedSet)
-	} else {
-		r.ResolvedErrors.Store(serviceName, map[string]bool{key: true})
-	}
-}
-
-// RemoveResolved removes a resolved error from resolved error set
-func (r *inMemoryRepository) RemoveResolved(serviceName string, key string) {
-	if resolvedSet, ok := r.ResolvedErrors.Load(serviceName); ok {
-		resolvedSet := resolvedSet.(map[string]bool)
-		delete(resolvedSet, key)
-		r.ResolvedErrors.Store(serviceName, resolvedSet)
-	}
-}
-
-// SearchResolved searches if an error is inside the set of resolved errors
-func (r *inMemoryRepository) SearchResolved(serviceName string, key string) bool {
-	if resolvedSet, ok := r.ResolvedErrors.Load(serviceName); ok {
-		resolvedSet := resolvedSet.(map[string]bool)
-		return resolvedSet[key]
-	}
-	return false
-}
-
-// ResolveError removes the error from list of errors and adds to the set of resolved errors
-func (r *inMemoryRepository) ResolveError(serviceName string, key string) error {
-	if value, ok := r.AggregatedError.Load(serviceName); ok {
-		value, _ := value.([]ErrorAggregate)
-		newValues := []ErrorAggregate{}
-		for _, errorObj := range value {
-			if errorObj.AggregationKey != key {
-				newValues = append(newValues, errorObj)
-			}
+		return NewORMRepository(db)
+	case "mysql":
+		log.Printf("Using MySQL repository")
+		db, err := gorm.Open(mysql.Open(repositoryConfig.Dsn), gormConfig)
+		if err != nil {
+			panic("failed to connect database")
 		}
-		r.StoreErrors(serviceName, newValues)
-		r.addToResolved(serviceName, key)
-		return nil
+		return NewORMRepository(db)
+	case "postgres":
+		log.Printf("Using PostgresSQL repository")
+		db, err := gorm.Open(postgres.Open(repositoryConfig.Dsn), gormConfig)
+		if err != nil {
+			panic("failed to connect database")
+		}
+		return NewORMRepository(db)
+	case "memory":
+		log.Printf("Using in memory repository")
+		return NewMemoryRepository()
+	default:
+		log.Printf("Using in memory repository")
+		return NewMemoryRepository()
 	}
-	return fmt.Errorf("service %s not found", serviceName)
 }

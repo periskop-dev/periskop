@@ -12,7 +12,14 @@ import (
 )
 
 type PeriskopConfig struct {
-	Services []Service `yaml:"services"`
+	Services   []Service  `yaml:"services"`
+	Repository Repository `yaml:"repository"`
+}
+
+type Repository struct {
+	Type string `yaml:"type"`
+	Path string `yaml:"path,omitempty"`
+	Dsn  string `yaml:"dsn,omitempty"`
 }
 
 type Service struct {

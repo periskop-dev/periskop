@@ -1,3 +1,5 @@
+repository:
+  type: memory
 services:
 - name: mock-target
   dns_sd_configs:

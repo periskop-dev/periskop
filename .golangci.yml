@@ -15,3 +15,4 @@ issues:
   - path: _test\.go
     linters:
       - gomnd
+      - errcheck

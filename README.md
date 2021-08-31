@@ -33,9 +33,11 @@ The UI allows navigating and inspecting exceptions as they occur.
 ![ui](https://i.imgur.com/Tljxd80.png)
 
 ## Run project locally
+
 Please see [CONTRIBUTING.md](CONTRIBUTING.md)
 
 ## Building & Running
+
 We are looking into distributing Periskop via Docker Hub.
 In the meantime, you can build and run Periskop from source:
 
@@ -44,12 +46,31 @@ docker build --tag periskop .
 docker run -v path/to/config.yaml:/etc/periskop/periskop.yaml -p 8080:8080 periskop
 ```
 
-## Client Libraries
+## Enable persistance storage
 
-  - [periskop-scala](https://github.com/soundcloud/periskop-scala)
-  - [periskop-go](https://github.com/soundcloud/periskop-go)
-  - [periskop-python](https://github.com/soundcloud/periskop-python)
+By default Periskop stores all the scrapped errors in memory [repository](repository/memory.go). You can configure your Periskop deployment to use persistent storage.
+Currently the supported persistance storages are SQLite, MySQL and PostgreSQL. 
+
+For SQLite, add these lines to your `config.yaml` file:
+```yaml
+repository:
+  type: sqlite
+  path: periskop.db
+```
+
+For MySQL:
+```yaml
+repository:
+  type: mysql
+  dsn: user:pass@tcp(127.0.0.1:3306)/dbname?charset=utf8mb4&parseTime=True&loc=Local
+```
   
+For PostgreSQL:
+```yaml
+repository:
+  type: postgres
+  dsn: host=localhost user=gorm password=gorm dbname=gorm port=9920 sslmode=disable
+```
 
 ## Alert reported exceptions
 
@@ -69,3 +90,9 @@ groups:
       description: "Errors for {{ $labels.service_name }}({{ $labels.aggregation_key }}) is {{ $value }}"
       dashboard: "https://periskop.example.com/#/{{ $labels.service_name }}/errors/{{ $labels.aggregation_key }}"
 ```
+
+## Client Libraries
+
+  - [periskop-scala](https://github.com/soundcloud/periskop-scala)
+  - [periskop-go](https://github.com/soundcloud/periskop-go)
+  - [periskop-python](https://github.com/soundcloud/periskop-python)

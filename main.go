@@ -42,7 +42,7 @@ func main() {
 
 	processor := scraper.NewProcessor(numOfProcessors)
 	processor.Run()
-	repo := repository.NewInMemory()
+	repo := repository.NewRepository(cfg.Repository)
 	for _, service := range cfg.Services {
 		resolver := servicediscovery.NewResolver(service)
 		s := scraper.NewScraper(resolver, &repo, service, processor)
