@@ -64,7 +64,6 @@ func (r *ormRepository) GetErrors(serviceName string, numberOfErrors int) ([]Err
 
 // ReplaceErrors deletes previous stored errors for a service name and stores the new list of errors in json format
 func (r *ormRepository) ReplaceErrors(serviceName string, errors []ErrorAggregate) {
-
 	for _, errorAggregate := range errors {
 		errObj := AggregatedError{}
 		key := errorAggregate.AggregationKey
@@ -87,7 +86,6 @@ func (r *ormRepository) ReplaceErrors(serviceName string, errors []ErrorAggregat
 				Update("Errors", errorAggregate)
 		}
 	}
-
 }
 
 // GetServices fetches the list of unique services
