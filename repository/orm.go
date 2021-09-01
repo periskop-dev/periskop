@@ -83,7 +83,7 @@ func (r *ormRepository) ReplaceErrors(serviceName string, errors []ErrorAggregat
 				Where("service_name = ?", serviceName).
 				Where("aggregation_key = ?", key).
 				Update("total_count", errorAggregate.TotalCount).
-				Update("Errors", errorAggregate)
+				Update("errors", errorAggregate)
 		}
 	}
 }

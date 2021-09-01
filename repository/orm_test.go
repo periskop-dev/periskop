@@ -53,7 +53,7 @@ func TestORMReplaceErrors(t *testing.T) {
 	errors = []ErrorAggregate{
 		{
 			AggregationKey: key,
-			Severity:       "error",
+			Severity:       "warning",
 			CreatedAt:      time.Unix(0, 0).Unix(),
 			TotalCount:     2,
 			LatestErrors: []ErrorWithContext{
@@ -76,6 +76,9 @@ func TestORMReplaceErrors(t *testing.T) {
 		First(&errObj)
 	if errObj.TotalCount != 2 {
 		t.Errorf("Found %d error instances, expected 2", errObj.TotalCount)
+	}
+	if errObj.Errors.Severity != "warning" {
+		t.Errorf("Wrong data from Errors Severity field, found '%s', expected 'warning'", errObj.Errors.Severity)
 	}
 }
 
