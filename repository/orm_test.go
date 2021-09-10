@@ -26,11 +26,16 @@ func newSQLiteMemory() *gorm.DB {
 func TestORMReplaceErrors(t *testing.T) {
 	db := newSQLiteMemory()
 	r := NewORMRepository(db)
+	key := "errorKey"
+	serviceName := "test_replace"
+
+	// test if creation is successful
 	errors := []ErrorAggregate{
 		{
-			AggregationKey: "key",
+			AggregationKey: key,
 			Severity:       "error",
 			CreatedAt:      time.Unix(0, 0).Unix(),
+			TotalCount:     1,
 			LatestErrors: []ErrorWithContext{
 				{
 					Error:     ErrorInstance{},
@@ -39,10 +44,41 @@ func TestORMReplaceErrors(t *testing.T) {
 				},
 			},
 		}}
-	r.ReplaceErrors("test_store", errors)
-	r.ReplaceErrors("test_store", errors)
-	if countErrors(db, "test_store") != 1 {
-		t.Errorf("Found %d errors, expected 1", countErrors(db, "test_store"))
+	r.ReplaceErrors(serviceName, errors)
+	if countErrors(db, serviceName) != 1 {
+		t.Errorf("Found %d errors, expected 1", countErrors(db, serviceName))
+	}
+
+	// test if update is successful
+	errors = []ErrorAggregate{
+		{
+			AggregationKey: key,
+			Severity:       "warning",
+			CreatedAt:      time.Unix(0, 0).Unix(),
+			TotalCount:     2,
+			LatestErrors: []ErrorWithContext{
+				{
+					Error:     ErrorInstance{},
+					Severity:  "error",
+					Timestamp: time.Unix(0, 0).Unix(),
+				},
+			},
+		}}
+	r.ReplaceErrors(serviceName, errors)
+	if countErrors(db, serviceName) != 1 {
+		t.Errorf("Found %d errors, expected 1", countErrors(db, serviceName))
+	}
+
+	errObj := AggregatedError{}
+	db.Model(&AggregatedError{}).
+		Where("service_name = ?", serviceName).
+		Where("aggregation_key = ?", key).
+		First(&errObj)
+	if errObj.TotalCount != 2 {
+		t.Errorf("Found %d error instances, expected 2", errObj.TotalCount)
+	}
+	if errObj.Errors.Severity != "warning" {
+		t.Errorf("Wrong data from Errors Severity field, found '%s', expected 'warning'", errObj.Errors.Severity)
 	}
 }
 

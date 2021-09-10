@@ -28,6 +28,7 @@ type AggregatedError struct {
 	ServiceName    string `gorm:"index"`
 	AggregationKey string `gorm:"index"`
 	Errors         ErrorAggregate
+	TotalCount     int
 }
 
 func NewORMRepository(db *gorm.DB) ErrorsRepository {
@@ -63,29 +64,27 @@ func (r *ormRepository) GetErrors(serviceName string, numberOfErrors int) ([]Err
 
 // ReplaceErrors deletes previous stored errors for a service name and stores the new list of errors in json format
 func (r *ormRepository) ReplaceErrors(serviceName string, errors []ErrorAggregate) {
-	err := r.DB.Transaction(func(tx *gorm.DB) error {
-		// Delete previous records
-		if err := tx.
+	for _, errorAggregate := range errors {
+		errObj := AggregatedError{}
+		key := errorAggregate.AggregationKey
+		result := r.DB.Model(&AggregatedError{}).
 			Where("service_name = ?", serviceName).
-			Unscoped().
-			Delete(&AggregatedError{}).Error; err != nil {
-			return err
+			Where("aggregation_key = ?", key).
+			First(&errObj)
+		if result.RowsAffected == 0 {
+			r.DB.Create(&AggregatedError{
+				ServiceName:    serviceName,
+				Errors:         errorAggregate,
+				AggregationKey: key,
+				TotalCount:     errorAggregate.TotalCount,
+			})
+		} else if errorAggregate.TotalCount > errObj.TotalCount { // only update if there are more errors than before
+			r.DB.Model(&AggregatedError{}).
+				Where("service_name = ?", serviceName).
+				Where("aggregation_key = ?", key).
+				Update("total_count", errorAggregate.TotalCount).
+				Update("errors", errorAggregate)
 		}
-
-		for _, errorAggregate := range errors {
-			if err := tx.
-				Create(&AggregatedError{
-					ServiceName:    serviceName,
-					Errors:         errorAggregate,
-					AggregationKey: errorAggregate.AggregationKey,
-				}).Error; err != nil {
-				return err
-			}
-		}
-		return nil
-	})
-	if err != nil {
-		metrics.ErrorCollector.Report(err)
 	}
 }
 
