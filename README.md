@@ -91,8 +91,13 @@ groups:
       dashboard: "https://periskop.example.com/#/{{ $labels.service_name }}/errors/{{ $labels.aggregation_key }}"
 ```
 
+## Pushgateway
+
+See [periskop-pushgateway](https://github.com/soundcloud/periskop-pushgateway) if you want to use Periskop as push based metric system.
+
 ## Client Libraries
 
   - [periskop-scala](https://github.com/soundcloud/periskop-scala)
   - [periskop-go](https://github.com/soundcloud/periskop-go)
   - [periskop-python](https://github.com/soundcloud/periskop-python)
+  - [periskop-ruby](https://github.com/soundcloud/periskop-ruby)
