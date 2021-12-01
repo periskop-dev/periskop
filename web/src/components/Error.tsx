@@ -169,7 +169,7 @@ const ErrorComponent: React.FC<Props> = (props) => {
     return(
       <ListGroup.Item>
         <h4 className="list-group-item-heading"> Body</h4>
-        {request_body}
+        <pre className="request-body">{request_body}</pre>
       </ListGroup.Item>
     );
   };
