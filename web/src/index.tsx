@@ -1,4 +1,4 @@
-import "index.scss"
+import "./index.scss"
 import "favicon.ico"
 
 import * as React from "react"

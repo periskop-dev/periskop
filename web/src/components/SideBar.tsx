@@ -1,4 +1,4 @@
-import "SideBar.scss"
+import "./SideBar.scss"
 import * as React from "react"
 import { ListGroup, Badge, DropdownButton, ButtonGroup, Dropdown } from "react-bootstrap"
 import { connect } from "react-redux"
