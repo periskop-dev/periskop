@@ -1,4 +1,4 @@
-import "Navbar.scss"
+import "./Navbar.scss"
 import Logo from "../img/logo.png"
 import * as React from "react"
 import { withRouter, RouteComponentProps } from "react-router"
