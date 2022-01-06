@@ -98,7 +98,7 @@ See [periskop-pushgateway](https://github.com/soundcloud/periskop-pushgateway) i
 
 ## Client Libraries
 
-  - [periskop-scala](https://github.com/soundcloud/periskop-scala)
-  - [periskop-go](https://github.com/soundcloud/periskop-go)
-  - [periskop-python](https://github.com/soundcloud/periskop-python)
-  - [periskop-ruby](https://github.com/soundcloud/periskop-ruby)
+  - [periskop-scala](https://github.com/periskop-dev/periskop-scala)
+  - [periskop-go](https://github.com/periskop-dev/periskop-go)
+  - [periskop-python](https://github.com/periskop-dev/periskop-python)
+  - [periskop-ruby](https://github.com/periskop-dev/periskop-ruby)
