@@ -94,7 +94,7 @@ groups:
 
 ## Pushgateway
 
-See [periskop-pushgateway](https://github.com/soundcloud/periskop-pushgateway) if you want to use Periskop as push based metric system.
+See [periskop-pushgateway](https://github.com/periskop-dev/periskop-pushgateway) if you want to use Periskop as push based metric system.
 
 ## Client Libraries
 
