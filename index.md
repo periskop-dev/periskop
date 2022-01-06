@@ -30,8 +30,13 @@ The UI allows navigating and inspecting exceptions as they occur.
 
 ![ui](https://i.imgur.com/Tljxd80.png)
 
+## Pushgateway
+
+See [periskop-pushgateway](https://github.com/periskop-dev/periskop-pushgateway) if you want to use Periskop as push based metric system.
+
 ## Client Libraries
 
-  - [periskop-scala](https://github.com/soundcloud/periskop-scala)
-  - [periskop-go](https://github.com/soundcloud/periskop-go)
-  - [periskop-python](https://github.com/soundcloud/periskop-python)
+  - [periskop-scala](https://github.com/periskop-dev/periskop-scala)
+  - [periskop-go](https://github.com/periskop-dev/periskop-go)
+  - [periskop-python](https://github.com/periskop-dev/periskop-python)
+  - [periskop-ruby](https://github.com/periskop-dev/periskop-ruby)
