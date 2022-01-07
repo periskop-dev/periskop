@@ -7,8 +7,8 @@ import (
 	"sync"
 	"time"
 
-	"github.com/soundcloud/periskop-go"
-	"github.com/soundcloud/periskop/metrics"
+	"github.com/periskop-dev/periskop-go"
+	"github.com/periskop-dev/periskop/metrics"
 )
 
 const httpClientTimeoutSeconds = 30

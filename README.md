@@ -1,6 +1,6 @@
 # <img src="https://i.imgur.com/z8BLePO.png" width="65%">
 
-[![Build Status](https://api.cirrus-ci.com/github/soundcloud/periskop.svg)](https://cirrus-ci.com/github/soundcloud/periskop)
+[![Build Status](https://api.cirrus-ci.com/github/periskop-dev/periskop.svg)](https://cirrus-ci.com/github/periskop-dev/periskop)
 [![Gitter chat](https://badges.gitter.im/gitterHQ/gitter.png)](https://gitter.im/soundcloud/periskop)
 
 Pull based, language agnostic exception aggregator for microservice environments.

@@ -5,7 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/soundcloud/periskop/metrics"
+	"github.com/periskop-dev/periskop/metrics"
 	"gorm.io/gorm"
 )
 

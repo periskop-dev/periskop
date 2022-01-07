@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"sync"
 
-	"github.com/soundcloud/periskop/metrics"
+	"github.com/periskop-dev/periskop/metrics"
 )
 
 func NewMemoryRepository() ErrorsRepository {

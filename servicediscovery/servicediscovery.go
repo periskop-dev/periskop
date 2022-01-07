@@ -11,7 +11,7 @@ import (
 	prometheus_target_group "github.com/prometheus/prometheus/discovery/targetgroup"
 	prometheus_labels "github.com/prometheus/prometheus/pkg/labels"
 	prometheus_relabel "github.com/prometheus/prometheus/pkg/relabel"
-	"github.com/soundcloud/periskop/config"
+	"github.com/periskop-dev/periskop/config"
 )
 
 type ResolvedAddresses struct {

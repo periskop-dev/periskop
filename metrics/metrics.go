@@ -1,8 +1,8 @@
 package metrics
 
 import (
+	"github.com/periskop-dev/periskop-go"
 	"github.com/prometheus/client_golang/prometheus"
-	"github.com/soundcloud/periskop-go"
 )
 
 const (
