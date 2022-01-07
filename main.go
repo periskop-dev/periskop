@@ -9,8 +9,8 @@ import (
 	"path/filepath"
 
 	"github.com/gorilla/mux"
-	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/periskop-dev/periskop-go"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 
 	"github.com/periskop-dev/periskop/api"
 	"github.com/periskop-dev/periskop/config"
