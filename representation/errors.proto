@@ -1,5 +1,5 @@
 syntax = "proto3";
-package com.soundcloud.periskop;
+package com.periskop;
 
 message Errors {
     repeated AggregatedError aggregatedErrors = 1;

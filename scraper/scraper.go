@@ -6,10 +6,10 @@ import (
 	"sync"
 	"time"
 
-	"github.com/soundcloud/periskop/config"
-	"github.com/soundcloud/periskop/metrics"
-	"github.com/soundcloud/periskop/repository"
-	"github.com/soundcloud/periskop/servicediscovery"
+	"github.com/periskop-dev/periskop/config"
+	"github.com/periskop-dev/periskop/metrics"
+	"github.com/periskop-dev/periskop/repository"
+	"github.com/periskop-dev/periskop/servicediscovery"
 )
 
 // map error key -> errorAggregate

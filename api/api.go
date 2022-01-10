@@ -7,8 +7,8 @@ import (
 	"strings"
 
 	"github.com/gorilla/mux"
-	"github.com/soundcloud/periskop/metrics"
-	"github.com/soundcloud/periskop/repository"
+	"github.com/periskop-dev/periskop/metrics"
+	"github.com/periskop-dev/periskop/repository"
 )
 
 func NewServicesListHandler(r *repository.ErrorsRepository) http.Handler {

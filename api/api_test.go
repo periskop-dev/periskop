@@ -8,7 +8,7 @@ import (
 	"time"
 
 	"github.com/gorilla/mux"
-	"github.com/soundcloud/periskop/repository"
+	"github.com/periskop-dev/periskop/repository"
 )
 
 func TestServicesWithEmptyRepoReturnsSuccess(t *testing.T) {

@@ -9,15 +9,15 @@ import (
 	"path/filepath"
 
 	"github.com/gorilla/mux"
+	"github.com/periskop-dev/periskop-go"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
-	"github.com/soundcloud/periskop-go"
 
-	"github.com/soundcloud/periskop/api"
-	"github.com/soundcloud/periskop/config"
-	"github.com/soundcloud/periskop/metrics"
-	"github.com/soundcloud/periskop/repository"
-	"github.com/soundcloud/periskop/scraper"
-	"github.com/soundcloud/periskop/servicediscovery"
+	"github.com/periskop-dev/periskop/api"
+	"github.com/periskop-dev/periskop/config"
+	"github.com/periskop-dev/periskop/metrics"
+	"github.com/periskop-dev/periskop/repository"
+	"github.com/periskop-dev/periskop/scraper"
+	"github.com/periskop-dev/periskop/servicediscovery"
 )
 
 const numOfProcessors = 8

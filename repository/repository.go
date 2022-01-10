@@ -4,7 +4,7 @@ import (
 	"log"
 	"sync"
 
-	"github.com/soundcloud/periskop/config"
+	"github.com/periskop-dev/periskop/config"
 	"gorm.io/driver/mysql"
 	"gorm.io/driver/postgres"
 	"gorm.io/driver/sqlite"

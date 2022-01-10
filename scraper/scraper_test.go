@@ -5,7 +5,7 @@ import (
 	"io/ioutil"
 	"testing"
 
-	"github.com/soundcloud/periskop/repository"
+	"github.com/periskop-dev/periskop/repository"
 )
 
 func TestCombineLastErrorsSortsByTimestamp(t *testing.T) {
