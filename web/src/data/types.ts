@@ -34,6 +34,14 @@ export interface AggregatedError {
   "latest_errors"?: Error[]
 }
 
+export interface Target {
+  "endpoint"?: string,
+}
+
+export interface Targets {
+  [name: string]: Target[];
+}
+
 export type ServicesState = {
   services: RemoteData.RemoteData<any, string[]>
 }
@@ -48,12 +56,13 @@ export type ErrorsState = {
   latestExceptionIndex: number
   activeSortFilter: SortFilters,
   severityFilter: SeverityFilter,
-  searchTerm: string,
+  searchTerm: string
 }
 
 export type StoreState = {
   servicesReducer: ServicesState,
-  errorsReducer: ErrorsState
+  errorsReducer: ErrorsState,
+  targetsReducer: TargetsState
 }
 
 export enum SeverityFilter {
@@ -61,4 +70,8 @@ export enum SeverityFilter {
   Error = "Error",
   Info = "Info",
   Warning = "Warning",
+}
+
+export type TargetsState = {
+  targets: RemoteData.RemoteData<any, Targets>,
 }

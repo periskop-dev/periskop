@@ -3,6 +3,8 @@ task:
   skip: "!changesInclude('.cirrus.yml', 'web/**')"
   container:
     image: node:latest
+  env:
+    NODE_OPTIONS: --openssl-legacy-provider
   node_modules_cache:
     folder: node_modules
     fingerprint_script: cat web/package-lock.json

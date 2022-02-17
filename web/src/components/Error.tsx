@@ -10,7 +10,7 @@ import { connect } from "react-redux"
 interface ConnectedProps {
   activeError: AggregatedError,
   activeService: string,
-  latestExceptionIndex: number,
+  latestExceptionIndex: number
 }
 
 interface DispatchProps {
@@ -37,13 +37,9 @@ const ErrorComponent: React.FC<Props> = (props) => {
 
   const renderErrorInstance = (errorInstance: ErrorInstance) => {
     if (!errorInstance) return ""
-
     return (
       <div>      
-        <ListGroup.Item>
-          <h4 className="list-group-item-heading"> Class</h4>
-          { errorInstance.class }
-        </ListGroup.Item>
+        { renderClass(errorInstance.class) }
         { renderMessage(errorInstance.message) }
         { renderStackTrace(errorInstance.stacktrace) }
         { renderCause(errorInstance.cause) }
@@ -93,6 +89,19 @@ const ErrorComponent: React.FC<Props> = (props) => {
       <ListGroup.Item>
         <h4 className="list-group-item-heading"> Cause</h4>
         { renderErrorInstance(cause) }
+      </ListGroup.Item>
+    )
+  }
+
+  const renderClass = (klass: string) => {
+    if (klass === null || klass.trim().length === 0) {
+      return ""
+    }
+
+    return (
+      <ListGroup.Item>
+        <h4 className="list-group-item-heading"> Class</h4>
+        { klass }
       </ListGroup.Item>
     )
   }
@@ -160,7 +169,7 @@ const ErrorComponent: React.FC<Props> = (props) => {
     return(
       <ListGroup.Item>
         <h4 className="list-group-item-heading"> Body</h4>
-        {request_body}
+        <pre className="request-body">{request_body}</pre>
       </ListGroup.Item>
     );
   };
@@ -237,10 +246,16 @@ const ErrorComponent: React.FC<Props> = (props) => {
 }
 
 const mapStateToProps = (state: StoreState) => {
+  const activeError = state.errorsReducer.activeError
+  const searchTerm = state.errorsReducer.searchTerm
+
   return {
-    activeError: state.errorsReducer.activeError,
+    activeError: {
+      ...activeError,
+      latest_errors: activeError.latest_errors.filter(e => JSON.stringify(e).toLowerCase().includes(searchTerm.toLowerCase()))
+    },
     activeService: state.errorsReducer.activeService,
-    latestExceptionIndex: state.errorsReducer.latestExceptionIndex,
+    latestExceptionIndex: state.errorsReducer.latestExceptionIndex
   }
 }
 

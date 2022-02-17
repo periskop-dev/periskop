@@ -7,13 +7,22 @@ import (
 	"strings"
 
 	"github.com/gorilla/mux"
-	"github.com/soundcloud/periskop/metrics"
-	"github.com/soundcloud/periskop/repository"
+	"github.com/periskop-dev/periskop/metrics"
+	"github.com/periskop-dev/periskop/repository"
 )
 
 func NewServicesListHandler(r *repository.ErrorsRepository) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
 		err := servicesList(w, r)
+		if err != nil {
+			metrics.ErrorCollector.ReportWithHTTPRequest(err, req)
+		}
+	})
+}
+
+func NewTargetsHandler(r *repository.ErrorsRepository) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+		err := targets(w, r)
 		if err != nil {
 			metrics.ErrorCollector.ReportWithHTTPRequest(err, req)
 		}
@@ -81,6 +90,10 @@ func errorsForService(w http.ResponseWriter, r *repository.ErrorsRepository,
 
 func servicesList(w http.ResponseWriter, r *repository.ErrorsRepository) error {
 	return renderJSON(w, (*r).GetServices())
+}
+
+func targets(w http.ResponseWriter, r *repository.ErrorsRepository) error {
+	return renderJSON(w, (*r).GetTargets())
 }
 
 func renderJSON(w http.ResponseWriter, value interface{}) error {

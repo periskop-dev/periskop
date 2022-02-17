@@ -100,7 +100,7 @@ const initialState: ErrorsState = {
   latestExceptionIndex: 0,
   activeSortFilter: "latest_occurrence",
   severityFilter: SeverityFilter.All,
-  searchTerm: "",
+  searchTerm: ""
 }
 
 function errorsReducer(state = initialState, action: ErrorsAction) {

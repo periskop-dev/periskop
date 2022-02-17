@@ -7,8 +7,8 @@ import (
 	"sync"
 	"time"
 
-	"github.com/soundcloud/periskop-go"
-	"github.com/soundcloud/periskop/metrics"
+	"github.com/periskop-dev/periskop-go"
+	"github.com/periskop-dev/periskop/metrics"
 )
 
 const httpClientTimeoutSeconds = 30
@@ -78,7 +78,12 @@ func defaultErrorsFetcher() ErrorsFetcher {
 			})
 			return responsePayload{}, err
 		}
-		rp.Target = target
+
+		// Fallback to target if no target_uuid is present for backward compatibility
+		// Can lead to issues with counters as it is not guaranteed to be unique
+		if len(rp.Target) == 0 {
+			rp.Target = target
+		}
 		return rp, nil
 	}
 }

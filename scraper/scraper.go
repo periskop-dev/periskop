@@ -6,10 +6,10 @@ import (
 	"sync"
 	"time"
 
-	"github.com/soundcloud/periskop/config"
-	"github.com/soundcloud/periskop/metrics"
-	"github.com/soundcloud/periskop/repository"
-	"github.com/soundcloud/periskop/servicediscovery"
+	"github.com/periskop-dev/periskop/config"
+	"github.com/periskop-dev/periskop/metrics"
+	"github.com/periskop-dev/periskop/repository"
+	"github.com/periskop-dev/periskop/servicediscovery"
 )
 
 // map error key -> errorAggregate
@@ -46,30 +46,56 @@ func (errorAggregates errorAggregateMap) combine(serviceName string, r *reposito
 			targetErrorsCount[rp.Target] = make(map[string]int)
 		}
 		prevErrorInstances := errorInstancesAccumulator[item.AggregationKey]
-		var currentCount int
+		var errorCountDelta int
 		lastestErrors := combineLastErrors(prevErrorInstances, item.LatestErrors)
 
 		if existing, exists := errorAggregates[item.AggregationKey]; exists {
 			prevCount := targetErrorsCount[rp.Target][item.AggregationKey]
-			currentCount = item.TotalCount - prevCount
-			errorAggregates[item.AggregationKey] = errorAggregate{
-				TotalCount:     existing.TotalCount + currentCount,
-				AggregationKey: existing.AggregationKey,
-				Severity:       item.Severity,
-				LatestErrors:   lastestErrors,
-				CreatedAt:      existing.CreatedAt,
+			if prevCount <= item.TotalCount {
+				// Set the CreatedAt of its oldest occurrence
+				createdAt := existing.CreatedAt
+				if item.CreatedAt.Before(createdAt) {
+					createdAt = item.CreatedAt
+				}
+
+				errorCountDelta = item.TotalCount - prevCount
+				errorAggregates[item.AggregationKey] = errorAggregate{
+					TotalCount:     existing.TotalCount + errorCountDelta,
+					AggregationKey: existing.AggregationKey,
+					Severity:       item.Severity,
+					LatestErrors:   lastestErrors,
+					CreatedAt:      createdAt,
+				}
+				updateValues(item, errorCountDelta, lastestErrors,
+					serviceName, r, rp,
+					targetErrorsCount, errorInstancesAccumulator)
+			} else {
+				log.Printf("warning: count of errors for '%s' target is inconsistent: prev %d, current %d.",
+					rp.Target,
+					prevCount,
+					item.TotalCount,
+				)
+				log.Printf(" Counters won't be updated\n")
 			}
 		} else {
-			currentCount = item.TotalCount
 			errorAggregates[item.AggregationKey] = item
+			updateValues(item, item.TotalCount, lastestErrors,
+				serviceName, r, rp,
+				targetErrorsCount, errorInstancesAccumulator)
 		}
+	}
+}
 
-		metrics.ErrorOccurrences.WithLabelValues(serviceName, item.Severity, rp.Target,
-			item.AggregationKey).Add(float64(currentCount))
-		targetErrorsCount[rp.Target][item.AggregationKey] = item.TotalCount
-		errorInstancesAccumulator[item.AggregationKey] = lastestErrors
-		// If an error that was previously mark as resolved is scrapped again
-		// it's going to be added to list of errors
+func updateValues(item errorAggregate, errorCountDelta int, latestErrors []errorWithContext,
+	serviceName string, r *repository.ErrorsRepository, rp responsePayload,
+	targetErrorsCount targetErrorsCountMap, errorInstancesAccumulator errorInstancesAccumulatorMap) {
+	metrics.ErrorOccurrences.WithLabelValues(serviceName, item.Severity, rp.Target,
+		item.AggregationKey).Add(float64(errorCountDelta))
+	targetErrorsCount[rp.Target][item.AggregationKey] = item.TotalCount
+	errorInstancesAccumulator[item.AggregationKey] = latestErrors
+	// If an error that was previously mark as resolved is scrapped again
+	// it's going to be added to list of errors
+	if (*r).SearchResolved(serviceName, item.AggregationKey) {
 		(*r).RemoveResolved(serviceName, item.AggregationKey)
 	}
 }
@@ -94,6 +120,7 @@ func (scraper Scraper) Scrape() {
 		select {
 		case newResult := <-resolutions:
 			resolvedAddresses = newResult
+			storeTargets(serviceConfig.Name, serviceConfig.Scraper.Endpoint, scraper.Repository, resolvedAddresses)
 			log.Printf("Received new dns resolution result for %s. Address resolved: %d\n", serviceConfig.Name,
 				len(resolvedAddresses.Addresses))
 
@@ -105,7 +132,7 @@ func (scraper Scraper) Scrape() {
 				errorAggregates.combine(serviceConfig.Name, scraper.Repository,
 					responsePayload, targetErrorsCount, errorInstancesAccumulator)
 			}
-			store(serviceConfig.Name, scraper.Repository, errorAggregates)
+			storeErrors(serviceConfig.Name, scraper.Repository, errorAggregates)
 
 			numInstances := len(resolvedAddresses.Addresses)
 			numErrors := len(errorAggregates)
@@ -140,7 +167,7 @@ func scrapeInstances(addresses []string, endpoint string, processor Processor) <
 	return out
 }
 
-func store(serviceName string, r *repository.ErrorsRepository, errorAggregates errorAggregateMap) {
+func storeErrors(serviceName string, r *repository.ErrorsRepository, errorAggregates errorAggregateMap) {
 	errors := make([]repository.ErrorAggregate, 0, len(errorAggregates))
 	for _, value := range errorAggregates {
 		if !(*r).SearchResolved(serviceName, value.AggregationKey) {
@@ -154,7 +181,18 @@ func store(serviceName string, r *repository.ErrorsRepository, errorAggregates e
 			})
 		}
 	}
-	(*r).StoreErrors(serviceName, errors)
+	(*r).ReplaceErrors(serviceName, errors)
+}
+
+func storeTargets(serviceName string, path string,
+	r *repository.ErrorsRepository, addr servicediscovery.ResolvedAddresses) {
+	targets := make([]repository.Target, 0, len(addr.Addresses))
+	for _, host := range addr.Addresses {
+		targets = append(targets, repository.Target{
+			Endpoint: host + path,
+		})
+	}
+	(*r).StoreTargets(serviceName, targets)
 }
 
 func toRepositoryErrorsWithContent(occurrences []errorWithContext) []repository.ErrorWithContext {
