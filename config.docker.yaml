@@ -14,7 +14,7 @@ services:
 - name: periskop
   static_configs:
   - targets:
-    - api:7777
+    - api:8080
   scraper:
     endpoint: "/errors"
     refresh_interval: 10s

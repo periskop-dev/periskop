@@ -44,7 +44,7 @@ In the meantime, you can build and run Periskop from source:
 
 ```
 docker build --tag periskop .
-docker run -e CONFIG_FILE=/etc/periskop/config/<config-file>.yaml -v /path/to/config/yaml/folder:/etc/periskop/config -p 8080:8080 periskop
+docker run -v path/to/config.yaml:/etc/periskop/periskop.yaml -p 8080:8080 periskop
 ```
 
 ## Enable persistance storage

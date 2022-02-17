@@ -50,4 +50,4 @@ up: clean
 	docker-compose up -d
 
 logs:
-	docker-compose logs
+	docker-compose logs -f

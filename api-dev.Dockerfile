@@ -1,5 +1,5 @@
 ## Build api
-FROM golang:1.16.3
+FROM golang:1.17.7
 
 WORKDIR /periskop-dev
 
