@@ -3,6 +3,7 @@ package main
 import (
 	"flag"
 	"fmt"
+	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
@@ -11,6 +12,7 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/periskop-dev/periskop-go"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
+	"github.com/prometheus/prometheus/tsdb"
 
 	"github.com/periskop-dev/periskop/api"
 	"github.com/periskop-dev/periskop/config"
@@ -40,12 +42,22 @@ func main() {
 		panic(err)
 	}
 
+	dir, err := ioutil.TempDir("", "tsdb-test")
+	if err != nil {
+		panic(err)
+	}
+	db, err := tsdb.Open(dir, nil, nil, tsdb.DefaultOptions(), nil)
+	if err != nil {
+		panic(err)
+	}
+
+
 	processor := scraper.NewProcessor(numOfProcessors)
 	processor.Run()
 	repo := repository.NewRepository(cfg.Repository)
 	for _, service := range cfg.Services {
 		resolver := servicediscovery.NewResolver(service)
-		s := scraper.NewScraper(resolver, &repo, service, processor)
+		s := scraper.NewScraper(resolver, &repo, service, processor, db)
 		go s.Scrape()
 	}
 

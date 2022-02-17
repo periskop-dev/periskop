@@ -1,6 +1,7 @@
 package scraper
 
 import (
+	"context"
 	"log"
 	"sort"
 	"sync"
@@ -10,6 +11,9 @@ import (
 	"github.com/periskop-dev/periskop/metrics"
 	"github.com/periskop-dev/periskop/repository"
 	"github.com/periskop-dev/periskop/servicediscovery"
+	"github.com/prometheus/prometheus/pkg/labels"
+	"github.com/prometheus/prometheus/storage"
+	"github.com/prometheus/prometheus/tsdb"
 )
 
 // map error key -> errorAggregate
@@ -26,21 +30,24 @@ type Scraper struct {
 	Repository    *repository.ErrorsRepository
 	ServiceConfig config.Service
 	processor     Processor
+	db            *tsdb.DB
 }
 
 // NewScraper create a new scraper for a given service name
 func NewScraper(resolver servicediscovery.Resolver, r *repository.ErrorsRepository,
-	serviceConfig config.Service, processor Processor) Scraper {
+	serviceConfig config.Service, processor Processor, db *tsdb.DB) Scraper {
 	return Scraper{
 		Resolver:      resolver,
 		Repository:    r,
+		db:            db,
 		ServiceConfig: serviceConfig,
 		processor:     processor,
 	}
 }
 
 func (errorAggregates errorAggregateMap) combine(serviceName string, r *repository.ErrorsRepository,
-	rp responsePayload, targetErrorsCount targetErrorsCountMap, errorInstancesAccumulator errorInstancesAccumulatorMap) {
+	rp responsePayload, targetErrorsCount targetErrorsCountMap, errorInstancesAccumulator errorInstancesAccumulatorMap,
+	appender storage.Appender) {
 	for _, item := range rp.ErrorAggregate {
 		if _, exists := targetErrorsCount[rp.Target]; !exists {
 			targetErrorsCount[rp.Target] = make(map[string]int)
@@ -48,6 +55,11 @@ func (errorAggregates errorAggregateMap) combine(serviceName string, r *reposito
 		prevErrorInstances := errorInstancesAccumulator[item.AggregationKey]
 		var errorCountDelta int
 		lastestErrors := combineLastErrors(prevErrorInstances, item.LatestErrors)
+		series := labels.FromStrings("aggregation_key", item.AggregationKey)
+		_, err := appender.Append(0, series, item.CreatedAt, item.TotalCount)
+		if err != nil {
+			panic(err)
+		}
 
 		if existing, exists := errorAggregates[item.AggregationKey]; exists {
 			prevCount := targetErrorsCount[rp.Target][item.AggregationKey]
@@ -68,7 +80,7 @@ func (errorAggregates errorAggregateMap) combine(serviceName string, r *reposito
 				}
 				updateValues(item, errorCountDelta, lastestErrors,
 					serviceName, r, rp,
-					targetErrorsCount, errorInstancesAccumulator)
+					targetErrorsCount, errorInstancesAccumulator, appender)
 			} else {
 				log.Printf("warning: count of errors for '%s' target is inconsistent: prev %d, current %d.",
 					rp.Target,
@@ -81,18 +93,21 @@ func (errorAggregates errorAggregateMap) combine(serviceName string, r *reposito
 			errorAggregates[item.AggregationKey] = item
 			updateValues(item, item.TotalCount, lastestErrors,
 				serviceName, r, rp,
-				targetErrorsCount, errorInstancesAccumulator)
+				targetErrorsCount, errorInstancesAccumulator, appender)
 		}
 	}
 }
 
 func updateValues(item errorAggregate, errorCountDelta int, latestErrors []errorWithContext,
 	serviceName string, r *repository.ErrorsRepository, rp responsePayload,
-	targetErrorsCount targetErrorsCountMap, errorInstancesAccumulator errorInstancesAccumulatorMap) {
+	targetErrorsCount targetErrorsCountMap, errorInstancesAccumulator errorInstancesAccumulatorMap,
+	appender storage.Appender) {
+
 	metrics.ErrorOccurrences.WithLabelValues(serviceName, item.Severity, rp.Target,
 		item.AggregationKey).Add(float64(errorCountDelta))
 	targetErrorsCount[rp.Target][item.AggregationKey] = item.TotalCount
 	errorInstancesAccumulator[item.AggregationKey] = latestErrors
+	appender.Commit()
 	// If an error that was previously mark as resolved is scrapped again
 	// it's going to be added to list of errors
 	if (*r).SearchResolved(serviceName, item.AggregationKey) {
@@ -129,8 +144,10 @@ func (scraper Scraper) Scrape() {
 			errorInstancesAccumulator := make(errorInstancesAccumulatorMap)
 			for responsePayload := range scrapeInstances(resolvedAddresses.Addresses, serviceConfig.Scraper.Endpoint,
 				scraper.processor) {
+				appender := scraper.db.Appender(context.Background())
+
 				errorAggregates.combine(serviceConfig.Name, scraper.Repository,
-					responsePayload, targetErrorsCount, errorInstancesAccumulator)
+					responsePayload, targetErrorsCount, errorInstancesAccumulator, appender)
 			}
 			storeErrors(serviceConfig.Name, scraper.Repository, errorAggregates)
 
