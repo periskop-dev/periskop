@@ -4,7 +4,7 @@ services:
 - name: mock-target
   dns_sd_configs:
   - names:
-    - localhost
+    - mock-target
     refresh_interval: 10s
     type: A
     port: 7778
@@ -14,7 +14,7 @@ services:
 - name: periskop
   static_configs:
   - targets:
-    - localhost:7777
+    - api:7777
   scraper:
     endpoint: "/errors"
     refresh_interval: 10s

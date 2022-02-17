@@ -134,8 +134,8 @@ module.exports = function (env) {
             }),
 
             new webpack.EnvironmentPlugin({
-                SERVER_URL: 'localhost', // use 'localhost' unless process.env.NODE_ENV is defined
-                SERVER_PORT: 7777,
+                API_HOST: 'localhost', // use 'localhost' unless process.env.NODE_ENV is defined
+                API_PORT: 7777,
             }),
         ]
     }

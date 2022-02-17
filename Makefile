@@ -17,7 +17,7 @@ build-web:
 	npm run build:dist --prefix $(WEB_FOLDER)
 
 run-api:
-	go build -o periskop && SERVER_URL=localhost ./periskop -port=$(PORT) -config ./config.dev.yaml
+	go build -o periskop && ./periskop -port=$(PORT) -config ./config.dev.yaml
 
 run-mock-target:
 	cd mocktarget && go build -o mock-target mocktarget/mocktarget.go && ./mock-target
@@ -44,10 +44,10 @@ down:
 	docker-compose down
 
 build-up:
-	SERVER_URL=$(DOCKER_IP) docker-compose up --build -d
+	docker-compose up --build -d
 
 up: clean
-	SERVER_URL=$(DOCKER_IP) docker-compose up -d
+	docker-compose up -d
 
 logs:
 	docker-compose logs

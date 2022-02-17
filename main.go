@@ -9,15 +9,15 @@ import (
 	"path/filepath"
 
 	"github.com/gorilla/mux"
+	"github.com/periskop-dev/periskop-go"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
-	"github.com/soundcloud/periskop-go"
 
-	"github.com/soundcloud/periskop/api"
-	"github.com/soundcloud/periskop/config"
-	"github.com/soundcloud/periskop/metrics"
-	"github.com/soundcloud/periskop/repository"
-	"github.com/soundcloud/periskop/scraper"
-	"github.com/soundcloud/periskop/servicediscovery"
+	"github.com/periskop-dev/periskop/api"
+	"github.com/periskop-dev/periskop/config"
+	"github.com/periskop-dev/periskop/metrics"
+	"github.com/periskop-dev/periskop/repository"
+	"github.com/periskop-dev/periskop/scraper"
+	"github.com/periskop-dev/periskop/servicediscovery"
 )
 
 const numOfProcessors = 8
@@ -30,20 +30,8 @@ func main() {
 
 	flag.Parse()
 
-	serverURL, envServer := os.LookupEnv("SERVER_URL")
-	if !envServer || serverURL == "" {
-		serverURL = "localhost"
-	}
-
-	basePath, err := filepath.Abs(filepath.Dir(os.Args[0]))
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	log.Printf("Using baseDir %s", basePath)
-
 	if _, err := os.Stat(*configurationFile); err != nil {
-		log.Fatalf("Invalid configuration file %s", *configurationFile)
+		log.Fatalf("Missing configuration file %s", *configurationFile)
 	}
 
 	log.Printf("Using configFile %s", *configurationFile)
@@ -54,28 +42,20 @@ func main() {
 
 	processor := scraper.NewProcessor(numOfProcessors)
 	processor.Run()
-	repo := repository.NewInMemory()
+	repo := repository.NewRepository(cfg.Repository)
 	for _, service := range cfg.Services {
 		resolver := servicediscovery.NewResolver(service)
 		s := scraper.NewScraper(resolver, &repo, service, processor)
 		go s.Scrape()
 	}
 
-	webFolder := filepath.Join(basePath, "web/dist")
-	log.Printf("Using webFolder %s", webFolder)
-	fs := http.FileServer(http.Dir(webFolder))
+	router := mux.NewRouter()
 
 	// API routing
-	r := mux.NewRouter()
-	r.Handle("/services/",
-		api.NewServicesListHandler(&repo)).Methods(http.MethodGet)
-	r.Handle("/services/{service_name}/errors/",
-		api.NewErrorsListHandler(&repo)).Methods(http.MethodGet)
-	r.Handle("/services/{service_name}/errors/{error_key:.*}/",
-		api.NewErrorResolveHandler(&repo)).Methods(http.MethodDelete, http.MethodOptions)
-	r.PathPrefix("/").Handler(http.StripPrefix("/", fs))
-	r.Use(api.CORSLocalhostMiddleware(r))
-	http.Handle("/", r)
+	setupAPIRouting(repo, router)
+
+	// Web routing
+	setupWebRouting(router)
 
 	// Telemetry endpoints
 	errorExporter := periskop.NewErrorExporter(&metrics.ErrorCollector)
@@ -85,9 +65,36 @@ func main() {
 	http.Handle("/errors", periskopHandler)
 	http.HandleFunc("/-/health", healthHandler)
 
-	address := fmt.Sprintf("0.0.0.0:%s", *port)
+	address := fmt.Sprintf(":%s", *port)
 	log.Printf("Serving on address %s", address)
 	log.Fatal(http.ListenAndServe(address, nil))
+}
+
+func setupWebRouting(r *mux.Router) {
+	basePath, err := filepath.Abs(filepath.Dir(os.Args[0]))
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	log.Printf("Using baseDir %s", basePath)
+
+	webFolder := filepath.Join(basePath, "web/dist")
+	log.Printf("Using webFolder %s", webFolder)
+	fs := http.FileServer(http.Dir(webFolder))
+	r.PathPrefix("/").Handler(http.StripPrefix("/", fs))
+}
+
+func setupAPIRouting(repo repository.ErrorsRepository, r *mux.Router) {
+	r.Handle("/services/",
+		api.NewServicesListHandler(&repo)).Methods(http.MethodGet)
+	r.Handle("/services/{service_name}/errors/",
+		api.NewErrorsListHandler(&repo)).Methods(http.MethodGet)
+	r.Handle("/services/{service_name}/errors/{error_key:.*}/",
+		api.NewErrorResolveHandler(&repo)).Methods(http.MethodDelete, http.MethodOptions)
+	r.Handle("/targets/",
+		api.NewTargetsHandler(&repo)).Methods(http.MethodGet)
+	r.Use(api.CORSLocalhostMiddleware(r))
+	http.Handle("/", r)
 }
 
 func healthHandler(w http.ResponseWriter, r *http.Request) {

@@ -10,9 +10,8 @@ services:
     volumes: 
       - .:/periskop-dev
     environment:
-      - SERVER_URL=${SERVER_URL}
       - PORT=8080
-      - CONFIG_FILE=./config.dev.yaml
+      - CONFIG_FILE=./config.docker.yaml
     build: 
       context: ./
       dockerfile: go-dev.Dockerfile
@@ -30,8 +29,8 @@ services:
     volumes:
       - ./web:/periskop-dev
     environment:
-      - SERVER_URL=${SERVER_URL}
-      - SERVER_PORT=8080
+      - API_HOST=api
+      - API_PORT=8080
     build: 
       dockerfile: node-dev.Dockerfile
       context: ./web
