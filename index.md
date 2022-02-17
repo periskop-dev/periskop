@@ -10,6 +10,14 @@ Periskop scales well with the number of exceptions and application instances:
 
 A UI component is provided for convenience.
 
+See our talk "Periskop: Exception Monitoring at Scale" at FOSDEM [here](https://fosdem.org/2022/schedule/event/periskop/).
+
+Related blog posts at SoundCloud's developers blog:
+
+* [Periskop: Exception Monitoring Service](https://developers.soundcloud.com/blog/periskop-exception-monitoring-service)
+* [What Is New with Periskop in 2022](https://developers.soundcloud.com/blog/periskop-in-2022)
+
+
 ## Scraping
 
 Errors are scraped and aggregated using a configured endpoint from each of the instances discovered via service discovery.
