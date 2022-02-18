@@ -69,6 +69,8 @@ All the commands that boot up containers override 2 environment variables:
 - `API_HOST`: This is the host of the api. 
 - `API_PORT`: The port where the api will be listening to. It defaults to `8080`.
 
+Note: For development, we recommend running each of the components separately instead of using docker compose. This will enable hot reload for web changes and allow to compile components independently.
+
 ## Testing
 
 Running the API tests:

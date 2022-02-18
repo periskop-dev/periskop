@@ -42,9 +42,6 @@ lint-api:
 down:
 	docker-compose down
 
-build-up:
-	docker-compose up --build -d
-
 up: clean
 	docker-compose up -d
 
