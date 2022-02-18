@@ -43,6 +43,8 @@ services:
     - |
       go build -o "/periskop-be/app" .
       "/periskop-be/app"
+    depends_on:
+      - mock-target
   
   mock-target:
     networks: 

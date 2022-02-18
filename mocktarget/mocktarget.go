@@ -11,7 +11,7 @@ const port = "7778"
 
 func handler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
-	body, _ := ioutil.ReadFile("./errors.json")
+	body, _ := ioutil.ReadFile("errors.json")
 	fmt.Fprintln(w, string(body))
 }
 
