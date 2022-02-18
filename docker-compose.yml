@@ -1,0 +1,59 @@
+version: "3.8"
+services:
+  web:
+    networks:
+      - api
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./web:/periskop-dev
+    environment:
+      - API_HOST=localhost
+      - API_PORT=8080
+    build: 
+      dockerfile: Dockerfile
+      context: ./web
+    working_dir: /periskop-dev
+    command:
+    - /bin/bash
+    - -c
+    - |
+      cp -r . /periskop-modules/.
+      cd /periskop-modules
+      npm start
+    depends_on:
+      - api
+
+  api:
+    networks:
+      - api
+    ports:
+      - "8080:8080"
+    volumes: 
+      - .:/periskop-dev
+    environment:
+      - PORT=8080
+      - CONFIG_FILE=./config.docker.yaml
+    build: 
+      context: ./
+      dockerfile: api-dev.Dockerfile
+    command: 
+    - /bin/bash
+    - -c
+    - |
+      go build -o "/periskop-be/app" .
+      "/periskop-be/app"
+    depends_on:
+      - mock-target
+  
+  mock-target:
+    networks: 
+      - api
+    ports: 
+      - "7778:7778"
+    build:
+      dockerfile: Dockerfile
+      context: ./mocktarget
+
+networks:
+  api:

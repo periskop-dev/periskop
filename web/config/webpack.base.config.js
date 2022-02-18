@@ -132,6 +132,11 @@ module.exports = function (env) {
                 metadata: METADATA,
                 favicon: 'src/favicon.ico'
             }),
+
+            new webpack.EnvironmentPlugin({
+                API_HOST: 'localhost', // use 'localhost' unless process.env.NODE_ENV is defined
+                API_PORT: 7777,
+            }),
         ]
     }
 };

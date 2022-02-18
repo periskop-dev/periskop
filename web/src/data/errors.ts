@@ -4,6 +4,7 @@ import { registerReducer } from "data/store"
 import { AggregatedError, ErrorsState, SeverityFilter, SortFilters } from "data/types"
 import { errorSortByLatestOccurrence, errorSortByEventCount } from "util/errors"
 import { ThunkDispatch } from "redux-thunk";
+const METADATA = require('../../config/metadata.js');
 
 export const FETCH = "periskop/errors/FETCH"
 export const FETCH_SUCCESS = "periskop/errors/FETCH_SUCCESS"
@@ -29,7 +30,7 @@ export type ErrorsAction =
   | { type: typeof RESOLVE_ERROR_FAILURE; service: string, errorKey: String }
 
 export const fetchErrors = (service: string) => {
-  return (
+  return(
     dispatch: Dispatch<ErrorsAction>
   ) => {
     dispatch(fetchingErrors(service))
@@ -165,8 +166,9 @@ registerReducer("errorsReducer", errorsReducer)
 
 const parseHostName = () => {
   let windowUrl = new URL(window.location.origin)
-  if (windowUrl.hostname === "localhost") {
-    windowUrl.port = "7777"
+  if (windowUrl.hostname === METADATA.api_host ) {
+    windowUrl.port = METADATA.api_port
   }
+
   return windowUrl
 }

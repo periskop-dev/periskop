@@ -19,7 +19,7 @@ run-api:
 	go build -o periskop && ./periskop -port=$(PORT) -config ./config.dev.yaml
 
 run-mock-target:
-	go build -o mock-target mocktarget/mocktarget.go && ./mock-target
+	go build -o mocktarget/mock-target mocktarget/mocktarget.go && cd mocktarget && ./mock-target
 
 run-web:
 	npm start --prefix $(WEB_FOLDER)
@@ -34,3 +34,16 @@ test-api:
 
 lint-api:
 	golangci-lint run
+
+###########################################################################################
+## DOCKER COMPOSE
+###########################################################################################
+
+down:
+	docker-compose down
+
+up: clean
+	docker-compose up -d
+
+logs:
+	docker-compose logs -f

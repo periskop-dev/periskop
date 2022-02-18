@@ -41,6 +41,36 @@ make run-mock-target
 
 Now you can point your browser to `http://localhost:3000`
 
+### Using `docker-compose`
+
+We also provide a way to run periskop using `docker` container and orchestrated via composition.
+
+In the `Makefile` there's a section for `DOCKER COMPOSE`:
+
+- `make up`: Boots up the 3 containers (api, web, mock-target). Note: I may take some time until all the containers boot up and errors scraped and shown in the UI.
+- `make down`: Will call `docker-compose down` which will stop all running containers orchestrated with our `docker-compose` configuration
+- `make logs`: Shows the logs of the 3 containers
+
+If you would like to follow the logs of any container you can do so as follows:
+
+```bash
+# Front end container - nodejs
+docker-compose logs --follow web
+
+# Back end container - golang
+docker-compose logs --follow api
+
+# The mock target. Doesn't do much other that show 1 line of code where it is serving the errors - golang
+docker-compose logs --follow mock-target
+```
+
+All the commands that boot up containers override 2 environment variables:
+
+- `API_HOST`: This is the host of the api. 
+- `API_PORT`: The port where the api will be listening to. It defaults to `8080`.
+
+Note: For development, we recommend running each of the components separately instead of using docker compose. This will enable hot reload for web changes and allow to compile components independently.
+
 ## Testing
 
 Running the API tests:
