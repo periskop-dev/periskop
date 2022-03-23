@@ -102,3 +102,9 @@ See [periskop-pushgateway](https://github.com/periskop-dev/periskop-pushgateway)
   - [periskop-go](https://github.com/periskop-dev/periskop-go)
   - [periskop-python](https://github.com/periskop-dev/periskop-python)
   - [periskop-ruby](https://github.com/periskop-dev/periskop-ruby)
+
+## Integrations
+
+  - [Backstage plugin](https://github.com/backstage/backstage/blob/master/plugins/periskop)
+
+![backstage-plugin](https://github.com/backstage/backstage/blob/3131784fb71ac35ec24cea433a37bc5cab0595f9/plugins/periskop/docs/periskop-plugin-screenshot.png?raw=true)
