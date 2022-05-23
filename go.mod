@@ -3,6 +3,7 @@ module github.com/periskop-dev/periskop
 require (
 	github.com/go-kit/kit v0.10.0
 	github.com/gorilla/mux v1.7.4
+	github.com/periskop-dev/periskop-go v0.0.0-20220512172842-c5603b259677
 	github.com/prometheus/client_golang v1.5.1
 	github.com/prometheus/prometheus v1.8.2-0.20200507164740-ecee9c8abfd1
 	gopkg.in/yaml.v2 v2.2.8
@@ -72,7 +73,6 @@ require (
 	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
 	github.com/modern-go/reflect2 v1.0.1 // indirect
 	github.com/mwitkow/go-conntrack v0.0.0-20190716064945-2f068394615f // indirect
-	github.com/periskop-dev/periskop-go v0.0.0-20220106155054-4dd58584af9f // indirect
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/prometheus/client_model v0.2.0 // indirect
 	github.com/prometheus/common v0.9.1 // indirect
