@@ -63,10 +63,14 @@ func defaultErrorsFetcher() ErrorsFetcher {
 	return func(target string) (responsePayload, error) {
 		body, err := fetch(target)
 		if err != nil {
-			metrics.ErrorCollector.ReportWithHTTPContext(err, &periskop.HTTPContext{
-				RequestMethod: "GET",
-				RequestURL:    target,
-			}, "scrapped-url-error")
+			metrics.ErrorCollector.Report(periskop.ErrorReport{
+				Err: err,
+				HTTPCtx: &periskop.HTTPContext{
+					RequestMethod: "GET",
+					RequestURL:    target,
+				},
+				ErrKey: "scrapped-url-error",
+			})
 			return responsePayload{}, err
 		}
 
