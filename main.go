@@ -78,7 +78,7 @@ func setupWebRouting(r *mux.Router) {
 
 	log.Printf("Using baseDir %s", basePath)
 
-	webFolder := filepath.Join(basePath, "web/dist")
+	webFolder := filepath.Join(basePath, "web/build")
 	log.Printf("Using webFolder %s", webFolder)
 	fs := http.FileServer(http.Dir(webFolder))
 	r.PathPrefix("/").Handler(http.StripPrefix("/", fs))

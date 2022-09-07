@@ -4,7 +4,7 @@ import { registerReducer } from "data/store"
 import { AggregatedError, ErrorsState, SeverityFilter, SortFilters } from "data/types"
 import { errorSortByLatestOccurrence, errorSortByEventCount } from "util/errors"
 import { ThunkDispatch } from "redux-thunk";
-const METADATA = require('../../config/metadata.js');
+const METADATA = require('config/metadata.js');
 
 export const FETCH = "periskop/errors/FETCH"
 export const FETCH_SUCCESS = "periskop/errors/FETCH_SUCCESS"

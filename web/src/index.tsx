@@ -1,9 +1,6 @@
 import "./index.scss"
-import "favicon.ico"
 
-import * as React from "react"
-import { render } from "react-dom"
-
+import ReactDOM from "react-dom/client";
 import { Provider } from "react-redux"
 import { store } from "data/store"
 import NavbarComponent from "components/Navbar"
@@ -13,10 +10,12 @@ import Home from "components/Home"
 import TargetsList from "components/TargetsList"
 import { Route, Router, Switch } from "react-router"
 import { createHashHistory } from "history"
+import reportWebVitals from './reportWebVitals';
 
 const history = createHashHistory()
 
-render(
+const app = ReactDOM.createRoot(document.getElementById("app"));
+app.render(
     <Provider store={store}>
         <Router history={history}>
             <div className="app-container">
@@ -31,5 +30,9 @@ render(
             </div>
         </Router>
     </Provider>,
-    document.getElementById("app")
 );
+
+// If you want to start measuring performance in your app, pass a function
+// to log results (for example: reportWebVitals(console.log))
+// or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
+reportWebVitals();

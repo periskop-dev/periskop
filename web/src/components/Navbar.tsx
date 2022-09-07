@@ -91,7 +91,7 @@ class NavbarComponent extends React.Component<Props, {}> {
             <NavDropdown title={this.props.activeService ? this.props.activeService : "Service"} id="project-nav-dropdown">
               {this.renderServicesInDropdown()}
             </NavDropdown>
-            <Nav.Link active={this.props.currentPage === 'targets'} href="#targets">Targets</Nav.Link>
+            <Nav.Link active={this.props.location.pathname === '/targets'} href="#targets">Targets</Nav.Link>
           </Nav>
           <Navbar.Text className="updated-at-text">{this.renderUpdatedAt()}</Navbar.Text>
           <Nav>
