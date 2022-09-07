@@ -20,10 +20,6 @@ type Props = DispatchProps & ConnectedProps & RouteComponentProps<{service: stri
 
 class TargetsList extends React.Component<Props, {}> {
 
-  constructor(props: Props) {
-    super(props)
-  }
-
   componentDidMount() {
     this.props.fetchTargets()
   }
@@ -32,7 +28,7 @@ class TargetsList extends React.Component<Props, {}> {
     const hosts = targets.map(
       (target, index) =>
         <ListGroup.Item key={targetName+String(index)}>
-          <a href={`http://${target.endpoint}`} target="_blank">
+          <a href={`http://${target.endpoint}`} target="_blank" rel="noreferrer">
             {target.endpoint}
           </a>
         </ListGroup.Item>

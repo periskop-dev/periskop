@@ -83,7 +83,7 @@ class NavbarComponent extends React.Component<Props, {}> {
           fixed="top"
         >
         <Navbar.Brand href="/">
-        <img src={Logo} width="130" height="20"></img>
+        <img src={Logo} width="130" height="20" alt=""></img>
         </Navbar.Brand>
         <Navbar.Toggle/>
         <Navbar.Collapse>
