@@ -1,71 +1,58 @@
 {
   "name": "periskop",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "Exception Aggregator for micro-service environments",
   "main": "index.js",
-  "scripts": {
-    "clean:all": "npm cache clean && npm run clean:dist && rimraf node_modules",
-    "clean:dist": "rimraf dist && rimraf lint-reports",
-    "build:dev": "npm run clean:dist && webpack --env=dev --progress --profile --colors --display-error-details --display-cached",
-    "build:prod": "npm run clean:dist && npm run test && webpack --env=prod --progress --profile --colors --display-error-details --display-cached",
-    "start": "webpack-dev-server --env=dev --progress --profile --colors --hot",
-    "test": "karma start --no-auto-watch --single-run",
-    "test:watch": "karma start --auto-watch --no-single-run",
-    "build:dist": "webpack --env=prod"
-  },
   "author": "SoundCloud",
   "license": "Apache-2.0",
   "dependencies": {
-    "bootstrap": "~4.4.1",
-    "moment": "^2.29.4",
-    "react": "~17.0.2",
-    "react-bootstrap": "^1.0.0-beta.16",
-    "react-dom": "~17.0.2",
-    "react-redux": "^7.2.0",
-    "react-router": "^5.1.2",
-    "redux": "^4.0.5",
-    "redux-thunk": "^2.3.0"
-  },
-  "devDependencies": {
-    "@types/jasmine": "~3.5.0",
-    "@types/node": "~13.1.8",
-    "@types/react": "~16.9.17",
-    "@types/react-addons-test-utils": "~0.14.25",
+    "@testing-library/jest-dom": "^5.16.5",
+    "@testing-library/react": "^13.4.0",
+    "@testing-library/user-event": "^13.5.0",
+    "@types/jest": "^27.5.2",
+    "@types/node": "^16.11.56",
+    "@types/react": "^18.0.18",
+    "@types/react-dom": "^18.0.6",
     "@types/react-bootstrap": "^0.32.20",
-    "@types/react-dom": "~16.9.4",
     "@types/react-redux": "^7.1.7",
     "@types/react-router": "^5.1.7",
-    "css-loader": "^3.5.2",
-    "file-loader": "~6.0.0",
-    "html-webpack-plugin": "^5.3.2",
-    "jasmine-core": "~3.5.0",
-    "karma": "^6.3.16",
-    "karma-cli": "~2.0.0",
-    "karma-jasmine": "~3.1.1",
-    "karma-mocha-reporter": "~2.2.3",
-    "karma-phantomjs-launcher": "~1.0.4",
-    "karma-sourcemap-loader": "~0.3.7",
-    "karma-webpack": "~4.0.2",
-    "less": "^3.10.3",
-    "less-loader": "~5.0.0",
-    "mini-css-extract-plugin": "~0.9.0",
+    "bootstrap": "~4.4.1",
+    "moment": "^2.29.4",
+    "react": "^18.2.0",
+    "react-bootstrap": "^1.0.0-beta.16",
+    "react-dom": "^18.2.0",
+    "react-scripts": "5.0.1",
+    "react-redux": "^7.2.0",
+    "react-router": "^5.3.3",
+    "redux": "^4.0.5",
+    "redux-thunk": "^2.3.0",
     "sass": "^1.44.0",
-    "npm": "^6.14.6",
-    "phantomjs-prebuilt": "~2.1.14",
-    "react-addons-test-utils": "~15.6.2",
-    "rimraf": "~2.6.1",
     "sass-loader": "^12.0.0",
-    "source-map-loader": "~0.2.4",
-    "style-loader": "~0.23.1",
-    "ts-loader": "~6.2.1",
-    "ts-node": "~8.6.2",
-    "tslint": "~5.20.1",
-    "tslint-loader": "~3.5.4",
-    "typescript": "3.7.3",
-    "url-loader": "^3.0.0",
-    "webpack": "^5.40.0",
-    "webpack-cli": "^3.3.10",
-    "webpack-dev-server": "^3.10.0",
-    "webpack-merge": "~4.2.2"
+    "typescript": "^4.8.2",
+    "web-vitals": "^2.1.4"
+  },
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject"
+  },
+  "eslintConfig": {
+    "extends": [
+      "react-app",
+      "react-app/jest"
+    ]
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
   }
 }

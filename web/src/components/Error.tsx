@@ -1,6 +1,6 @@
 import * as React from "react"
 import { ListGroup, Table, Button, Badge } from "react-bootstrap"
-import * as moment from "moment"
+import moment from "moment"
 import { AggregatedError, Error, HttpContext, Headers, StoreState, ErrorInstance } from "data/types"
 import { ButtonGroup } from "react-bootstrap"
 import { setCurrentExceptionIndex, resolveError } from "data/errors"

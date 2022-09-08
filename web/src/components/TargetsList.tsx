@@ -1,5 +1,5 @@
 import * as React from "react"
-import { withRouter } from "react-router";
+import { withRouter, RouteComponentProps } from "react-router"
 import * as RemoteData from "data/remote-data"
 import { bindActionCreators, Dispatch, AnyAction } from "redux";
 import { StoreState } from "data/types";
@@ -16,13 +16,9 @@ interface DispatchProps {
   fetchTargets: () => void
 }
 
-type Props = DispatchProps & ConnectedProps
+type Props = DispatchProps & ConnectedProps & RouteComponentProps<{service: string}>
 
 class TargetsList extends React.Component<Props, {}> {
-
-  constructor(props: Props) {
-    super(props)
-  }
 
   componentDidMount() {
     this.props.fetchTargets()
@@ -32,7 +28,7 @@ class TargetsList extends React.Component<Props, {}> {
     const hosts = targets.map(
       (target, index) =>
         <ListGroup.Item key={targetName+String(index)}>
-          <a href={`http://${target.endpoint}`} target="_blank">
+          <a href={`http://${target.endpoint}`} target="_blank" rel="noreferrer">
             {target.endpoint}
           </a>
         </ListGroup.Item>
@@ -93,4 +89,4 @@ function mapStateToProps(state: StoreState): ConnectedProps {
   }
 }
 
-export default withRouter(connect<ConnectedProps, DispatchProps, {}>(mapStateToProps, matchDispatchToProps)(TargetsList))
+export default withRouter(connect(mapStateToProps, matchDispatchToProps)(TargetsList))

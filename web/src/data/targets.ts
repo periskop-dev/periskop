@@ -2,7 +2,7 @@ import { Dispatch } from "redux";
 import * as RemoteData from "data/remote-data";
 import { registerReducer } from "data/store"
 import { Targets, TargetsState } from "data/types"
-const METADATA = require('../../config/metadata.js');
+const METADATA = require('config/metadata.js');
 
 export const FETCH = "periskop/targets/FETCH"
 export const FETCH_SUCCESS = "periskop/targets/FETCH_SUCCESS"

@@ -1,4 +1,4 @@
-import * as React from "react"
+import React from "react"
 import { withRouter } from "react-router"
 import { connect } from "react-redux"
 import { RouteComponentProps } from "react-router"
@@ -33,9 +33,9 @@ interface DispatchProps {
 type Props = ConnectedProps & DispatchProps & RouteComponentProps<{ service: string, errorKey: string }>
 
 
-class App extends React.Component<Props, {}> {
-  constructor(props, context) {
-    super(props, context)
+class App extends React.Component<Props> {
+  constructor(props) {
+    super(props)
     this.handlerErrorSelect = this.handlerErrorSelect.bind(this)
   }
 
@@ -140,4 +140,4 @@ const matchDispatchToProps = (dispatch: Dispatch<AnyAction>): DispatchProps => {
   return bindActionCreators({ fetchErrors, setActiveError, setErrorsSeverityFilter, setErrorsSearchFilter }, dispatch);
 }
 
-export default withRouter(connect<ConnectedProps, {}, RouteComponentProps<{ service: string }>>(mapStateToProps, matchDispatchToProps)(App))
+export default withRouter(connect(mapStateToProps, matchDispatchToProps)(App))
