@@ -4,9 +4,9 @@ require (
 	github.com/go-kit/kit v0.10.0
 	github.com/gorilla/mux v1.7.4
 	github.com/periskop-dev/periskop-go v0.0.0-20220512172842-c5603b259677
-	github.com/prometheus/client_golang v1.5.1
+	github.com/prometheus/client_golang v1.11.1
 	github.com/prometheus/prometheus v1.8.2-0.20200507164740-ecee9c8abfd1
-	gopkg.in/yaml.v2 v2.2.8
+	gopkg.in/yaml.v2 v2.3.0
 	gorm.io/driver/mysql v1.1.2
 	gorm.io/driver/postgres v1.1.0
 	gorm.io/driver/sqlite v1.1.4
@@ -36,8 +36,8 @@ require (
 	github.com/go-sql-driver/mysql v1.6.0 // indirect
 	github.com/gogo/protobuf v1.3.1 // indirect
 	github.com/golang/groupcache v0.0.0-20200121045136-8c9f03a8e57e // indirect
-	github.com/golang/protobuf v1.4.0 // indirect
-	github.com/google/go-cmp v0.4.0 // indirect
+	github.com/golang/protobuf v1.4.3 // indirect
+	github.com/google/go-cmp v0.5.5 // indirect
 	github.com/google/gofuzz v1.0.0 // indirect
 	github.com/google/uuid v1.1.1 // indirect
 	github.com/googleapis/gax-go/v2 v2.0.5 // indirect
@@ -62,7 +62,7 @@ require (
 	github.com/jinzhu/now v1.1.2 // indirect
 	github.com/jmespath/go-jmespath v0.3.0 // indirect
 	github.com/jpillora/backoff v1.0.0 // indirect
-	github.com/json-iterator/go v1.1.9 // indirect
+	github.com/json-iterator/go v1.1.11 // indirect
 	github.com/mattn/go-colorable v0.1.6 // indirect
 	github.com/mattn/go-isatty v0.0.12 // indirect
 	github.com/mattn/go-sqlite3 v1.14.5 // indirect
@@ -75,8 +75,8 @@ require (
 	github.com/mwitkow/go-conntrack v0.0.0-20190716064945-2f068394615f // indirect
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/prometheus/client_model v0.2.0 // indirect
-	github.com/prometheus/common v0.9.1 // indirect
-	github.com/prometheus/procfs v0.0.11 // indirect
+	github.com/prometheus/common v0.26.0 // indirect
+	github.com/prometheus/procfs v0.6.0 // indirect
 	github.com/samuel/go-zookeeper v0.0.0-20190923202752-2cc03de413da // indirect
 	go.opencensus.io v0.22.3 // indirect
 	golang.org/x/crypto v0.0.0-20210322153248-0c34fe9e7dc2 // indirect
@@ -90,7 +90,7 @@ require (
 	google.golang.org/appengine v1.6.6 // indirect
 	google.golang.org/genproto v0.0.0-20200420144010-e5e8543f8aeb // indirect
 	google.golang.org/grpc v1.29.0 // indirect
-	google.golang.org/protobuf v1.21.0 // indirect
+	google.golang.org/protobuf v1.26.0-rc.1 // indirect
 	gopkg.in/fsnotify/fsnotify.v1 v1.4.7 // indirect
 	gopkg.in/inf.v0 v0.9.1 // indirect
 	k8s.io/api v0.17.5 // indirect
